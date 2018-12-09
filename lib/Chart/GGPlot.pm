@@ -4,7 +4,7 @@ package Chart::GGPlot;
 
 use Chart::GGPlot::Class;
 
-# VERSIONS
+# VERSION
 
 use Autoload::AUTOCAN;
 use List::AllUtils qw(pairgrep pairmap firstres);
@@ -91,7 +91,7 @@ has backend => (
     },
 );
 
-has data => ( is => 'ro' );
+has data   => ( is => 'ro' );
 has layers => (
     is      => 'ro',
     isa     => ArrayRef,
@@ -103,7 +103,7 @@ has scales => (
     default => sub { Chart::GGPlot::ScalesList->new() }
 );
 has mapping => ( is => 'ro' );
-has theme => (
+has theme   => (
     is      => 'ro',
     isa     => HashRef,
     default => sub { {} }
@@ -130,21 +130,23 @@ has guides => ( is => 'ro', default => sub { Chart::GGPlot::Guides->new() } );
 
 with qw(MooseX::Clone);
 
-=method labels
-
-=cut
-
 method labels () {
     return $self->mapping->make_labels->merge( $self->_labels->as_hashref );
 }
 
 =method show
 
-    show(HashRef $opts={})
+    $ggplot->show(HashRef $opts={})
+
+Show the plot.
+Implementation depends on the plotting backend.
 
 =method save
 
-    save($filename, HashRef $opts={})
+    $ggplot->save($filename, HashRef $opts={})
+
+Save the plot to file.
+Implementation depends on the plotting backend.
 
 =cut
 
@@ -163,7 +165,7 @@ Get a useful description of a ggplot object.
 =cut
 
 method summary () {
-    my $s = '';
+    my $s     = '';
     my $label = fun($l) { sprintf( "%-9s", $l ); };
 
     #TODO: use Text::Wrap for better format
@@ -186,7 +188,7 @@ method summary () {
 }
 
 method add_layer ($layer) {
-    push @{$self->layers}, $layer;
+    push @{ $self->layers }, $layer;
     my $new_labels = $layer->mapping->make_labels;
     $self->add_labels($new_labels);
     return $self;
@@ -217,13 +219,18 @@ Also note that at this moment you will also need my forked version of the
 
 =head1 DESCRIPTION
 
-This library is an implementation of L<https://en.wikipedia.org/wiki/Ggplot2|"ggplot">
-in Perl. Instead of this module, which represents the ggplot class, you
-would usually want to look at L<Chart::GGPlot::Functions>, which is a
-function interface of this library and is easier to use than this class.
+This Chart-GGPlot library is an implementation of
+L<ggplot|https://en.wikipedia.org/wiki/Ggplot> in Perl. It's designed to
+be possible to support multiple plotting backends. And it ships a default
+backend which uses L<Chart::Plotly>.
+
+This Chart::GGPlot module itself just represents the ggplot class.
+Instead of this module you would usually want to look at
+L<Chart::GGPlot::Functions>, which is a function interface of this library
+and is closer to R ggplot2's API.
 
 =head1 SEE ALSO
 
-L<https://en.wikipedia.org/wiki/Ggplot2|ggplot2>
+L<ggplot|https://en.wikipedia.org/wiki/Ggplot>
 
 L<Chart::GGPlot::Functions>

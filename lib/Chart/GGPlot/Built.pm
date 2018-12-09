@@ -4,7 +4,7 @@ package Chart::GGPlot::Built;
 
 use Chart::GGPlot::Class qw(:pdl);
 
-# VERSIONS
+# VERSION
 
 use List::AllUtils qw(pairmap);
 use Types::Standard qw(ArrayRef);

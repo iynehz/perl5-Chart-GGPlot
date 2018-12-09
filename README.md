@@ -8,33 +8,6 @@ Chart::GGPlot - ggplot port for Perl
 
 version 0.0000\_01
 
-# DESCRIPTION
-
-This library is an implementation of [https://en.wikipedia.org/wiki/Ggplot2|"ggplot"](https://en.wikipedia.org/wiki/Ggplot2|&#x22;ggplot&#x22;)
-in Perl. Instead of this module, which represents the ggplot class, you
-would usually want to look at [Chart::GGPlot::Functions](https://metacpan.org/pod/Chart::GGPlot::Functions), which is a
-function interface of this library and is easier to use than this class.
-
-# METHODS
-
-## labels
-
-## show
-
-```
-show(HashRef $opts={})
-```
-
-## save
-
-```
-save($filename, HashRef $opts={})
-```
-
-## summary()
-
-Get a useful description of a ggplot object.
-
 # STATUS
 
 At this moment this library is still under active development (at my
@@ -47,9 +20,45 @@ you can get the source from [https://github.com/stphnlyd/perl5-Chart-GGPlot/](ht
 Also note that at this moment you will also need my forked version of the
 "Data-Frame" package at [https://github.com/stphnlyd/p5-Data-Frame/tree/alt-pdlsv](https://github.com/stphnlyd/p5-Data-Frame/tree/alt-pdlsv). In my fork I improved PDL::SV and will still work on PDL::Factor.
 
+# DESCRIPTION
+
+This Chart-GGPlot library is an implementation of
+[ggplot](https://en.wikipedia.org/wiki/Ggplot) in Perl. It's designed to
+be possible to support multiple plotting backends. And it ships a default
+backend which uses [Chart::Plotly](https://metacpan.org/pod/Chart::Plotly).
+
+This Chart::GGPlot module itself just represents the ggplot class.
+Instead of this module you would usually want to look at
+[Chart::GGPlot::Functions](https://metacpan.org/pod/Chart::GGPlot::Functions), which is a function interface of this library
+and is closer to R ggplot2's API.
+
+# METHODS
+
+## show
+
+```
+$ggplot->show(HashRef $opts={})
+```
+
+Show the plot.
+Implementation depends on the plotting backend.
+
+## save
+
+```
+$ggplot->save($filename, HashRef $opts={})
+```
+
+Save the plot to file.
+Implementation depends on the plotting backend.
+
+## summary()
+
+Get a useful description of a ggplot object.
+
 # SEE ALSO
 
-[https://en.wikipedia.org/wiki/Ggplot2|ggplot2](https://en.wikipedia.org/wiki/Ggplot2|ggplot2)
+[ggplot](https://en.wikipedia.org/wiki/Ggplot)
 
 [Chart::GGPlot::Functions](https://metacpan.org/pod/Chart::GGPlot::Functions)
 
