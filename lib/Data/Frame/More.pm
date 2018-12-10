@@ -18,6 +18,7 @@ use PDL::Lite;
 use PDL::Core qw(pdl null);
 use PDL::Primitive ();
 use PDL::Factor    ();
+use PDL::SV        ();
 
 use List::AllUtils qw(each_arrayref pairkeys pairmap);
 use Ref::Util qw(is_plain_arrayref is_plain_hashref);
@@ -66,6 +67,9 @@ use overload (
     fallback => 1
 );
 
+# Relative tolerance. This can be used for data frame comparison.
+our $TOLERANCE_REL = undef;
+
 # Check if all columns have same length or have a length of 1.
 around BUILDARGS($orig, $class : @args) {
     my %args = @args;   
@@ -86,8 +90,10 @@ around BUILDARGS($orig, $class : @args) {
         if ($data->length != $max_length) {
             if ($data->length == 1) {
                 if ($columns_is_aref) {
-                    my $idx = List::AllUtils::lastidx { $_ eq $column_name } List::AllUtils::pairkeys(@$columns); 
-                    $columns->[$idx + 1] = $data->repeat($max_length);
+                    my $idx = List::AllUtils::lastidx {
+                        $_ eq $column_name
+                    } List::AllUtils::pairkeys(@$columns); 
+                    $columns->[2*$idx + 1] = $data->repeat($max_length);
                 } else {    # hashref
                     $columns->{$column_name} = $data->repeat($max_length);
                 }
@@ -96,7 +102,7 @@ around BUILDARGS($orig, $class : @args) {
             }
         }
     }
-    return $class->$orig(@args);
+    return $class->$orig(\%args);
 }
 
 method BUILD ($args) {
@@ -622,7 +628,8 @@ method append (DataFrame $df) {
     my $columns = $self->names->map(
         sub {
             my $col = $self->at($_);
-            $_ => $col->append( $df->at($_) );
+            # use glue() as PDL's append() cannot handle bad values
+            $_ => $col->glue( 0, $df->at($_) );
         }
     );
     return $class->new( columns => $columns );
@@ -793,11 +800,11 @@ method assign ((DataFrame | Piddle) $x) {
     return $self;
 }
 
-=method is_number_column($column_name_or_idx)
+=method is_numeric_column($column_name_or_idx)
 
 =cut
 
-method is_number_column ($column_name_or_idx) {
+method is_numeric_column ($column_name_or_idx) {
     my $column = $self->at($column_name_or_idx);
     return !is_discrete($column);
 }
@@ -821,9 +828,13 @@ method sort ($by_columns, $ascending=true) {
 }
 
 method sorti ($by_columns, $ascending=true) {
+    if (Ref::Util::is_plain_arrayref($ascending)) {
+        $ascending = pdl($ascending);
+    }
+
     return pdl( [ 0 .. $self->nrow - 1 ] ) if $by_columns->length == 0;
 
-    my $is_number = $by_columns->map( sub { $self->is_number_column($_) } );
+    my $is_number = $by_columns->map( sub { $self->is_numeric_column($_) } );
     my $compare = sub {
         my ( $a, $b ) = @_;
         for my $i ( 0 .. $#$is_number ) {
@@ -932,50 +943,89 @@ method copy () {
 method _compare ($other, $mode) {
     my $class = ref($self);
 
-    state $fcompare = {
-        eq => [ sub { ( $_[0] == $_[1] ) }, sub { ( $_[0] eq $_[1] ) || 0 } ],
-        ne => [ sub { ( $_[0] != $_[1] ) }, sub { ( $_[0] ne $_[1] ) || 0 } ],
-        lt => [ sub { ( $_[0] < $_[1] ) }, sub { ( $_[0] lt $_[1] ) || 0 } ],
-        le => [ sub { ( $_[0] <= $_[1] ) }, sub { ( $_[0] le $_[1] ) || 0 } ],
-        gt => [ sub { ( $_[0] > $_[1] ) }, sub { ( $_[0] gt $_[1] ) || 0 } ],
-        ge => [ sub { ( $_[0] >= $_[1] ) }, sub { ( $_[0] ge $_[1] ) || 0 } ],
+    state $gen_fcompare = sub {
+        my ($f) = @_;
+
+        return sub {
+            my ( $col, $x ) = @_;
+            my $col_isbad = $col->isbad;
+            my $x_isbad   = $x->$_call_if_can('isbad') // 1;
+            my $both_bad  = ( $col_isbad & $x_isbad );
+
+            my $rslt = $f->( $col, $x );
+            return ( $rslt, $both_bad );
+        }
+    };
+
+    state $fcompare_exact = {
+        pairmap { $a => $gen_fcompare->($b) }
+        (
+            eq => sub { $_[0] == $_[1] },
+            ne => sub { $_[0] != $_[1] },
+            lt => sub { $_[0] < $_[1] },
+            le => sub { $_[0] <= $_[1] },
+            gt => sub { $_[0] > $_[1] },
+            ge => sub { $_[0] >= $_[1] },
+        )
+    };
+
+    # Absolute tolerance, calculated from multiplying $TOLERANCE_REL 
+    #  with max abs of the two values.
+    state $_tolerance = sub {
+        my ( $col, $x ) = @_;
+        my $a = $col->abs;
+        my $b = ref($x) ? $x->abs : abs($x);
+        return ifelse( $a > $b, $a, $b ) * $TOLERANCE_REL;
+    };
+
+    state $fcompare_float = {
+        pairmap { $a => $gen_fcompare->($b) }
+        (
+            eq => sub { ( $_[0] - $_[1] )->abs < $_tolerance->(@_) },
+            ne => sub { ( $_[0] - $_[1] )->abs > $_tolerance->(@_) },
+            lt => sub { ( $_[0] - $_[1] ) < $_tolerance->(@_) },
+            le => sub { ( $_[0] - $_[1] ) < $_tolerance->(@_) },
+            gt => sub { ( $_[0] - $_[1] ) > $_tolerance->(@_) },
+        )
+    };
+
+    state $same_names = sub {
+        my ( $a, $b ) = @_;
+        return 0 unless $a->length eq $b->length;
+        return (
+            List::AllUtils::all { $a->at($_) eq $b->at($_) }
+            ( 0 .. $a->length - 1 )
+        );
     };
 
     my $compare_column = sub {
         my ( $name, $x ) = @_;
 
-        my $column       = $self->at($name);
-        my $column_isbad = $column->isbad;
-        my $x_isbad      = $x->$_call_if_can('isbad') // 1;
-        my $both_bad     = ( $column_isbad & $x_isbad );
+        my $col = $self->at($name);
 
-        if ( $self->is_number_column($name) ) {
-            my $f = $fcompare->{$mode}->[0];
-            my $rslt = $f->( $column, $x );
-            return ( $rslt, $both_bad );
+        my $fcompare;
+        if ( $self->is_numeric_column($name) ) {
+            $fcompare =
+              (
+                not defined $TOLERANCE_REL
+                  or ( $col->type < PDL::float
+                    and ( !ref($x) and $x->type < PDL::float ) )
+              )
+              ? $fcompare_exact->{$mode}
+              : $fcompare_float->{$mode};
         }
-        else {
-            my $f    = $fcompare->{$mode}->[1];
-            my $rslt = pdl(
-                [
-                    map {
-                        my $a = $column->at($_);
-                        my $b = $x->$_call_if_can( 'at', $_ ) // $x;
-                        $f->( $a, $b );
-                    } ( 0 .. $self->nrow - 1 )
-                ]
-            );
-            $rslt = $rslt->setbadif( $column_isbad | $x_isbad );
-            return ( $rslt, $both_bad );
+        elsif ( $col->$_DOES('PDL::SV') ) {
+            $fcompare = $fcompare_exact->{$mode};
         }
-    };
+        elsif ( $col->$_DOES('PDL::Factor') ) {
+            $fcompare = $fcompare_exact->{$mode};
+        }
 
-    state $same_names = fun( $a, $b ) {
-        return 0 if $a->length ne $b->length;
-        for my $i ( 0 .. $a->length - 1 ) {
-            return 0 if ( $a->at($i) ne $b->at($i) );
+        unless ($fcompare) {
+            die qq{Different types found on column "$name"};
         }
-        return 1;
+
+        return $fcompare->( $col, $x );
     };
 
     my $result_columns;

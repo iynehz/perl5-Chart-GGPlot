@@ -29,8 +29,10 @@ use Scalar::Util qw(looks_like_number);
 use Types::PDL qw(Piddle Piddle1D PiddleFromAny);
 use Types::Standard qw(ArrayRef Value);
 
-use constant BAD => pdl('nan')->setnantobad;
-use constant NA  => pdl('nan')->setnantobad;
+fun BAD($n=1) {
+    pdl(('nan') x $n)->setnantobad;
+}
+*NA = \&BAD;
 
 fun ifelse ($test, $yes, $no) {
     state $check = Type::Params::compile(

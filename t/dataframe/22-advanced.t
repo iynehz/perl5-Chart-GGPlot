@@ -105,6 +105,7 @@ subtest sort => sub {
         $df_sorted1, '$df->sort($by, $aref)' );
 
     my $df_sorted2 = $df_uniq->sort( [qw(vs am)], false );
+
     dataframe_is(
         $df_sorted2,
         Data::Frame::More->new(
@@ -121,6 +122,7 @@ subtest sort => sub {
         ),
         '$df->sort($by, false)'
     );
+
     dataframe_is( $df_uniq->sort( [qw(vs am)], [ 0, 0 ] ),
         $df_sorted2, '$df->sort($by, $aref)' );
     dataframe_is( $df_uniq->sort( [qw(vs am)], pdl( [ 0, 0 ] ) ),

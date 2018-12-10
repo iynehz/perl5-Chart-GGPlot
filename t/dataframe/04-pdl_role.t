@@ -42,6 +42,9 @@ subtest repeat => sub {
 
     my $na = pdl("nan")->setnantobad;
     pdl_is( $na->repeat(3)->isbad, pdl([1,1,1]), '$bad->repeat' );
+
+    pdl_is( pdl(1)->repeat(1), pdl([1]),
+            'repeat() can convert a 0D piddle to 1D' );
 };
 
 subtest repeat_to_length => sub {

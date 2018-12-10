@@ -69,7 +69,13 @@ Only works with 1D piddle.
 
 sub repeat {
     my ( $self, $n ) = @_;
-    return $self->copy if ( $self->length == 0 or $n <= 1 );
+    if ( $self->length == 0 or $n <= 1 ) {
+        my $p = $self->copy;
+
+        # Make sure we return a piddle of at least 1D. 
+        $p->reshape(1) if ($self->ndims == 0);
+        return $p;
+    }
 
     my $class = ref($self);
 

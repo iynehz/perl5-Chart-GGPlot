@@ -5,14 +5,23 @@ use Data::Frame::More::Setup;
 use Data::Frame::More;
 use Data::Frame::More::Indexer qw(:all);
 
-use PDL::Lite;
-use PDL::SV;
+use PDL::Core qw(pdl);
+use PDL::SV ();
 
 use Test2::V0;
 use Test2::Tools::DataFrame;
 use Test2::Tools::PDL;
 
 #use Carp::Always;
+
+subtest constrution => sub {
+    my $df = Data::Frame::More->new(
+            columns => [ a => pdl( [ 0 .. 9 ] ),
+                         b => pdl->new([1]),
+                         c => PDL::SV->new([qw(foo)]),
+            ] );
+    ok( $df, 'for construction column length can be either max or 1' );
+};
 
 my $df = Data::Frame::More->new( columns => [ a => pdl( [ 0 .. 9 ] ) ] );
 ok( $df, 'constructor' );
