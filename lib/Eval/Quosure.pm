@@ -140,7 +140,7 @@ and so on.
 
 =head1 SEE ALSO
 
-L<https://cran.r-project.org/web/packages/rlang|R's "rlang" package> which
+L<R's "rlang" package|https://cran.r-project.org/web/packages/rlang> which
 provides quosure.
 
 L<Eval::Closure>, L<Binding>

@@ -17,8 +17,7 @@ use namespace::autoclean;
 
 This class inherits L<Chart::GGPlot::Aes>.
 
-=heade SEE ALSO
+=head1 SEE ALSO
 
-L<Chart::GGPlot::Labels::Functions>,
-L<Chart::GGPlot::Aes>
+L<Chart::GGPlot::Labels::Functions>, L<Chart::GGPlot::Aes>
 

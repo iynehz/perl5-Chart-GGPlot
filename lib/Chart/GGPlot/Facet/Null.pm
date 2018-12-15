@@ -12,9 +12,7 @@ use Types::Standard qw(ArrayRef Bool CodeRef Enum Maybe Str);
 
 use Chart::GGPlot::Types qw(:all);
 
-=over 4
-
-=item shrink
+=attr shrink
 
 If true, will shrink scales to fit output of statistics, not
 raw data. If fause will be range of raw data before statistical
