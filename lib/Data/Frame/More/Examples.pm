@@ -4,11 +4,11 @@ package Data::Frame::More::Examples;
 
 use Data::Frame::More::Setup;
 
-use File::ShareDir qw(module_dir);
+use File::ShareDir qw(dist_dir);
 use Module::Runtime qw(module_notional_filename);
 use Path::Tiny;
-use aliased 'Data::Frame::More' => 'DataFrame';
-use boolean;
+
+use Data::Frame::More;
 
 # VERSION
 
@@ -24,9 +24,11 @@ my @data_names = keys %data_setup;
 our @EXPORT_OK = (@data_names);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK, );
 
-# TODO: replace this with File::ShareDir
 my $data_raw_dir;
-eval { $data_raw_dir = module_dir(__PACKAGE__); };
+
+#TODO: Change this dist name when merging this to Data::Frame or moving
+# into a new dist.
+eval { $data_raw_dir = dist_dir('Chart-GGPlot'); };
 if ($@) {    # for dev env only
     my $path = path( $INC{ module_notional_filename(__PACKAGE__) } );
     $data_raw_dir =
@@ -38,7 +40,7 @@ fun _make_data ( $name, %rest ) {
     return sub {
         state $df;
         unless ($df) {
-            $df = DataFrame->from_csv(
+            $df = Data::Frame::More->from_csv(
                 "$data_raw_dir/$name.csv",
                 header => true,
                 %rest
