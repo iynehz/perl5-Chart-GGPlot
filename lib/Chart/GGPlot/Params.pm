@@ -151,7 +151,7 @@ method merge ($other, $skip_undef=false) {
     return bless( { _hash => { $self->flatten, @other_data } }, $class );
 }
 
-=mether defaults($other)
+=method defaults($other)
 
 Using data from C<$other> as defaults.
 

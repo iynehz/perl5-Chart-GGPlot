@@ -27,7 +27,7 @@ our %EXPORT_TAGS = (
     ggplot => \@export_ggplot,
 );
 
-=fun lims(%pairs)
+=func lims(%pairs)
 
 Call C<limits()> on each kv pair in C<%pairs>.
 Returns an array ref like C<[ limits($key1, $value1), ... ]>.
