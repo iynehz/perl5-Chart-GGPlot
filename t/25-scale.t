@@ -47,13 +47,15 @@ subtest scale_x_discrete => sub {
     isa_ok( $s, [qw(Chart::GGPlot::Scale::DiscretePosition)],
         'scale_x_discrete()' );
 
+    is($s->breaks, undef, '$s->breaks');
+    pdl_is($s->get_breaks, PDL::SV->new([qw(Fair Ideal)]), '$s->get_breaks()');
+    pdl_is($s->get_labels, PDL::SV->new([qw(Fair Ideal)]), '$s->get_labels()');
+    pdl_is($s->get_limits, PDL::SV->new([qw(Fair Ideal)]), '$s->get_limits()');
+
     pdl_is( $s->break_positions, pdl([0, 1]), '$s->break_positions()' );
     ok( $s->dimension->isempty, '$s->dimension()' );
     pdl_is( $s->get_breaks, PDL::SV->new([qw(Fair Ideal)]), '$s->get_breaks()' );
     ok( $s->get_breaks_minor->isempty, '$s->get_breaks_minor()' );
-    pdl_is( $s->get_limits, PDL::SV->new([qw(Fair Ideal)]), '$s->get_limits()' );
-    pdl_is( $s->get_labels, PDL::SV->new([qw(Fair Ideal)]), '$s->get_labels()' );
-
     pdl_is( $s->break_positions, pdl( [ 0, 1 ] ), '$s->break_positions()');
 
 };

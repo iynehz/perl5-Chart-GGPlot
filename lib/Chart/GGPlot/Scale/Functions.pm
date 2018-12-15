@@ -6,6 +6,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 # VERSION
 
+use List::AllUtils qw(pairgrep);
 use Types::Standard qw(CodeRef Str);
 
 use Chart::GGPlot::Aes::Functions qw(:all);
@@ -146,23 +147,26 @@ fun continuous_scale (
     }
 
     return $super->new(
-        aesthetics => $aesthetics,
-        scale_name => $scale_name,
-        palette    => $palette,
-        range      => continuous_range(),
-        limits     => $limits,
-        trans      => $trans,
-        na_value   => $na_value,
-        expand     => $expand,
-        rescaler     => $rescaler,     # Used by diverging and n color gradients
-        oob          => $oob,
-        name         => $name,
-        breaks       => $breaks,
-        minor_breaks => $minor_breaks,
-        labels       => $labels,
-        guide        => $guide,
-        position     => $position,
-        %rest
+        pairgrep { defined $b } 
+        (
+            aesthetics => $aesthetics,
+            scale_name => $scale_name,
+            palette    => $palette,
+            range      => continuous_range(),
+            limits     => $limits,
+            trans      => $trans,
+            na_value   => $na_value,
+            expand     => $expand,
+            rescaler   => $rescaler,     # Used by diverging and n color gradients
+            oob          => $oob,
+            name         => $name,
+            breaks       => $breaks,
+            minor_breaks => $minor_breaks,
+            labels       => $labels,
+            guide        => $guide,
+            position     => $position,
+            %rest
+        )
     );
 }
 
@@ -171,7 +175,7 @@ fun discrete_scale (
     : $scale_name,
     : $palette,
     : $name         = undef,
-    : $breaks       = null(),
+    : $breaks       = undef,
     : $labels       = undef,
     : $limits       = null(),
     : $expand       = undef,
@@ -193,21 +197,24 @@ fun discrete_scale (
         $guide = "none";
     }
     return $super->new(
-        aesthetics   => $aesthetics,
-        scale_name   => $scale_name,
-        palette      => $palette,
-        range        => discrete_range(),
-        limits       => $limits,
-        na_value     => $na_value,
-        na_translate => $na_translate,
-        expand       => $expand,
-        name         => $name,
-        breaks       => $breaks,
-        labels       => $labels,
-        drop         => $drop,
-        guide        => $guide,
-        position     => $position,
-        %rest
+        pairgrep { defined $b }
+        (
+            aesthetics   => $aesthetics,
+            scale_name   => $scale_name,
+            palette      => $palette,
+            range        => discrete_range(),
+            limits       => $limits,
+            na_value     => $na_value,
+            na_translate => $na_translate,
+            expand       => $expand,
+            name         => $name,
+            breaks       => $breaks,
+            labels       => $labels,
+            drop         => $drop,
+            guide        => $guide,
+            position     => $position,
+            %rest
+        )
     );
 }
 

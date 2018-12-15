@@ -22,7 +22,7 @@ fun stat_identity(
     : $data        = undef,
     : $geom        = "point",
     : $position    = "identity",
-    : $show_legend = NA,
+    : $show_legend = NA(),
     : $inherit_aes = true, %rest
   )
 {

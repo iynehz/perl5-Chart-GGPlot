@@ -16,11 +16,11 @@ use Chart::GGPlot::Types qw(:all);
 use parent qw(Exporter::Tiny);
 
 our @EXPORT_OK = qw(
-  aes aes_to_scale is_position_aes
+  aes aes_all aes_to_scale is_position_aes
 );
 our %EXPORT_TAGS = (
     'all'    => \@EXPORT_OK,
-    'ggplot' => [qw(aes)],
+    'ggplot' => [qw(aes aes_all)],
 );
 
 =func aes
@@ -43,7 +43,9 @@ object with enviroment be caller of the C<aes()> function.
 
 fun aes (%mapping) { _aes( \%mapping ); }
 
-fun _aes ($mapping, $level=3) {
+my $aes_level_default = 3;
+
+fun _aes ($mapping, $level=$aes_level_default) {
     my %params = pairmap {
         my $val;
 
@@ -90,9 +92,9 @@ fun is_position_aes ($aes_names) {
 }
 
 # Given a character vector, create a set of identity mappings
-#fun aes_all (@names) {
-#    return aes( map { $_ => $_ } @names );
-#}
+fun aes_all (@names) {
+    return _aes( { map { $_ => $_ } @names }, $aes_level_default );
+}
 
 1;
 

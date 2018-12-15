@@ -33,7 +33,7 @@ fun geom_blank (
     : $data        = undef,
     : $stat        = "identity",
     : $position    = "identity",
-    : $show_legend = NA,
+    : $show_legend = 'auto',
     : $inherit_aes = true, %rest
   ) {
     return layer(
@@ -78,7 +78,7 @@ fun geom_histogram (
     : $binwidth    = undef,
     : $bins        = undef,
     : $na_rm       = false,
-    : $show_legend = undef,
+    : $show_legend = 'auto',
     : $inherit_aes = true,
     %rest
   ) {

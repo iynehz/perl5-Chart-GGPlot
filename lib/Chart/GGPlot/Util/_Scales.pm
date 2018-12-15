@@ -28,7 +28,6 @@ use Chart::GGPlot::Util::_Labeling qw(:all);
 use parent qw(Exporter::Tiny);
 
 our @EXPORT_OK = qw(
-  alpha
   censor discard expand_range zero_range
   rescale squish
   hue_pal brewer_pal gradient_n_pal rescale_pal
@@ -41,35 +40,35 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 ## color
 
-fun alpha($color, $alpha=[]) {
-    my $color_length = $color->length;
-    my $alpha_length = $alpha->length;
-
-    if ( $color_length != $alpha_length ) {
-        if ( $color_length > 1 and $alpha_length > 1 ) {
-            croak("Only one of colour and alpha can be vectorised");
-        }
-        if ( $color_length > 1 ) {
-            $alpha = [ ( $alpha->at(0) ) x $color_length ];
-        }
-        elsif ( $alpha->length > 1 ) {
-            $color = [ ( $color->at(0) ) x $alpha_length ];
-        }
-    }
-
-    my @new_color = List::AllUtils::pairwise {
-        my ( $col, $alpha ) = ( $a, $b );
-
-        Graphics::Color::RGB->new(
-            r => $col->r,
-            g => $col->g,
-            b => $col->b,
-            a => ( $alpha // $col->a )
-        );
-    }
-    @$color, @$alpha;
-    return \@new_color;
-}
+#fun alpha($color, $alpha=[]) {
+#    my $color_length = $color->length;
+#    my $alpha_length = $alpha->length;
+#
+#    if ( $color_length != $alpha_length ) {
+#        if ( $color_length > 1 and $alpha_length > 1 ) {
+#            croak("Only one of colour and alpha can be vectorised");
+#        }
+#        if ( $color_length > 1 ) {
+#            $alpha = [ ( $alpha->at(0) ) x $color_length ];
+#        }
+#        elsif ( $alpha->length > 1 ) {
+#            $color = [ ( $color->at(0) ) x $alpha_length ];
+#        }
+#    }
+#
+#    my @new_color = List::AllUtils::pairwise {
+#        my ( $col, $alpha ) = ( $a, $b );
+#
+#        Graphics::Color::RGB->new(
+#            r => $col->r,
+#            g => $col->g,
+#            b => $col->b,
+#            a => ( $alpha // $col->a )
+#        );
+#    }
+#    @$color, @$alpha;
+#    return \@new_color;
+#}
 
 ## range
 
@@ -193,6 +192,10 @@ fun _pal_name ( $palette, $type ) {
 
 =cut
 
+# This method would result color slightly different from R's equivalent
+#  method, maybe it's because Convert::Color::LCh does rounding in a
+#  different way from R's grDevices::hcl(). But it's fine as the
+#  difference in result color channel is at max just 1/256.
 fun hcl ($h, $c, $l) {
     my $c = Convert::Color::LCh->new( $l, $c, $h );
     my ( $r, $g, $b ) = map { $_ > 1 ? 1 : $_ < 0 ? 0 : $_ } $c->rgb;

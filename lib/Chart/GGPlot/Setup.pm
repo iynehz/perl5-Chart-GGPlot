@@ -140,6 +140,8 @@ sub _import_tag {
         require PDL::Lite;
         require PDL::Core;
         require PDL::IO::Dumper;
+        require PDL::SV;
+        require PDL::Factor;
         require Role::Tiny;
 
         PDL::Lite->import::into($target);
@@ -148,14 +150,9 @@ sub _import_tag {
 
         Role::Tiny->apply_roles_to_package( 'PDL', 'Data::Frame::More::PDL' );
 
-        # TODO: use PDL::Factor (or PDL::SV) would import names like float,
-        # and cause a warning with Test::V0.
-        # Import::Into cannot do "use PDL::Factor ();"
-
-        #require PDL::Factor;
-        #require PDL::SV;
-        #PDL::Factor->import::into($target);
-        #PDL::SV->import::into($target);
+        # "use PDL::SV;" (or PDL::Factor) would import names like float,
+        # thus would pollute caller namespace and cause a warning with
+        # Test::V0. So we don't do PDL::SV->import::into
     }
     else {
         croak qq["$tag" is not exported by the $class module\n];

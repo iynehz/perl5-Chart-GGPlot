@@ -9,17 +9,17 @@ use Test2::V0;
 use Test2::Tools::DataFrame;
 use Test2::Tools::PDL;
 
-use Chart::GGPlot;
+use Chart::GGPlot::Functions qw(:all);
 use Chart::GGPlot::Built;
-use Chart::GGPlot::Aes::Functions qw(:ggplot);
-use Chart::GGPlot::Util qw(:all);
+#use Chart::GGPlot::Aes::Functions qw(:ggplot);
+use Chart::GGPlot::Util qw(NA);
 
 #use Carp::Always;
 
 my $mtcars = mtcars();
 
 subtest geom_point_1 => sub {
-    my $p = Chart::GGPlot->new(
+    my $p = ggplot(
         data    => $mtcars,
         mapping => aes( x => 'wt', y => 'mpg' )
     )->geom_point();
@@ -36,16 +36,19 @@ subtest geom_point_1 => sub {
         columns => [
             x      => $mtcars->at('wt'),
             y      => $mtcars->at('mpg'),
-            PANEL  => pdl(0)->repeat( $mtcars->nrow ),
-            group  => pdl(0)->repeat( $mtcars->nrow ),
-            alpha  => NA()->repeat( $mtcars->nrow ),
-            color  => PDL::SV->new( ['black'] )->repeat( $mtcars->nrow ),
-            fill   => NA()->repeat( $mtcars->nrow ),
-            shape  => pdl(19)->repeat( $mtcars->nrow ),
-            size   => pdl(1.5)->repeat( $mtcars->nrow ),
-            stroke => pdl(0.5)->repeat( $mtcars->nrow ),
+            PANEL  => pdl(0),
+            group  => pdl(0),
+            alpha  => NA(),
+            color  => PDL::SV->new( ['black'] ),
+            fill   => NA(),
+            shape  => pdl(19),
+            size   => pdl(1.5),
+            stroke => pdl(0.5),
         ]
     );
+
+    diag($data->[0]->string);
+
     dataframe_is( $data->[0], $data_expected, '$built->data' );
 
     my $layout = $built->layout;
@@ -92,7 +95,7 @@ subtest geom_point_1 => sub {
 };
 
 subtest geom_point_2 => sub {
-    my $p = Chart::GGPlot->new(
+    my $p = ggplot(
         data    => $mtcars,
         mapping => aes( x => 'wt', y => 'mpg' )
     )->geom_point( mapping => aes( color => 'factor($cyl)' ) );
@@ -111,9 +114,10 @@ subtest geom_point_2 => sub {
                     }
                 )
             ),
+            color_raw => factor($mtcars->at('cyl')),
             x     => $mtcars->at('wt'),
             y     => $mtcars->at('mpg'),
-            PANEL => pdl(0)->repeat( $mtcars->nrow ),
+            PANEL => pdl(0),
             group => pdl(
                 $mtcars->at('cyl')->unpdl->map(
                     sub {
@@ -122,13 +126,16 @@ subtest geom_point_2 => sub {
                     }
                 )
             ),
-            alpha  => NA()->repeat( $mtcars->nrow ),
-            fill   => NA()->repeat( $mtcars->nrow ),
-            shape  => pdl(19)->repeat( $mtcars->nrow ),
-            size   => pdl(1.5)->repeat( $mtcars->nrow ),
-            stroke => pdl(0.5)->repeat( $mtcars->nrow ),
+            alpha  => NA(),
+            fill   => NA(),
+            shape  => pdl(19),
+            size   => pdl(1.5),
+            stroke => pdl(0.5),
         ]
     );
+
+    diag($data->[0]->string);
+
     dataframe_is( $data->[0], $data_expected, '$built->data' );
 
     is( $built->plot->labels,

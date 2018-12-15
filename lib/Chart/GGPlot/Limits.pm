@@ -64,7 +64,7 @@ fun limits ( $var, $lims ) {
     if (is_discrete($lims)) {
         return _limits_factor( $var, $lims );
     }
-    elsif ( $lims->$_isa('PDL::DateTime') ) {
+    elsif ( $lims->$_DOES('PDL::DateTime') ) {
         return _limits_date( $var, $lims );
     }
     else {
@@ -79,7 +79,9 @@ fun _check_limits_size ( $lims, $expected_size = 2 ) {
 }
 
 fun _limits_numeric ( $var, $lims ) {
-    state $check = Type::Params::compile(Piddle1D->plus_coercions(PiddleFromAny));
+    state $check = Type::Params::compile(
+            Piddle1D->plus_coercions(PiddleFromAny)
+        );
     ($lims) = $check->($lims);
 
     _check_limits_size($lims);

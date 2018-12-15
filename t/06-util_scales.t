@@ -120,6 +120,7 @@ pdl_is(
 );
 
 subtest alpha => sub {
+    skip_all "revisit this once we find we need alpha()";
 
     is(
         alpha("red")->map( sub { $_->as_hex_string } ),
@@ -147,8 +148,6 @@ subtest alpha => sub {
 
 subtest hue_pal => sub {
     no warnings 'qw';
-
-    say  hue_pal()->(4)->string;
 
     pdl_is( hue_pal()->(4),
         PDL::SV->new( [qw(#f7766c #7bae00 #00bfc4 #c77cff)] ), 'hue_pal()' );

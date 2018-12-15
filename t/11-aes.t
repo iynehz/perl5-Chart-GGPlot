@@ -2,13 +2,18 @@
 
 use Chart::GGPlot::Setup;
 
-use List::AllUtils;
+use List::AllUtils qw(pairmap);
 use Ref::Util qw(is_arrayref);
 
 use Test2::V0;
 
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Aes::Functions qw(:all);
+
+sub aes_quosure_to_hashref {
+    my ($aes) = @_;
+    return { pairmap { $a => $b->expr } $aes->flatten };
+}
 
 {
     my $aes = Chart::GGPlot::Aes->new( x => 'mpg', y => 'wt', color => 'cyl' );
@@ -39,32 +44,39 @@ use Chart::GGPlot::Aes::Functions qw(:all);
 
 {
     my $aes = aes( x => 'mpg', y => 'wt', color => 'cyl' );
-    is( $aes->as_hashref, { x => 'mpg', y => 'wt', color => 'cyl' }, 'aes()' );
+    is(
+        aes_quosure_to_hashref($aes),
+        { x => 'mpg', y => 'wt', color => 'cyl' },
+        'aes()'
+    );
 
     is(
-        $aes->hslice( [qw(x color)] )->as_hashref,
+        aes_quosure_to_hashref($aes->hslice( [qw(x color)] )),
         { x => 'mpg', color => 'cyl' },
         '$aes->hslice()'
     );
 
     is(
-        $aes->rename( { color => 'fill' } )->as_hashref,
+        aes_quosure_to_hashref($aes->rename( { color => 'fill' } )),
         { x => 'mpg', y => 'wt', fill => 'cyl' },
         '$aes->rename()'
     );
 
     is(
-        $aes->merge( aes( fontsize => 20 ) )->as_hashref,
+        aes_quosure_to_hashref($aes->merge( aes( fontsize => 20 ) )),
         { x => 'mpg', y => 'wt', color => 'cyl', fontsize => 20 },
         '$aes->merge()'
     );
 
     my $aes2 = aes( $aes->flatten );
-    is( $aes2->as_hashref,
-        { x => 'mpg', y => 'wt', color => 'cyl' }, '$aes->flatten' );
+    is(
+        aes_quosure_to_hashref($aes2), 
+        { x => 'mpg', y => 'wt', color => 'cyl' },
+        '$aes->flatten'
+    );
 
     my $aes_all = aes_all( "x", "y", "color" );
-    is( $aes_all->as_hashref,
+    is( aes_quosure_to_hashref($aes_all), 
         { x => 'x', y => 'y', color => 'color' }, 'aes_all()' );
 
     ok( is_position_aes( [qw(x y)] ), 'is_position_aes()' );
