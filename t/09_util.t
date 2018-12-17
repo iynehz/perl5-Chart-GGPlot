@@ -3,7 +3,9 @@
 use Chart::GGPlot::Setup qw(:base :pdl);
 
 use Data::Frame::More;
+use Data::Frame::More::Examples qw(airquality);
 use PDL::Constants qw(PI);
+use PDL::Core qw(long);
 use Chart::GGPlot::Util qw(:all !match);
 
 use Test2::V0;
@@ -80,6 +82,22 @@ subtest split_indices => sub {
         [ [ 0, 5 ], [ 1, 2, 3, 4 ] ],
         'split_indices()'
     );
+};
+
+subtest resolution => sub {
+    is( resolution( pdl( [ 1 .. 10 ] ) ),       1 );
+    is( resolution( pdl( [ 1 .. 10 ] ) - 0.5 ), 0.5 );
+    is( resolution( pdl( [ 1 .. 10 ] ) - 0.5, false ), 1, '$zero=false' );
+
+    # Note the difference between float and integer piddles.
+    is( resolution( pdl( [ 2, 10, 20, 50 ] ) ), 2 );
+    is( resolution( long( [ 2, 10, 20, 50 ] ) ),
+        1, 'result 1 for integer type piddles' );
+};
+
+subtest remove_missing => sub {
+    my $airquality = airquality();
+    is(remove_missing($airquality)->nrow, 111);
 };
 
 done_testing();

@@ -23,6 +23,7 @@ use parent qw(Exporter::Tiny);
 
 my @export_ggplot = qw(
   expand_range4 remove_missing
+  resolution
 );
 
 my @export_all = (
@@ -69,7 +70,11 @@ fun expand_range4 ( $limits, $expand ) {
     return pdl( [ $lower, $upper ] );
 }
 
-=func remove_missing($df, $na_rm=false, $vars=$df->keys, $name='', $finite=false)
+=func remove_missing
+
+    remove_missing($df,
+                   :$na_rm=false, :$vars=$df->names,
+                   :$name='', :$finite=false)
 
 Remove all non-complete rows, with a warning if C<$na_rm> is false.
 For those stats which require complete data, missing values will be
@@ -90,24 +95,20 @@ If true, will also remove non-finite values.
 
 =cut
 
-fun remove_missing (
-    $df,
-    $vars = $df->keys,
-    : $na_rm  = false,
-    : $name   = '',
-    : $finite = false
-  ) {
-    $vars = $vars->intersect($df->keys);
+fun remove_missing ($df,
+                    :$vars = $df->names, :$na_rm = false,
+                    :$name = '', :$finite = false) {
+    $vars = $vars->intersect( $df->names );
 
-    my $missing = zeros( $df->number_of_rows );
+    my $missing = PDL::Core::zeros( $df->nrow );
 
     for my $var (@$vars) {
-        my $col = $df->get($var);
+        my $col = $df->at($var);
         my $bad = $col->isbad;
-        if ($finite) {
+        if ($finite and !is_discrete($col)) {
             $bad = ( $bad | !( $col->isfinite ) );
         }
-        $missing->index( which( $bad > 0 ) ) .= 1;
+        $missing->slice( which($bad) ) .= 1;
     }
 
     if ( $missing->any ) {
@@ -115,13 +116,13 @@ fun remove_missing (
             carp(
                 sprintf(
                     "Removed %s rows containing %s values%s.",
-                    which( $missing > 0 )->length,
+                    which($missing)->length,
                     ( $finite ? 'non-finite' : 'missing' ),
                     ( $name   ? " ($name)"   : $name )
                 )
             );
         }
-        return $df->select_rows($missing);
+        return $df->select_rows( which( !$missing ) );
     }
     else {
         return $df;
@@ -287,6 +288,18 @@ fun split_indices ((ArrayRef | Piddle1D) $indices, $n=List::AllUtils::max(@$indi
         push @{ $rslt[$id] }, $i;
     }
     return [ map { pdl($_) } @rslt ];
+}
+
+fun resolution(Piddle1D $x, $zero=true) {
+    if ($x->type < PDL::float or zero_range(range_($x, true))) {
+        return 1;
+    }
+    if ($zero) {
+        $x = $x->glue(0, pdl(0))->uniq;
+    } else {
+        $x = $x->uniq;
+    }
+    return $x->qsort->diff->min;
 }
 
 1;
