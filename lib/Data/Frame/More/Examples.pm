@@ -15,9 +15,10 @@ use Data::Frame::More;
 use parent qw(Exporter::Tiny);
 
 my %data_setup = (
-    diamonds   => {},
-    mtcars     => {},
     airquality => {},
+    diamonds   => {},
+    mpg        => {},
+    mtcars     => {},
 );
 my @data_names = keys %data_setup;
 

@@ -13,7 +13,7 @@ use Test2::Tools::PDL;
 use Data::Frame::More::Examples qw(:all);
 
 subtest simple => sub {     # just test if the data is loadable
-    for my $name (qw(airquality mtcars diamonds)) {
+    for my $name (qw(airquality mpg mtcars diamonds)) {
         no strict 'refs';
         ok( $name->(), $name );
     }
