@@ -4,7 +4,7 @@ use Data::Frame::More::Setup;
 
 use PDL::Lite;
 use PDL::Core qw(pdl);
-use PDL::SV;
+use PDL::SV ();
 
 use Test2::V0;
 use Test2::Tools::PDL;

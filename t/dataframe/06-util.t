@@ -3,8 +3,8 @@
 use Data::Frame::More::Setup;
 
 use PDL::Core qw(pdl null);
-use PDL::SV;
-use PDL::Factor;
+use PDL::SV ();
+use PDL::Factor ();
 
 use Test2::V0;
 use Test2::Tools::PDL;
