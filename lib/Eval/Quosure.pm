@@ -12,10 +12,10 @@ use List::Util qw(pairmap);
 use PadWalker qw(peek_my peek_our);
 use Safe::Isa;
 use Sub::Quote qw(quote_sub);
-use Types::Standard qw(Str Int HashRef);
+use Types::Standard qw(Str Int HashRef Optional);
 
 sub new {
-    state $check = Type::Params::compile(Str, Int);
+    state $check = Type::Params::compile(Str, Optional[Int]);
 
     my $class = shift;
     my ($expr, $level) = $check->(@_);
@@ -53,7 +53,7 @@ Returns an arrayref of same structure as what the C<caller()> returns.
 
 sub expr     { $_[0]->{expr} }
 sub captures { $_[0]->{captures} }
-sub caller   { $_->[0]->{caller} }
+sub caller   { $_[0]->{caller} }
 
 =method eval
 
@@ -67,7 +67,7 @@ of the variable including sigil.
 =cut
 
 sub eval {
-    state $check = Type::Params::compile(HashRef);
+    state $check = Type::Params::compile(Optional[HashRef]);
 
     my $self = shift;
     my ($additional_captures) = $check->(@_);
@@ -75,7 +75,7 @@ sub eval {
 
     my $captures = 
       { %{ $self->captures }, pairmap { $a => \$b } %$additional_captures };
-    my $caller = $self->{caller};
+    my $caller = $self->caller;
 
     my $coderef = quote_sub(
         __PACKAGE__ . "::_Temp::foo",
@@ -87,8 +87,8 @@ sub eval {
             file       => $caller->[1],
             line       => $caller->[2],
 
-# Without below it could get error with Function::Parameters
-#  Function::Parameters: internal error: $^H{'Function::Parameters/config'} not a hashref
+            # Without below it would get error with Function::Parameters
+            #  https://rt.cpan.org/Public/Bug/Display.html?id=122698
             hintshash => undef,
         }
     );
