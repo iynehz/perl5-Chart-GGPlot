@@ -20,6 +20,14 @@ to produce an Chart::GGPlot::Built object that can be rendered.
 =cut
 
 classmethod build($ggplot) {
+    # A convient function for debug logging.
+    state $debug_data = sub {
+        my ($dataframes, $step) = @_;
+        $log->debug( "Backend::build : data $step :\n"
+              . join( "\n", map { $_->string } @$dataframes ) )
+          if ( $log->is_debug );
+    };
+
     my $plot = $ggplot->clone();
 
     if ( $plot->layers->isempty ) {
@@ -47,6 +55,7 @@ classmethod build($ggplot) {
 
     # Compute aesthetics to produce data with generalised variable names
     $data = &$by_layer( fun( $l, $d ) { $l->compute_aesthetics( $d, $plot ) } );
+    $debug_data->($data, 'after compute_aesthetics()');
 
     my $scale_x = sub { $scales->get_scales('x') };
     my $scale_y = sub { $scales->get_scales('y') };
@@ -58,21 +67,25 @@ classmethod build($ggplot) {
     $data = &$by_layer( fun( $l, $d ) { $l->compute_statistic( $d, $layout ) }
     );
     $data = &$by_layer( fun( $l, $d ) { $l->map_statistic( $d, $plot ) } );
+    $debug_data->($data, 'after map_statistic()');
 
     # Make sure missing (but required) aesthetics are added
     $scales->add_missing( [qw(x y)] );
 
     # Reparameterise geoms from (e.g.) y and width to ymin and ymax
     $data = &$by_layer( fun( $l, $d ) { $l->compute_geom_1($d); } );
+    $debug_data->($data, 'after compute_geom_1()');
 
     # Apply position adjustments
     $data = &$by_layer( fun( $l, $d ) { $l->compute_position( $d, $layout ); }
     );
+    $debug_data->($data, 'after compute_position()');
 
     # Reset position scales, then re-train and map.  This ensures that facets
     # have control over the range of a plot: is it generated from what is
     # displayed, or does it include the range of underlying data
     $layout->reset_scales();
+
     $layout->train_position( $data, $scale_x->(), $scale_y->() );
     $layout->setup_panel_params();
     $data = $layout->map_position($data);
@@ -86,8 +99,10 @@ classmethod build($ggplot) {
 
     $data = &$by_layer( fun( $l, $d ) { $l->compute_geom_2($d) } );
     $data = &$by_layer( fun( $l, $d ) { $l->finish_statistics($d) } );
+    $debug_data->($data, 'after finish_statistics()');
 
     $data = $layout->finish_data($data);
+    $debug_data->($data, 'after finish_data()');
 
     # build guides
     $plot->guides->build($scales, labels => $plot->labels);
