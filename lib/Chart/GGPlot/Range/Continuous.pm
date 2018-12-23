@@ -18,7 +18,7 @@ method train ($p) {
     if (is_discrete($p)) {
         die("Discrete value supplied to continuous scale");
     }
-    my $range = range_( pdl( [ @{ $self->range->unpdl }, @{ $p->unpdl } ] ) );
+    my $range = range_( $self->range->glue(0, $p) );
     $self->range($range);
 
     return $self->range;

@@ -8,6 +8,8 @@ use Chart::GGPlot::Class qw(:pdl);
 
 with qw(Chart::GGPlot::Range);
 
+sub _build_range { PDL::SV->new([]); }
+
 use List::AllUtils qw(uniq);
 use Types::PDL -types;
 

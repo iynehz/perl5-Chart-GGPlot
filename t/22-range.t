@@ -30,12 +30,12 @@ ok(
 );
 
 my $discrete_range = Chart::GGPlot::Range::Discrete->new();
-ok( $discrete_range,                'Range::Discrete->new' );
-ok( $discrete_range->range->isnull, "default range is null" );
+ok( $discrete_range,                 'Range::Discrete->new' );
+ok( $discrete_range->range->isempty, "default range is empty" );
 
 is( $discrete_range->train( PDL::Factor->new( [qw(foo bar baz)] ) )->levels,
-    [qw(foo bar baz)], "Range::Discrete->train" );
-is( $discrete_range->range->levels, [qw(foo bar baz)],
+    [qw(bar baz foo)], "Range::Discrete->train" );
+is( $discrete_range->range->levels, [qw(bar baz foo)],
     "Range::Discrete->train" );
 
 ok(
