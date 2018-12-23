@@ -109,7 +109,19 @@ method get_breaks ( $limits = $self->get_limits() ) {
     }
 
     # Breaks can only occur only on values in domain
-    my $in_domain = $breaks->unpdl->intersect( $limits->unpdl );
+
+    # TODO: See if it's better to change the behavior of PDL::Factor or
+    #  make some level of abstraction there.
+    state $unpdl = sub {
+        my ($x) = @_;
+        if ($x->$_DOES('PDL::Factor')) {
+            my $levels = $x->levels;
+            return $x->unpdl->map(sub { $levels->[$_] });
+        } else {
+            return $x->unpdl;
+        }
+    };
+    my $in_domain = $unpdl->($breaks)->intersect( $unpdl->($limits) );
     return PDL::SV->new($in_domain);
 }
 
@@ -170,9 +182,7 @@ method break_info ( $range = undef ) {
         range        => $range,
         labels       => $labels,
         major        => $major_n,
-        minor        => undef,
         major_source => $major,
-        minor_source => undef,
     };
 }
 

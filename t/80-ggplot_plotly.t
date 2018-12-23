@@ -183,10 +183,6 @@ subtest geom_bar_1 => sub {
 
     my $layout = $built->layout;
     my $panel_params = $layout->panel_params->at(0);
-    #diag Dumper($panel_params);
-
-  SKIP : {
-    skip "to fix this later", 1;
 
     pdl_is(
         $panel_params->{'x.labels'},
@@ -195,8 +191,6 @@ subtest geom_bar_1 => sub {
         ),
         'x labels'
     );
-  }
-
 };
 
 done_testing();
