@@ -39,7 +39,7 @@ has [qw(coord_params facet_params)] => (
 has layout => ( is => 'rw', isa => DataFrame, init_arg => undef );
 
 has [qw(panel_scales_x panel_scales_y)] => ( is => 'rw' );
-has panel_params => ( is => 'rwp', isa => ArrayRef );
+has panel_params => ( is => 'rwp', isa => ArrayRef [HashRef] );
 
 method setup (ArrayRef $data, $plot_data=Data::Frame::More->new()) {
     $data = [ $plot_data, @$data ];
@@ -114,12 +114,6 @@ method map_position (ArrayRef $data) {
     return $data->map(
         fun($layer_data)
         {
-            unless (defined $self->panel_scales_x
-                and defined $self->panel_scales_y )
-            {
-                return $layer_data;
-            }
-
             my $match_id =
               match( $layer_data->at('PANEL'), $layout->at('PANEL') );
 
@@ -141,8 +135,8 @@ method map_position (ArrayRef $data) {
                 }
             };
 
-            &$do_axis('x');
-            &$do_axis('y');
+            &$do_axis('x') if defined $self->panel_scales_x;
+            &$do_axis('y') if defined $self->panel_scales_y;
 
             return $layer_data;
         }
@@ -174,9 +168,17 @@ method finish_data ($data) {
 method get_scales ($i) {
     my $this_panel =
       $self->layout->select_rows( which( $self->layout->at('PANEL') == $i ) );
-    return {
+    my $href = {
         x => $self->panel_scales_x->at( $this_panel->at('SCALE_X')->at(0) ),
-        y => $self->panel_scales_y->at( $this_panel->at('SCALE_Y')->at(0) ),
+        (
+            defined $self->panel_scales_y
+            ? (
+                y => $self->panel_scales_y->at(
+                    $this_panel->at('SCALE_Y')->at(0)
+                )
+              )
+            : ()
+        ),
     };
 }
 
@@ -216,7 +218,8 @@ fun _xylabel ($axis) {
 
 # Apply scale method to multiple variables in a data set.
 # Returns a hash ref of { var => piddle }
-classmethod scale_apply ($data, $vars, $method, Piddle1D $scale_id, ArrayRef $scales) {
+classmethod scale_apply ($data, $vars, $method,
+                         Piddle1D $scale_id, ArrayRef $scales) {
     return if ( $vars->length == 0 );
     return if ( $data->nrow == 0 );
 

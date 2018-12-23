@@ -26,8 +26,6 @@ use namespace::autoclean 0.28 ();
 
 use List::AllUtils qw(uniq);
 
-use Data::Frame::More::Patch;
-
 use Moose::Autobox;
 for my $type (qw(Hash Array)) {
     Moose::Autobox->mixin_additional_role(

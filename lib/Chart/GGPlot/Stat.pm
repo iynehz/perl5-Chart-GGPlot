@@ -6,6 +6,7 @@ use Chart::GGPlot::Role qw(:pdl);
 
 # VERSION
 
+use List::AllUtils qw(reduce pairmap);
 use Types::Standard qw(ArrayRef CodeRef Str InstanceOf Bool);
 use Types::PDL -types;
 
@@ -29,47 +30,65 @@ method setup_params ( $data, $params ) { $params }
 
 method compute_layer ( $data, $params, $layout ) {
     $self->check_required_aes(
-        [ @{ $data->keys }, @{ $params->keys } ] );
+        [ @{ $data->names }, @{ $params->names } ] );
 
     $data = remove_missing(
         $data,
-        $params->at('na_rm'),
-        [ @{ $self->required_aes }, @{ $self->non_missing_aes } ],
-        ref($self), true
+        na_rm  => $params->at('na_rm'),
+        vars   => [ @{ $self->required_aes }, @{ $self->non_missing_aes } ],
+        name   => ref($self),
+        finite => true,
     );
 
     # Trim off extra parameters
     my $params =
-      $params->hslice( $params->keys->intersect($self->parameters) );
+      $params->slice( $params->names->intersect($self->parameters) );
 
-    my $scales = $layout->get_scales( $data->at('PANEL') );
-    my @args = ( $data, $scales, $params );
-    return $data;
+    my $splitted = $data->split( $data->at('PANEL') );
+    return (
+        reduce { $a->cbind($b) } $splitted->keys->map(
+            sub {
+                my ($panel_id) = @_;
+                my $d = $splitted->{$panel_id};
+
+                my $scales = $layout->get_scales( $d->at('PANEL')->at(0) );
+
+                try {
+                    return $self->compute_panel( $d, $scales, $params );
+                }
+                catch {
+                    warn
+                      sprintf( "Computation failed in '%s': $@", ref($self) );
+                    return;
+                }
+            }
+        )->flatten
+    );
 }
 
-method compute_panel ( $data, $scales, @rest ) {
-    if ( $data->isempty ) {
-        return Data::Frame::More->new();
-    }
+method compute_panel ( $data, $scales, $params ) {
+    return Data::Frame::More::->new() if ( $data->isempty );
+
     my $groups = $data->split( $data->at('group') );
-    my $stats =
-      $groups->map( sub { $_ => $self->compute_group( $_, $scales, @rest ) } );
+    my $stats = {
+        pairmap { $a => $self->compute_group( $b, $scales, $params ); }
+        %$groups
+    };
 
-    # TODO I don't very understand the logic in R here
+    # cbind the result of compute_group() with splitted df,
+    #  and also rbind to form one df that corresponds to the $data.
+    $stats = [
+        map {   # $_ is group id
+            my $new_df  = $stats->{$_};
+            my $old_df  = $groups->{$_};
+            my $missing = $old_df->names->setdiff($new_df->names);
+            $new_df->cbind(
+                $old_df->slice( [ 0 .. $new_df->nrow - 1 ], $missing ) );
+        } sort { $a <=> $b } @{ $stats->keys }
+    ];
 
-    #stats <- mapply(function(new, old) {
-    #  if (empty(new)) return(data.frame())
-    #  unique <- uniquecols(old)
-    #  missing <- !(names(unique) %in% names(new))
-    #  cbind(
-    #    new,
-    #    unique[rep(1, nrow(new)), missing,drop = FALSE]
-    #  )
-    #}, stats, groups, SIMPLIFY = FALSE)
-    #
-    #do.call(plyr::rbind.fill, stats)
-
-    return $stats;
+    my $rslt = reduce { $a->rbind($b) } @$stats;
+    return $rslt;
 }
 
 method compute_group ( $data, $scales ) { ... }
@@ -78,9 +97,13 @@ method finish_layer ( $data, $param ) { $data }
 
 method aesthetics () {
     my @names = List::AllUtils::uniq( @{ $self->required_aes },
-        @{ $self->default_aes->keys }, 'group' );
+        @{ $self->default_aes->names }, 'group' );
     return \@names;
 }
+
+# TODO: revisit Chart::GGPlot::Setup and its use of namespace::autoclean
+no warnings 'redefine';
+sub stat { goto \&Chart::GGPlot::Util::stat; }
 
 1;
 

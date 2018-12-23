@@ -20,7 +20,7 @@ use PDL::Primitive ();
 use PDL::Factor    ();
 use PDL::SV        ();
 
-use List::AllUtils qw(each_arrayref pairkeys pairmap);
+use List::AllUtils qw(each_arrayref pairgrep pairkeys pairmap);
 use Ref::Util qw(is_plain_arrayref is_plain_hashref);
 use Scalar::Util qw(openhandle looks_like_number);
 use Sereal::Decoder;
@@ -563,10 +563,15 @@ C<$func> can be one of the following,
 * A function coderef. It would be applied to all columns.
 * A hashref of C<{ $column_name =E<gt> $coderef, ... }>. It allows to apply
 the function to the specified columns. The raw data frame's columns not 
-appearing in the hashref would not be changed. Hashref keys not yet
-existing in the raw data frame can be used for creating new columns. 
-* An arrayref like C<[ $column_name =E<gt> $coderef, ... ]>. In this case
-newly added columns would be in order.
+existing in the hashref be retained unchanged. Hashref keys not yet
+existing in the raw data frame can be used for creating new columns.
+* An arrayref like C<[ $column_name =E<gt> $coderef, ... ]>. In this mode
+it's similar as the hasref above, but newly added columns would be in order.
+
+In any of the forms of C<$func> above, if a new column data is calculated
+to be C<undef>, or in the mappings like hashref or arrayref C<$coderef> is
+an explicit C<undef>, then the column would be removed from the result
+data frame.
 
 Here are some examples, 
 
@@ -621,9 +626,13 @@ method merge (DataFrame $df) {
 *cbind = \&merge;
 
 method append (DataFrame $df) {
-    if ( $df->nrow == 0 ) {
+    if ( $df->nrow == 0 ) {                     # $df is empty
         return $self->clone();
     }
+    if ( $self->column_names->length == 0) {    # $self has no columns
+        return $df->clone;
+    }
+
     my $class   = ref($self);
     my $columns = $self->names->map(
         sub {
@@ -638,7 +647,11 @@ method append (DataFrame $df) {
 
 method transform ($func) {
     state $check = Type::Params::compile(
-        ( CodeRef | ( HashRef [CodeRef] ) | ( CycleTuple [ Str, CodeRef ] ) ) );
+        (
+            CodeRef | ( HashRef [ Maybe [CodeRef] ] ) |
+              ( CycleTuple [ Str, Maybe [CodeRef] ] )
+        )
+    );
     ($func) = $check->($func);
 
     my $class = ref($self);
@@ -646,8 +659,9 @@ method transform ($func) {
     my @columns;
     if ( Ref::Util::is_coderef($func) ) {
         @columns =
-          $self->names->map( sub { $_ => $func->( $self->at($_), $self ) } )
-          ->flatten;
+          $self->names->map( sub {
+            $_ => $func->( $self->at($_), $self );
+          } )->flatten;
     }
     else {    # hashref or arrayref
         my $column_names = $self->names;
@@ -665,7 +679,8 @@ method transform ($func) {
 
         @columns = $column_names->map(
             sub {
-                my $f = $hashref->{$_} // sub { $_[0] };
+                my $f = exists($hashref->{$_}) ? $hashref->{$_} : sub { $_[0] };
+                $f //= sub { undef };
                 $_ => $f->( $self->at($_), $self );
             }
         )->flatten;
@@ -674,7 +689,13 @@ method transform ($func) {
           @new_column_names;
     }
 
-    return $class->new( columns => \@columns, row_names => $self->row_names );
+    my %columns_to_drop = @columns;
+    %columns_to_drop = pairgrep { not defined $b } %columns_to_drop;
+
+    return $class->new(
+        columns   => [ pairgrep { !exists($columns_to_drop{$a}) } @columns ],
+        row_names => $self->row_names,
+    );
 }
 
 =method split($factor, $use_eq=true)
@@ -742,11 +763,16 @@ classmethod _check_slice_args (@rest) {
 
     my ( $row_indexer, $column_indexer ) =
       map {
-            !defined($_)       ? undef
-          : Indexer->check($_) ? $_
-          : looks_like_number( $_->$_call_if_can( 'at', 0 ) // $_ )
-          ? $check_indices->($_)
-          : $check_labels->($_);
+        if ( !defined($_) ) {
+            undef;
+        }
+        elsif ( Indexer->check($_) ) {
+            $_;
+        }
+        else {
+            my $p = guess_and_convert_to_pdl($_);
+            ($p->$_DOES('PDL::SV') ? $check_labels : $check_indices)->($p);
+        }
       } ( @rest > 1 ? @rest : ( undef, $rest[0] ) );
     return ( $row_indexer, $column_indexer );
 }

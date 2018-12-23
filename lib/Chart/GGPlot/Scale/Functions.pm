@@ -134,7 +134,7 @@ fun continuous_scale (
     %rest
   ) {
     _check_breaks_labels( $breaks, $labels );
-    if (    !defined $breaks
+    if (    (  $breaks and $breaks->isempty )
         and !is_position_aes($aesthetics)
         and $guide ne "none" )
     {
@@ -177,7 +177,7 @@ fun discrete_scale (
     : $name         = undef,
     : $breaks       = undef,
     : $labels       = undef,
-    : $limits       = null(),
+    : $limits       = PDL::SV->new([]),
     : $expand       = undef,
     : $na_translate = true,
     : $na_value     = undef,
@@ -190,7 +190,7 @@ fun discrete_scale (
 
     _check_breaks_labels( $breaks, $labels );
 
-    if (    !defined $breaks
+    if (    ( defined $breaks and $breaks->isempty )
         and !is_position_aes($aesthetics)
         and $guide ne "none" )
     {

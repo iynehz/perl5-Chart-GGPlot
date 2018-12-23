@@ -1,6 +1,6 @@
 package Chart::GGPlot::HasParams;
 
-# ABSTRACT: The role for the 'extra_params' attr
+# ABSTRACT: The role for the 'extra_params' thing
 
 use Chart::GGPlot::Role;
 
@@ -8,10 +8,11 @@ use Chart::GGPlot::Role;
 
 use Types::Standard qw(ArrayRef);
 
-=attr extra_params
+=classmethod extra_params
+
+    my $extra_params_names = $obj->extra_params();
 
 Array ref for additional parameters that may be needed.
-
 Default is C<['na_rm']>.
 
 =cut
@@ -23,11 +24,7 @@ has _parameters => (
     default => sub { [] }
 );
 
-has extra_params => (
-    is      => 'ro',
-    isa     => ArrayRef,
-    default => sub { ['na_rm'] }
-);
+classmethod extra_params() { [qw(na_rm)] }
 
 # R ggplot2's Geom parameters() function automatically gets params from
 # draw_panel and draw_group methods via introspection on the method

@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 
 # VERSION
 
-use List::AllUtils qw(pairgrep pairmap);
+use List::AllUtils qw(pairgrep pairkeys pairmap);
 use Module::Load;
 use Data::Frame::More::Types qw(DataFrame);
 use Data::Frame::More::Util qw(is_discrete);
@@ -260,31 +260,23 @@ method compute_statistic ( $data, $layout ) {
 method map_statistic ( $data, $plot ) {
     return Data::Frame::More->new() if ( $data->isempty );
 
-    # TODO: fix this feature later.
-    return $data;
-
     # Assemble aesthetics from layer, plot and stat mappings
     my $aesthetics = $self->mapping;
     if ( $self->inherit_aes ) {
         $aesthetics = $aesthetics->defaults( $plot->mapping );
     }
-    $aesthetics = $aesthetics->defaults( $self->stat->default_aes );
 
+    $aesthetics = $aesthetics->defaults( $self->stat->default_aes );
     #$aesthetics = compact($aesthetics);
 
-    # TODO
-    my $new =
-      strip_dots( $aesthetics->hslice( $self->_calculated_aes($aesthetics) ) );
+    my $new = $aesthetics->hslice( $self->_calculated_aes($aesthetics) );
+    #say Dumper($new->keys);
     return $data if ( $new->isempty );
 
-    # Add map stat output to aesthetics
-    #env < - new . env( parent = baseenv() ) env $calc < - calc
-
-    my $stat_data;
-
-    #  stat_data <
-    #  -plyr::quickdf( lapply( new, eval, data, env ) ) names(stat_data) <
-    #  -names(new)
+    my $stat_data =
+      Data::Frame::More->new(
+        columns => [ pairmap { $a => $data->eval_tidy($b) } $new->flatten ] );
+    #say $stat_data->string;
 
     $plot->scales->add_defaults( $data, $new );
 
@@ -301,7 +293,7 @@ method compute_geom_1 ($data) {
 
     $self->geom->check_required_aes(
         [ @{ $data->names }, @{ $self->aes_params->names } ] );
-
+    
     return $self->geom->setup_data( $data,
         $self->geom_params->merge( $self->aes_params ) );
 }
@@ -324,12 +316,19 @@ method finish_statistics ($data) {
     $self->stat->finish_layer( $data, $self->stat_params );
 }
 
-# TODO: for now we treat all as not calculated...
+# return an arrayref of keys.
 method _calculated_aes ($aesthetics) {
-    return [];
+    # TODO: better to use PPR to make sure the function is "stat"?
+    return [
+        pairkeys(
+            pairgrep {
+                $b->$_DOES('Eval::Quosure') and $b->expr =~ /^\s*stat\s*\(/;
+            }
+            $aesthetics->flatten
+        )
+    ];
 }
 
-# TODO:
 classmethod add_group ($data) {
     return $data if $data->isempty;
 

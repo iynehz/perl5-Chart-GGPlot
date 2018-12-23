@@ -98,6 +98,7 @@ classmethod build($ggplot) {
     }
 
     $data = &$by_layer( fun( $l, $d ) { $l->compute_geom_2($d) } );
+    $debug_data->($data, 'after compute_geom_2()');
     $data = &$by_layer( fun( $l, $d ) { $l->finish_statistics($d) } );
     $debug_data->($data, 'after finish_statistics()');
 

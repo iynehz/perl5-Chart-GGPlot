@@ -50,14 +50,6 @@ classmethod all_aesthetics () { \@all_aesthetics; }
 
 method keys () { [ sort( @{ $self->SUPER::keys() } ) ]; }
 
-method make_labels () {
-    my %labels = List::AllUtils::pairmap {
-        $a => ( $b->$_DOES('Eval::Quosure') ? $b->expr : $b . '' )
-    }
-    $self->flatten;
-    return \%labels;
-}
-
 =classmethod check_aesthetics
     
     check_aesthetics($aes, $n=undef)

@@ -24,17 +24,18 @@ method compute_layer ($data, $params, $layout) {
     my $splitted = $data->split($panel_data);
 
     my $new_df = Data::Frame::More->new();
-    for my $panel (keys %$splitted) {
-        my $func = fun($df) {
+    for my $panel_id (sort { $a <=> $b } keys %$splitted) {
+        my $f = fun($df) {
             return $df if ($df->isempty);
-            my $scales = $layout->get->scales($panel);
+            my $scales = $layout->get_scales($panel_id);
             return $self->compute_panel($df, $params, $scales);
         };
-        $new_df = $new_df->append($func->($splitted->{$panel}));
+        $new_df = $new_df->append($f->($splitted->{$panel_id}));
     }
+    return $new_df;
 }
 
-method compute_panel($data, $params, $scales) { ... }
+method compute_panel($data, $params, $scales) { $data }
 
 
 1;

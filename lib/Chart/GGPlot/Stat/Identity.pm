@@ -1,6 +1,6 @@
 package Chart::GGPlot::Stat::Identity;
 
-# ABSTRACT: Chart::GGPlot's identity statistics
+# ABSTRACT: Statistics method that does identity
 
 use Chart::GGPlot::Class;
 use MooseX::Singleton;

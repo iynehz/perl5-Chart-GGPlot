@@ -19,14 +19,13 @@ use Types::Standard qw(HashRef Int);
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Util qw(:all);
 use Chart::GGPlot::Backend::Plotly::Geom;
+use Chart::GGPlot::Backend::Plotly::Util qw(br);
 
 #TODO: To test and see which value is proper.
 our $WEBGL_THRESHOLD = 2000;
 
 method layer_to_traces ($layer, $data, $layout, $plot) {
-    if ( $data->isempty ) {
-        return;
-    }
+    return if ( $data->isempty );
 
     my $geom            = $layer->geom;
     my $class_geom      = ( ref($geom) || $geom );
@@ -56,30 +55,37 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
         # put x and y at first in plotly hover text
         my @hover_aes = (
             qw(x y),
-            ( sort grep { $_ ne 'x' and $_ ne 'y' and elem($_, $all_aesthetics) } @{ $labels->keys } )
+            (
+                sort grep {
+                    $_ ne 'x' and $_ ne 'y' and elem( $_, $all_aesthetics )
+                } @{ $labels->keys }
+            )
         );
-
-        #@hover_aes = List::AllUtils::uniq(@hover_aes, @split_legend);
 
         my @hover_data = map {
             my $var = $labels->at($_);
             if ( $var->$_DOES('Eval::Quosure') ) {
                 $var = $var->expr;
             }
-            my $col = $d->exists("${_}_raw") ? $d->at("${_}_raw") : $d->at($_);
-
-       # TODO: Best to get PDL::Factor's unpdl to return levels instead of enums
-            if ( $col->$_DOES('PDL::Factor') ) {
-                my $levels = $col->levels;
-                $col = $col->unpdl->map( sub { $levels->at($_); } );
+            my $col =
+                $d->exists("${_}_raw") ? $d->at("${_}_raw")
+              : $d->exists($_)         ? $d->at($_)
+              :                          undef;
+            if (defined $col) {
+                if ( $col->$_DOES('PDL::Factor') ) {
+                    my $levels = $col->levels;
+                    $col = $col->unpdl->map( sub { $levels->at($_); } );
+                }
+                ( $var => $col );
+            } else {
+                ();
             }
-            ( $var, $col );
         } @hover_aes;
         my $hover_text = [ 0 .. $d->nrow - 1 ]->map(
             sub {
                 my $i = $_;
                 return
-                  join( "<br>", pairmap { "$a: " . $b->at($i) } @hover_data );
+                  join( br(), pairmap { "$a: " . $b->at($i) } @hover_data );
             }
         );
 
@@ -170,15 +176,15 @@ method to_plotly ($plot_built) {
 
         my $axis_title = $labels->at($xy) // '';
 
-        my $major_source = $panel_params->{"$xy.major_source"}->unpdl;
-        my $minor_source = $panel_params->{"$xy.minor_source"}->unpdl;
         my $labels       = $panel_params->{"$xy.labels"}->unpdl;
-        my %ticks        = (
-            ( map { $_ => ''; } @$minor_source ),
-            ( pairwise { $a => $b } @$major_source, @$labels )
-        );
-        my $tickvals = $minor_source;
-        my $ticktext = [ map { $ticks{$_} } @$minor_source ];
+        my $major_source = $panel_params->{"$xy.major_source"}->unpdl;
+        my %ticks = pairwise { $a => $b } @$major_source, @$labels;
+
+        # There is not necessarily minor ticks for an axis.
+        my $minor_source = $panel_params->{"$xy.minor_source"};
+        my $tickvals =
+          defined $minor_source ? $minor_source->unpdl : $major_source;
+        my $ticktext = [ map { $ticks{$_} // '' } @$tickvals ];
 
         $plotly_layout{"${xy}axis"} = {
             title    => $axis_title,
@@ -209,6 +215,7 @@ method to_plotly ($plot_built) {
                 #  https://github.com/plotly/plotly.js/issues/276
                 my $legend_titles =
                   join( "\n", map { $_->title } @{ $plot->guides->guides } );
+
                 my $annotations = $plotly_layout{annotations} //= [];
                 push @$annotations,
                   {
@@ -231,6 +238,9 @@ method to_plotly ($plot_built) {
             }
         }
     }
+
+    $log->debug( "plotly layout : " . Dumper( \%plotly_layout ) )
+      if $log->is_debug;
 
     $plotly->layout( \%plotly_layout );
 

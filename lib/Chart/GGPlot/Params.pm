@@ -110,12 +110,17 @@ method flatten () {
 
 =method hslice($keys)
 
+=method slice($keys)
+
+This is an alias of C<hslice>.
+
 =cut
 
 method hslice ($keys) {
     my $class = ref($self);
     return bless( { _hash => { map { $_ => $self->at($_) } @$keys } }, $class );
 }
+*slice = \&hslice;
 
 =method kv()
 

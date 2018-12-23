@@ -38,15 +38,14 @@ package Chart::GGPlot::Backend::Plotly::Geom::Point {
     use Chart::Plotly::Trace::Scattergl;
     use Chart::Plotly::Trace::Scattergl::Marker;
     use List::AllUtils qw(pairmap);
-    use PDL::Primitive qw(which);
 
-    use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px);
+    use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb);
     use Chart::GGPlot::Util qw(ifelse);
 
     classmethod to_trace ($df, %rest) {
-        my $color = $df->at('color');
+        my $color = to_rgb($df->at('color'));
         my $fill =
-          ifelse( $df->at('fill')->isbad, $color, $df->at('fill') );
+          ifelse( $df->at('fill')->isbad, $color, to_rgb($df->at('fill')) );
         my $opacity = $df->at('alpha')->setbadtoval(1);
         my $size    = cex_to_px( $df->at('size') );
         $size = ifelse( $size < 2, 2, $size );
@@ -95,6 +94,41 @@ package Chart::GGPlot::Backend::Plotly::Geom::Point {
                     hoverinfo => [ ('text') x $df->nrow ],
                 )
             ),
+        );
+    }
+
+    __PACKAGE__->meta->make_immutable;
+}
+
+package Chart::GGPlot::Backend::Plotly::Geom::Bar {
+    use Chart::GGPlot::Class;
+    with qw(Chart::GGPlot::Backend::Plotly::Geom);
+
+    use Chart::Plotly::Trace::Bar;
+    use Chart::Plotly::Trace::Bar::Marker;
+    use List::AllUtils qw(pairmap);
+
+    use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb);
+    use Chart::GGPlot::Util qw(ifelse);
+
+    classmethod to_trace ($df, %rest) {
+        #my $color   = to_rgb($df->at('color'));
+        my $fill    = to_rgb($df->at('fill'));
+        my $opacity = $df->at('alpha')->setbadtoval(1);
+
+        my $marker = Chart::Plotly::Trace::Bar::Marker->new(
+            color => $fill->unpdl,
+            opacity => $opacity->unpdl,
+        );
+
+        my ($x, $y) = map { $df->at($_)->unpdl } qw(x y);
+
+        return Chart::Plotly::Trace::Bar->new(
+            x         => $x,
+            y         => $y,
+            marker    => $marker,
+            hovertext => $df->at('hovertext')->unpdl,
+            hoverinfo => [ ('text') x $df->nrow ],
         );
     }
 

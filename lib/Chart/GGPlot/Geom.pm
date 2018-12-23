@@ -29,9 +29,9 @@ sub draw_key { return draw_key_point(@_) }
 method handle_na ( $data, $params ) {
     return remove_missing(
         $data,
-        $params->at('na_rm'),
-        [ @{ $self->required_aes }, @{ $self->non_missing_aes } ],
-        $self->name
+        na_rm => $params->at('na_rm'),
+        vars  => [ @{ $self->required_aes }, @{ $self->non_missing_aes } ],
+        name  => $self->name
     );
 }
 
@@ -45,6 +45,7 @@ method use_defaults ( $data, $params = {} ) {
     else {
         # Fill in missing aesthetics with their defaults
         my $missing_aes = $self->default_aes->names->setdiff( $data->names );
+
         for my $name ( sort @$missing_aes ) {
             my $default = $self->default_aes->at($name);
             next unless defined $default;

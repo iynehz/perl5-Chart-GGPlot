@@ -20,8 +20,9 @@ subtest transform => sub {
     my $df =
       Data::Frame::More->new(
         columns => [ a => pdl( [ 0 .. 9 ] ), b => pdl( [ 0 .. 9 ] ) / 10 ] );
+
     dataframe_is(
-        $df->transform( sub { $_[0] * 2 } ),
+        $df->transform( sub { my ($col) = @_; $col * 2 } ),
         Data::Frame::More->new(
             columns =>
               [ a => pdl( [ 0 .. 9 ] ) * 2, b => pdl( [ 0 .. 9 ] ) / 10 * 2 ]
@@ -61,6 +62,49 @@ subtest transform => sub {
         },
         '$df->transform($arrayref)'
     );
+
+    dataframe_is(
+        $mtcars->transform(
+            {
+                kpg => sub {
+                    my ( $col, $df ) = @_;
+                    return $df->at('mpg') * 1.609;
+                },
+                mpg => undef,
+                cyl => sub { undef }, 
+            }
+        ),
+        do {
+            my $x = $mtcars->copy;
+            $x->set( kpg => $mtcars->at('mpg') * 1.609 );
+            $x->delete('mpg');
+            $x->delete('cyl');
+            $x;
+        },
+        '$df->transform($hashref) with deleting'
+    );
+
+    dataframe_is(
+        $mtcars->transform(
+            [
+                kpg => sub {
+                    my ( $col, $df ) = @_;
+                    return $df->at('mpg') * 1.609;
+                },
+                mpg => undef,
+                cyl => sub { undef }, 
+            ]
+        ),
+        do {
+            my $x = $mtcars->copy;
+            $x->set( kpg => $mtcars->at('mpg') * 1.609 );
+            $x->delete('mpg');
+            $x->delete('cyl');
+            $x;
+        },
+        '$df->transform($arrayref) with deleting'
+    );
+    
 };
 
 subtest sort => sub {

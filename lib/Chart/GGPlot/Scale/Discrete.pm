@@ -24,15 +24,22 @@ my $Palette = ( ConsumerOf ['PDL::SV'] )->plus_coercions(
     }
 );
 
-has _palette_cache =>
-  ( is => 'rw', isa => $Palette, default => sub { PDL::SV->new([]); }, coerce => 1 );
+has _palette_cache => (
+    is      => 'rw',
+    isa     => $Palette,
+    default => sub { PDL::SV->new( [] ); },
+    coerce  => 1
+);
 
 has range => (
     is      => 'ro',
     isa     => ConsumerOf ["Chart::GGPlot::Range::Discrete"],
     default => sub { discrete_range() }
 );
-has range_c => ( is => 'rw' );
+has range_c => (
+    is  => 'rw',
+    isa => ConsumerOf ['Chart::GGPlot::Range::Continuous'],
+);
 
 with qw(
   Chart::GGPlot::Scale
@@ -72,8 +79,11 @@ method map_to_limits ( $p, $limits = $self->get_limits ) {
 
     return (
         $self->na_translate
-        ? ifelse( ( $p->isbad | $pal_match->isbad ),
-            PDL::SV->new([$self->na_value]), $pal_match )
+        ? ifelse(
+            ( $p->isbad | $pal_match->isbad ),
+            PDL::SV->new( [ $self->na_value ] ),
+            $pal_match
+          )
         : $pal_match
     );
 }
@@ -99,7 +109,7 @@ method get_breaks ( $limits = $self->get_limits() ) {
     }
 
     # Breaks can only occur only on values in domain
-    my $in_domain = $breaks->unpdl->intersect($limits->unpdl);
+    my $in_domain = $breaks->unpdl->intersect( $limits->unpdl );
     return PDL::SV->new($in_domain);
 }
 
@@ -121,7 +131,7 @@ method get_labels ( $breaks = $self->get_breaks ) {
         if ( not $self->labels->names->isempty ) {
 
             # If labels have names, use them to match with breaks
-            my $labels = $breaks;
+            my $labels   = $breaks;
             my $match_id = which( match( $self->labels->names, $labels ) > 0 );
             $labels->slice($match_id) .= $self->labels->slice($match_id);
             return $labels;
@@ -151,7 +161,6 @@ method break_info ( $range = undef ) {
     if ( defined $major ) {
         $labels = $self->get_labels($major);
         $major  = $self->map_to_limits($major);
-        @$major = grep { defined $_ } @$major;
 
         $major_n = rescale( $major, [ 0, 1 ], $range );
     }

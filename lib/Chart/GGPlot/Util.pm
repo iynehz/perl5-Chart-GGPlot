@@ -24,6 +24,7 @@ use parent qw(Exporter::Tiny);
 my @export_ggplot = qw(
   expand_range4 remove_missing
   resolution
+  stat
 );
 
 my @export_all = (
@@ -117,8 +118,8 @@ fun remove_missing ($df,
                 sprintf(
                     "Removed %s rows containing %s values%s.",
                     which($missing)->length,
-                    ( $finite ? 'non-finite' : 'missing' ),
-                    ( $name   ? " ($name)"   : $name )
+                    ( $finite       ? 'non-finite' : 'missing' ),
+                    ( length($name) ? " ($name)"   : $name )
                 )
             );
         }
@@ -301,6 +302,18 @@ fun resolution(Piddle1D $x, $zero=true) {
     }
     return $x->qsort->diff->min;
 }
+
+=func stat
+
+Can be used in C<aes()> quosure values as a flag to Chart::GGPlot to
+indicate that you want to use calculated aesthetics produced by the
+statistic.
+
+Note that this function has same name as Perl's CORE C<stat> function.
+
+=cut
+
+fun stat($x) { $x }
 
 1;
 

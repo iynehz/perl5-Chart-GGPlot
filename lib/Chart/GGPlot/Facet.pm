@@ -84,7 +84,7 @@ method train_scales (ArrayRef $data, $layout, $params,
         my $match_id =
           pdl( match( $layer_data->at('PANEL'), $layout->at('PANEL') ) );
 
-        my $do_axix = fun( $axis, $scales ) {
+        my $do_axis = fun( $axis, $scales ) {
             my $column_name = "SCALE_" . uc($axis);
             my $vars =
               $scales->at(0)->aesthetics->intersect($layer_data->names);
@@ -94,10 +94,10 @@ method train_scales (ArrayRef $data, $layout, $params,
         };
 
         if ( defined $x_scales ) {
-            &$do_axix( 'x', $x_scales );
+            &$do_axis( 'x', $x_scales );
         }
         if ( defined $y_scales ) {
-            &$do_axix( 'y', $y_scales );
+            &$do_axis( 'y', $y_scales );
         }
     }
     return;

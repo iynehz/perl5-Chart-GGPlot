@@ -2,13 +2,13 @@ package Chart::GGPlot::Geom::Rect;
 
 # ABSTRACT: Class for rect geom
 
-use Chart::GGPlot::Class;
+use Chart::GGPlot::Class qw(:pdl);
 use MooseX::Singleton;
 
 # VERSION
 
 use Chart::GGPlot::Aes;
-use Chart::GGPlot::Util qw(pt stroke);
+use Chart::GGPlot::Util qw(:all);
 
 with qw(Chart::GGPlot::Geom);
 

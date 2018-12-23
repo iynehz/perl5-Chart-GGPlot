@@ -10,6 +10,7 @@ use Autoload::AUTOCAN;
 use List::AllUtils qw(pairgrep pairmap firstres);
 use Module::Load;
 use Package::Stash;
+use String::Util qw(trim);
 use Types::Standard qw(ArrayRef ConsumerOf HashRef InstanceOf);
 
 use Chart::GGPlot::Built;
@@ -131,7 +132,8 @@ has guides => ( is => 'ro', default => sub { Chart::GGPlot::Guides->new() } );
 with qw(MooseX::Clone);
 
 method labels () {
-    return $self->mapping->make_labels->merge( $self->_labels->as_hashref );
+    return $self->make_labels( $self->mapping )
+      ->merge( $self->_labels->as_hashref );
 }
 
 =method show
@@ -189,14 +191,44 @@ method summary () {
 
 method add_layer ($layer) {
     push @{ $self->layers }, $layer;
-    my $new_labels = $layer->mapping->make_labels;
-    $self->add_labels($new_labels);
+
+    # Add any new labels
+    my $mapping = $self->make_labels($layer->mapping);
+    my $defaults = $self->make_labels($layer->stat->default_aes);
+    map { $mapping->{$_} //= $defaults->{$_} } keys %$defaults;
+    $self->add_labels($mapping);
+
     return $self;
 }
 
 method add_labels ($labels) {
     $self->_labels( $self->_labels->merge($labels) );
     return $self;
+}
+
+use Scalar::Util qw(looks_like_number);
+
+classmethod make_labels($mapping) {
+    state $strip = sub {    # strip_dots() in R ggplot2
+        my ($aesthetic, $expr) = @_; 
+        unless ($expr->$_DOES('Eval::Quosure')) {
+            return $expr;
+        }   
+
+        $expr = $expr->expr;
+
+        # TODO: Need PPR here.
+        if (looks_like_number($expr)) {
+            return $aesthetic;
+        }
+        elsif ($expr =~ /^\s*stat\s*\((.*)\)/) {
+            return trim($1);
+        }
+        return $expr;
+    };  
+
+    my %labels = pairmap { $a => $strip->($a, $b) } $mapping->flatten;
+    return \%labels;
 }
 
 __PACKAGE__->meta->make_immutable;

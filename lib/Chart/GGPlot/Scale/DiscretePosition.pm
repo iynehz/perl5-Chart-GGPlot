@@ -73,8 +73,11 @@ method dimension ( $expand = pdl([0, 0, 0, 0]) ) {
         return expand_range4( [ 1, $d_range->length ], $expand );
     }
     else {                                      # both
-        return range( $c_range,
-            expand_range4( [ 1, $d_range->length ], $expand ) );
+        return range_(
+            $c_range->glue(
+                0, expand_range4( [ 1, $d_range->length ], $expand )
+            )
+        );
     }
 }
 

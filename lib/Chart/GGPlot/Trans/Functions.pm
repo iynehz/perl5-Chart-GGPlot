@@ -55,7 +55,10 @@ fun as_trans($x) {
 fun trans_range( $trans, $p ) {
     $trans = as_trans($trans);
     return range(
-        $trans->transform->( range_( squish( $p, $trans->domain ), true ) ) );
+        $trans->transform->(
+            range_( squish( $p, $trans->domain ), true )
+        )
+    );
 }
 
 fun _trans_new( $name, $trans, $inv, %rest ) {

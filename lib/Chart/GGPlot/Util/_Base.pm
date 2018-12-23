@@ -20,7 +20,7 @@ our @EXPORT_OK = (
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 # Range of Values
-fun range_ ( $p, $na_rm = false, $finite = false ) {
+fun range_ (Piddle $p, $na_rm = false, $finite = false) {
     if ( !$finite and $na_rm ) {
         if ( $p->nbad ) {
             return pdl( [ 'nan', 'nan' ] )->setnantobad;

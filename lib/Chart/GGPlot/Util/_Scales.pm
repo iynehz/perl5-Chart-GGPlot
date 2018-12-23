@@ -101,6 +101,10 @@ fun discard ( $p, $range = pdl([ 0, 1 ]) ) {
 
 # Expand a range with a multiplicative or additive constant
 fun expand_range ( $range, $mul = 0, $add = 0, $zero_width = 1 ) {
+    state $check =
+      Type::Params::compile( Piddle->plus_coercions(PiddleFromAny) );
+    ($range) = $check->($range);
+
     return if ( $range->isempty );  # TODO: return undef or return empty $range?
 
     my ( $min, $max ) = $range->minmax;

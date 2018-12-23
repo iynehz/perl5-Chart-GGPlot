@@ -84,7 +84,7 @@ method setup_panel_params ($scale_x, $scale_y, $params = {}) {
 }
 
 method scale_range ($scale, $limits=undef, $expand=true) {
-    my $expansion = $expand ? $self->expand_default($scale) : [ 0, 0 ];
+    my $expansion = $expand ? $self->expand_default($scale) : pdl([ 0, 0 ]);
 
     if ( not defined $limits ) {
         return $scale->dimension($expansion);

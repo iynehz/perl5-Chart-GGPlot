@@ -15,7 +15,11 @@ use Chart::GGPlot::Util qw(:all);
 
 use parent qw(Exporter::Tiny);
 
-my @export_ggplot = qw(geom_blank geom_point geom_histogram);
+my @export_ggplot = qw(
+  geom_blank
+  geom_point
+  geom_bar geom_histogram
+);
 
 our @EXPORT_OK = (
     @export_ggplot,
@@ -70,6 +74,26 @@ fun geom_point (
     );
 }
 
+fun geom_bar(:$mapping=undef, :$data=undef,
+             :$stat='count', :$position='stack', 
+             :$width=undef, :$na_rm=false,
+             :$show_legend='auto', :$inherit_aes=true, %rest) {
+    return layer(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => $stat,
+        geom        => 'bar',
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        params      => {
+            width => $width,
+            na_rm => $na_rm,
+            %rest,
+        },
+    );
+}
+
 fun geom_histogram (
     : $data        = undef,
     : $mapping     = undef,
@@ -85,7 +109,7 @@ fun geom_histogram (
     return layer(
         data        => $data,
         mapping     => $mapping,
-        stat        => stat,
+        stat        => $stat,
         geom        => 'bar',
         position    => $position,
         show_legend => $show_legend,
