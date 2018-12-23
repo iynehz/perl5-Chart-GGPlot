@@ -12,7 +12,7 @@ use Chart::GGPlot::Util qw(pt stroke);
 
 with qw(Chart::GGPlot::Geom);
 
-has '+non_missing_aes' => ( default => sub { [qw(size shape colour)] } );
+has '+non_missing_aes' => ( default => sub { [qw(size shape color)] } );
 has '+default_aes'     => (
     default => sub {
         Chart::GGPlot::Aes->new(
