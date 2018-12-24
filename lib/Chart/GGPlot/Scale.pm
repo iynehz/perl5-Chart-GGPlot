@@ -164,7 +164,7 @@ method transform_df ($df) {
 =method map_df($df, $i=null)
 
 This calls C<map_to_limits()> on each of the scale's aesthetics. 
-Returns a hash ref of aesthetics to processed column data.
+Returns a hashref which maps aesthetics to processed column data.
 
 =method map_to_limits($p, $limits=$self->get_limits)
 
@@ -181,6 +181,7 @@ method map_df ( $df, $i = undef ) {
 
     my $func = sub {
         my $data_raw = defined $i ? $df->at($_)->select_rows($i) : $df->at($_);
+
         (
             $_         => $self->map_to_limits($data_raw),
             "${_}_raw" => $data_raw,

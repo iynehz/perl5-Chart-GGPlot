@@ -37,6 +37,8 @@ subtest geom_point_1 => sub {
             y      => $mtcars->at('mpg'),
             PANEL  => pdl(0),
             group  => pdl(0),
+            x_raw  => $mtcars->at('wt'),
+            y_raw  => $mtcars->at('mpg'),
             alpha  => NA(),
             color  => PDL::SV->new( ['black'] ),
             fill   => NA(),
@@ -126,6 +128,8 @@ subtest geom_point_2 => sub {
                     }
                 )
             ),
+            x_raw  => $mtcars->at('wt'),
+            y_raw  => $mtcars->at('mpg'),
             alpha  => NA(),
             fill   => NA(),
             shape  => pdl(19),
@@ -162,6 +166,7 @@ subtest geom_bar_1 => sub {
             x        => pdl( 0 .. 6 ),
             PANEL    => pdl(0),
             group    => pdl( 0 .. 6 ),
+            x_raw    => PDL::Factor->new($mpg->at('class')->levels),
             y        => $count,
             xmax     => pdl( 0.45, 1.45, 2.45, 3.45, 4.45, 5.45, 6.45 ),
             xmin     => pdl( -0.45, 0.55, 1.55, 2.55, 3.55, 4.55, 5.55 ),
@@ -189,8 +194,9 @@ subtest geom_bar_1 => sub {
         PDL::SV->new(
             [qw(2seater compact midsize minivan pickup subcompact suv)]
         ),
-        'x labels'
+        'x.labels',
     );
+    pdl_is( $panel_params->{'x.major_source'}, pdl(0 .. 6), 'x.major_source');
 };
 
 done_testing();

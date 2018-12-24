@@ -61,11 +61,16 @@ classmethod build($ggplot) {
     my $scale_y = sub { $scales->get_scales('y') };
 
     $layout->train_position( $data, $scale_x->(), $scale_y->() );
-    $data = $layout->map_position($data);
+
+    # keep raw column on first time of map_position()
+    $data = $layout->map_position($data, true);
+    $debug_data->($data, 'after map_position()');
 
     # Apply and map statistics
     $data = &$by_layer( fun( $l, $d ) { $l->compute_statistic( $d, $layout ) }
     );
+
+    $debug_data->($data, 'after compute_statistic()');
     $data = &$by_layer( fun( $l, $d ) { $l->map_statistic( $d, $plot ) } );
     $debug_data->($data, 'after map_statistic()');
 
@@ -89,6 +94,7 @@ classmethod build($ggplot) {
     $layout->train_position( $data, $scale_x->(), $scale_y->() );
     $layout->setup_panel_params();
     $data = $layout->map_position($data);
+    $debug_data->($data, 'after map_position() again');
 
     # Train and map non-position scales
     my $npscales = $scales->non_position_scales();

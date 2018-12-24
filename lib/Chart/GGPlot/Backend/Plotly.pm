@@ -82,11 +82,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
             }
         } @hover_aes;
         my $hover_text = [ 0 .. $d->nrow - 1 ]->map(
-            sub {
-                my $i = $_;
-                return
-                  join( br(), pairmap { "$a: " . $b->at($i) } @hover_data );
-            }
+            sub { join( br(), pairmap { "$a: " . $b->at($_) } @hover_data ); }
         );
 
         $d->set( 'hovertext', PDL::SV->new($hover_text) );

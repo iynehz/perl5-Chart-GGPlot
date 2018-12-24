@@ -7,6 +7,7 @@ use Chart::GGPlot::Class qw(:pdl);
 # VERSION
 
 use Data::Frame::More::Types qw(DataFrame);
+use Data::Munge qw(elem);
 use List::AllUtils qw(pairwise);
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle1D);
@@ -108,7 +109,7 @@ method train_position ($data, $x_scale, $y_scale) {
     );
 }
 
-method map_position (ArrayRef $data) {
+method map_position (ArrayRef $data, $keep_raw_column=false) {
     my $layout = $self->layout;
 
     return $data->map(
@@ -130,7 +131,15 @@ method map_position (ArrayRef $data) {
                   $self->scale_apply( $layer_data, $vars, "map_to_limits", $scale,
                     $self->$panel_scales );
 
-                for my $var ( @$vars ) {
+                for my $var (@$vars) {
+
+                    if ($keep_raw_column) {
+                        my $colname_raw = "${var}_raw";
+                        unless ( $layer_data->exists($colname_raw) ) {
+                            $layer_data->set(
+                                $colname_raw => $layer_data->at($var) );
+                        }
+                    }
                     $layer_data->set( $var => $new_data->{$var} );
                 }
             };
