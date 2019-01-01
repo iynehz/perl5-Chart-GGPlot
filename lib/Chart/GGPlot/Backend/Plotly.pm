@@ -24,6 +24,11 @@ use Chart::GGPlot::Backend::Plotly::Util qw(br);
 #TODO: To test and see which value is proper.
 our $WEBGL_THRESHOLD = 2000;
 
+# Does not do any yet.
+classmethod _split_on($data) {
+    return [];
+}
+
 method layer_to_traces ($layer, $data, $layout, $plot) {
     return if ( $data->isempty );
 
@@ -45,7 +50,14 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
         }
     } @{ $plot->scales->non_position_scales->scales };
 
+    # variables that produce multiple traces and deserve their own legend entries
     my @split_legend = map { "${_}_raw" } ( sort keys %discrete_scales );
+    $log->debugf( "Variables that would cause legend be splitted : %s",
+        Dumper( \@split_legend ) )
+      if $log->is_debug;
+
+    my $split_by = [ @split_legend, $self->_split_on($data) ];
+    my $split_vars = $split_by->intersect($data->names);
 
     my $panel_to_traces = fun( $d, $panel_params ) {
 
@@ -88,19 +100,40 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
         $d->set( 'hovertext', PDL::SV->new($hover_text) );
 
         #my $na_rm = $params->at('na_rm') // false;
-        my $show_legend =
-          @split_legend->intersect( $data->names )->length;
 
-        my $splitted = $d->split( $d->at('group') );
-        my @group_ids = sort { $a <=> $b } keys %$splitted;
+        my @splitted_sorted;
+        if ( $split_vars->length ) {
+            my $fac = do {
+                my $d_tmp      = $d->select_columns($split_vars);
+                my $lvls       = $d_tmp->uniq->sort($split_vars);
+                my $fac_levels = $lvls->id;
+                my $i          = 0;
+                my %fac_levels = map { $_ => $i++ } $fac_levels->flatten;
+                my $fac_integers =
+                  [ map { $fac_levels{$_} } $d_tmp->id->flatten ];
+                PDL::Factor->new(
+                    integer => $fac_integers,
+                    levels  => [ 0 .. $fac_levels->length - 1 ],
+                );
+            };
 
-        return @group_ids->map(
+            my $splitted = $d->split($fac);
+            @splitted_sorted =
+              map { $splitted->{$_} } sort { $a cmp $b } keys %$splitted;
+        }
+        else {
+            push @splitted_sorted, $d;
+        }
+
+        return @splitted_sorted->map(
             sub {
-                my $d = $splitted->{$_};
+                my ($d) = @_;
 
                 my $trace = $class_geom_impl->to_trace($d);
 
                 # If we need a legend, set legend info.
+                my $show_legend =
+                  @split_legend->intersect( $data->names )->length;
                 if ($show_legend) {
                     my $legend_key = join(
                         ', ',
@@ -123,7 +156,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
                     $trace->{name}       = $legend_key;
                 }
                 return $trace;
-            }
+            } 
         );
     };
 

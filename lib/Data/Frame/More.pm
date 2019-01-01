@@ -706,6 +706,9 @@ Returns a hash ref mapping value to data frame.
 =cut
 
 method split (Piddle $factor) {
+    if ($factor->$_DOES('PDL::Factor')) {
+        $factor = $factor->{PDL};
+    }
     my $uniq_values = $factor->$_call_if_can('uniq')
       // [ List::AllUtils::uniq( $factor->flatten ) ];
 
