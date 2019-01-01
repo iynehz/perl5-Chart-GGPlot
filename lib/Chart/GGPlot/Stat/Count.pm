@@ -1,6 +1,6 @@
 package Chart::GGPlot::Stat::Count;
 
-# ABSTRACT: Statistics method that counts number of data in bin
+# ABSTRACT: Statistic method that counts number of data in bin
 
 use Chart::GGPlot::Class qw(:pdl);
 use MooseX::Singleton;
@@ -36,7 +36,7 @@ method setup_params ($data, $params) {
 }
 
 method compute_group ($data, $scales, $params) {
-    my $width  = $params->at('width') // undef;
+    my $width  = $params->at('width');
 
     my $x      = $data->at('x');
     my $weight =
