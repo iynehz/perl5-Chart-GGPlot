@@ -10,6 +10,7 @@ use Chart::GGPlot::Aes::Functions qw(:all);
 
 subtest aes_mapping => sub {
     my $g = geom_bar(mapping => aes(weight => 'displ'));
+    is( $g->geom, 'Chart::GGPlot::Geom::Bar', 'geom' );
     ok($g->mapping->at('weight')->$_DOES('Eval::Quosure'), 'mapping');
     is($g->aes_params->as_hashref, {}, 'aes_params');
 };

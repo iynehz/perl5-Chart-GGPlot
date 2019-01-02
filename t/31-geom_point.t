@@ -10,6 +10,7 @@ use Chart::GGPlot::Aes::Functions qw(:all);
 
 subtest aes_mapping => sub {
     my $g = geom_point(mapping => aes(color => q{factor($cyl)}));
+    is( $g->geom, 'Chart::GGPlot::Geom::Point', 'geom' );
     ok($g->mapping->at('color')->$_DOES('Eval::Quosure'), 'mapping');
     is($g->aes_params->as_hashref, {}, 'aes_params');
 };
