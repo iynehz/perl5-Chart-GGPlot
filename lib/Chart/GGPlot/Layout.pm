@@ -3,6 +3,7 @@ package Chart::GGPlot::Layout;
 # ABSTRACT: Layout
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

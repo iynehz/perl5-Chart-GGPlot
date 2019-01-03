@@ -3,6 +3,7 @@ package Chart::GGPlot::Scale::Continuous;
 # ABSTRACT: Continuous scale
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

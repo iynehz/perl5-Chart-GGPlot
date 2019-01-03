@@ -3,6 +3,7 @@ package Chart::GGPlot::Geom;
 # ABSTRACT: The geom role
 
 use Chart::GGPlot::Role qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

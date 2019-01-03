@@ -3,6 +3,7 @@ package Chart::GGPlot::Scale::DiscreteIdentity;
 # ABSTRACT: Discrete identity scale
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

@@ -3,6 +3,7 @@ package Chart::GGPlot::HasParams;
 # ABSTRACT: The role for the 'extra_params' thing
 
 use Chart::GGPlot::Role;
+use namespace::autoclean;
 
 # VERSION
 

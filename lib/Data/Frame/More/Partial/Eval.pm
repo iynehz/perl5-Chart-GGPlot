@@ -3,6 +3,7 @@ package Data::Frame::More::Partial::Eval;
 # ABSTRACT: Partial class for data frame's eval method
 
 use Data::Frame::More::Role;
+use namespace::autoclean;
 
 # VERSION
 

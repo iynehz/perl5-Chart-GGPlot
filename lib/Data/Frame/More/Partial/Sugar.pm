@@ -3,6 +3,7 @@ package Data::Frame::More::Partial::Sugar;
 # ABSTRACT: Partial class for data frame syntax sugar
 
 use Data::Frame::More::Role;
+use namespace::autoclean;
 
 # VERSION
 

@@ -3,6 +3,7 @@ package Chart::GGPlot::HasLabeller;
 # ABSTRACT: The role for the 'labeller' attr
 
 use Chart::GGPlot::Role;
+use namespace::autoclean;
 
 # VERSION
 

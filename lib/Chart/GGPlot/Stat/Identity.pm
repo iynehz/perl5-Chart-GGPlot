@@ -3,6 +3,7 @@ package Chart::GGPlot::Stat::Identity;
 # ABSTRACT: Statistic method that does identity
 
 use Chart::GGPlot::Class;
+use namespace::autoclean;
 use MooseX::Singleton;
 
 # VERSION

@@ -3,6 +3,7 @@ package Chart::GGPlot::Guide;
 # ABSTRACT: Role for guide
 
 use Chart::GGPlot::Setup;
+use namespace::autoclean;
 
 # VERSION
 

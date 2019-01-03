@@ -3,6 +3,7 @@ package Chart::GGPlot::Guides;
 # ABSTRACT: The container of guides
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

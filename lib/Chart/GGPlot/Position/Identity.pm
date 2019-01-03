@@ -3,6 +3,7 @@ package Chart::GGPlot::Position::Identity;
 # ABSTRACT: Position class that does not adjust position
 
 use Chart::GGPlot::Class;
+use namespace::autoclean;
 
 # VERSION
 

@@ -3,6 +3,7 @@ package Chart::GGPlot::ScalesList;
 # ABSTRACT: Encapsulation multiple scale objects
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

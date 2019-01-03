@@ -3,6 +3,7 @@ package Chart::GGPlot::Bins;
 # ABSTRACT: Class for histogram bins
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

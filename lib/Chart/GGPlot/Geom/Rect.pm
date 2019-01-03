@@ -3,6 +3,7 @@ package Chart::GGPlot::Geom::Rect;
 # ABSTRACT: Class for rect geom
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 use MooseX::Singleton;
 
 # VERSION

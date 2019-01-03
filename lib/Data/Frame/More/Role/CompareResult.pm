@@ -4,6 +4,7 @@ package Data::Frame::More::Role::CompareResult;
 
 use Data::Frame::More::Setup;
 use Moo::Role;
+use namespace::autoclean;
 
 # VERSION
 

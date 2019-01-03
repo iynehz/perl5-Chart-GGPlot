@@ -3,6 +3,7 @@ package Chart::GGPlot::Theme::Element;
 # ABSTRACT: The role for theme elements
 
 use Chart::GGPlot::Role;
+use namespace::autoclean;
 
 # VERSION
 

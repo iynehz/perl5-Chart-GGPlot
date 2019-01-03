@@ -3,6 +3,7 @@ package Chart::GGPlot::Stat::Bin;
 # ABSTRACT: Statistic method that gets histogram of data
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean -except => 'stat';
 use MooseX::Singleton;
 
 # VERSION
@@ -13,7 +14,7 @@ use POSIX qw(floor);
 
 use Chart::GGPlot::Aes::Functions qw(aes);
 use Chart::GGPlot::Bins;
-use Chart::GGPlot::Util qw(call_if_coderef seq_n);
+use Chart::GGPlot::Util qw(call_if_coderef seq_n stat);
 
 with qw(
   Chart::GGPlot::Stat

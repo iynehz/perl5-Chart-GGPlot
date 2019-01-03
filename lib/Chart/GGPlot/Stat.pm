@@ -3,6 +3,7 @@ package Chart::GGPlot::Stat;
 # ABSTRACT: The stat role
 
 use Chart::GGPlot::Role qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 
@@ -13,7 +14,7 @@ use Types::PDL -types;
 use Data::Frame::More;
 use Chart::GGPlot::Trans;
 use Chart::GGPlot::Types qw(:all);
-use Chart::GGPlot::Util qw(:all);
+use Chart::GGPlot::Util qw(remove_missing stat);
 
 has retransform => ( is => 'ro' );
 
@@ -67,7 +68,7 @@ method compute_layer ( $data, $params, $layout ) {
 }
 
 method compute_panel ( $data, $scales, $params ) {
-    return Data::Frame::More::->new() if ( $data->isempty );
+    return Data::Frame::More->new() if ( $data->isempty );
 
     my $groups = $data->split( $data->at('group') );
     my $stats = {
@@ -100,10 +101,6 @@ method aesthetics () {
         @{ $self->default_aes->names }, 'group' );
     return \@names;
 }
-
-# TODO: revisit Chart::GGPlot::Setup and its use of namespace::autoclean
-no warnings 'redefine';
-sub stat { goto \&Chart::GGPlot::Util::stat; }
 
 1;
 

@@ -3,6 +3,7 @@ package Chart::GGPlot::Theme::Element::Rect;
 # ABSTRACT: Rectangular theme element
 
 use Chart::GGPlot::Class;
+use namespace::autoclean;
 use MooseX::Aliases;
 
 # VERSION

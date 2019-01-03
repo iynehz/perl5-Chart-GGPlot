@@ -3,6 +3,7 @@ package Chart::GGPlot::Built;
 # ABSTRACT: A processed ggplot that can be rendered
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

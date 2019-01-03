@@ -3,6 +3,7 @@ package Chart::GGPlot::Backend;
 # ABSTRACT: Role for backend classes for Chart::GGPlot 
 
 use Chart::GGPlot::Role;
+use namespace::autoclean;
 
 # VERSION
 

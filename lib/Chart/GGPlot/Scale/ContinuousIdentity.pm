@@ -3,6 +3,7 @@ package Chart::GGPlot::Scale::ContinuousIdentity;
 # ABSTRACT: Continuous identity scale
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

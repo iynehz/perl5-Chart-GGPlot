@@ -3,6 +3,7 @@ package Chart::GGPlot;
 # ABSTRACT: ggplot port for Perl
 
 use Chart::GGPlot::Class;
+use namespace::autoclean;
 
 # VERSION
 

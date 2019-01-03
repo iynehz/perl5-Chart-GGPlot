@@ -3,6 +3,7 @@ package Chart::GGPlot::Geom::Point;
 # ABSTRACT: Class for point geom
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 use MooseX::Singleton;
 
 # VERSION

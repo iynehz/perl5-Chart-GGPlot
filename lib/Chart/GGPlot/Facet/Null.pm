@@ -3,6 +3,7 @@ package Chart::GGPlot::Facet::Null;
 # ABSTRACT: A single panel for faceting
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

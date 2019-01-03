@@ -3,6 +3,7 @@ package Chart::GGPlot::Range::Discrete;
 # ABSTRACT: Discrete range
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

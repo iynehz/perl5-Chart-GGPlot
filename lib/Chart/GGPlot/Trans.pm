@@ -3,6 +3,7 @@ package Chart::GGPlot::Trans;
 # ABSTRACT: Transformation
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 use Types::Standard qw(Str CodeRef);
 use Types::PDL -types;

@@ -3,6 +3,7 @@ package Chart::GGPlot::Facet;
 # ABSTRACT: The facet class
 
 use Chart::GGPlot::Role qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

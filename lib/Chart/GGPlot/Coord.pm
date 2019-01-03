@@ -3,6 +3,7 @@ package Chart::GGPlot::Coord;
 # ABSTRACT: The role for coordinates
 
 use Chart::GGPlot::Role qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

@@ -3,6 +3,7 @@ package Chart::GGPlot::Position::Stack;
 # ABSTRACT:
 
 use Chart::GGPlot::Class;
+use namespace::autoclean;
 
 # VERSION
 

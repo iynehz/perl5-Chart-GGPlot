@@ -31,7 +31,6 @@ use MooseX::LazyRequire       ();
 use MooseX::StrictConstructor ();
 use MooseX::Traits            ();
 use boolean                   ();
-use namespace::autoclean 0.20;
 
 use List::AllUtils qw(uniq);
 
@@ -80,6 +79,7 @@ sub import {
 sub _import {
     my ( $class, $target, @tags ) = @_;
 
+    my @remove_module = @tags;
     for my $tag ( uniq @tags ) {
         $class->_import_tag( $target, $tag );
     }
@@ -120,8 +120,6 @@ sub _import_tag {
         MooseX::StrictConstructor->import::into($target);
 
         MooseX::Traits->import::into($target);
-
-        namespace::autoclean->import::into($target);
     }
     elsif ( $tag eq ':role' ) {
         $class->_import_tag( $target, ':base' );
@@ -133,8 +131,6 @@ sub _import_tag {
         MooseX::Aliases->import::into($target);
         MooseX::LazyRequire->import::into($target);
         MooseX::MungeHas->import::into($target);
-
-        namespace::autoclean->import::into($target);
     }
     elsif ( $tag eq ':pdl' ) {
         require PDL::Lite;

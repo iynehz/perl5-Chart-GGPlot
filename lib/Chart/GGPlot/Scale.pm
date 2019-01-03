@@ -3,6 +3,7 @@ package Chart::GGPlot::Scale;
 # ABSTRACT: The role for scale
 
 use Chart::GGPlot::Role qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

@@ -3,6 +3,7 @@ package Chart::GGPlot::Position;
 # ABSTRACT: The position role
 
 use Chart::GGPlot::Role;
+use namespace::autoclean;
 
 # VERSION
 

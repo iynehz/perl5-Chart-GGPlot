@@ -3,6 +3,7 @@ package Chart::GGPLot::Geom::Blank;
 # ABSTRACT: Class for blank geom
 
 use Chart::GGPlot::Class;
+use namespace::autoclean;
 use MooseX::Singleton;
 
 # VERSION

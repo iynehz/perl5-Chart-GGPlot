@@ -3,6 +3,7 @@ package Data::Frame::More;
 # ABSTRACT: Data frame implementation
 
 use Data::Frame::More::Class;
+use namespace::autoclean;
 
 with qw(
   MooX::Traits

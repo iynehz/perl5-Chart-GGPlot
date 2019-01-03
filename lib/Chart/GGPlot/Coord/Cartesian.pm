@@ -3,6 +3,7 @@ package Chart::GGPlot::Coord::Cartesian;
 # ABSTRACT: The Cartesian coordinate system
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

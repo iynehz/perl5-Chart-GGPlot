@@ -3,6 +3,7 @@ package Chart::GGPlot::Theme::Element::Blank;
 # ABSTRACT: Blank theme element
 
 use Chart::GGPlot::Class;
+use namespace::autoclean;
 
 # VERSION
 

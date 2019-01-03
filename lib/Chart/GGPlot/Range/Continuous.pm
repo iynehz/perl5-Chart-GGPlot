@@ -3,6 +3,7 @@ package Chart::GGPlot::Range::Continuous;
 # ABSTRACT: Continuous range
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

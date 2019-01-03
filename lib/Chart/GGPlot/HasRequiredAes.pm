@@ -3,6 +3,7 @@ package Chart::GGPlot::HasRequiredAes;
 # ABSTRACT: The role for the 'required_aes' attr
 
 use Chart::GGPlot::Role;
+use namespace::autoclean;
 
 # VERSION
 

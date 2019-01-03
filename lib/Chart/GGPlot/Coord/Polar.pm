@@ -3,6 +3,7 @@ package Chart::GGPlot::Coord::Polar;
 # ABSTRACT: The polar coordinate system
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

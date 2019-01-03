@@ -3,6 +3,7 @@ package Chart::GGPlot::HasDefaultAes;
 # ABSTRACT: The role for the 'default_aes' attr
 
 use Chart::GGPlot::Role;
+use namespace::autoclean;
 
 # VERSION
 

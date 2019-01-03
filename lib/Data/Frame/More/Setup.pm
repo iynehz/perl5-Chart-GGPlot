@@ -22,7 +22,6 @@ use boolean      ();
 
 use Moo 2.0 ();
 use Moo::Role  ();
-use namespace::autoclean 0.28 ();
 
 use List::AllUtils qw(uniq);
 
@@ -78,7 +77,6 @@ sub _import_tag {
             qw(classmethod :modifiers) );
 
         Moo->import::into($target);
-        namespace::autoclean->import::into($target);
     }
     elsif ( $tag eq ':role' ) {
         $class->_import_tag( $target, ':base' );
@@ -87,7 +85,6 @@ sub _import_tag {
             qw(classmethod :modifiers) );
 
         Moo::Role->import::into($target);
-        namespace::autoclean->import::into($target);
     }
     else {
         croak qq["$tag" is not exported by the $class module\n];

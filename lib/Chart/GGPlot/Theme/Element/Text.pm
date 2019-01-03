@@ -3,6 +3,7 @@ package Chart::GGPlot::Theme::Element::Text;
 # ABSTRACT: Text theme element
 
 use Chart::GGPlot::Class;
+use namespace::autoclean;
 use MooseX::Aliases;
 
 # VERSION

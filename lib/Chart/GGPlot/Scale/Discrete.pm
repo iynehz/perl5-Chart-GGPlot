@@ -3,6 +3,7 @@ package Chart::GGPlot::Scale::Discrete;
 # ABSTRACT: Discrete scale
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

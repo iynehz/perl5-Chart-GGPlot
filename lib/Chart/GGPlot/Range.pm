@@ -3,6 +3,7 @@ package Chart::GGPlot::Range;
 # ABSTRACT: The role for range
 
 use Chart::GGPlot::Role qw(:pdl);
+use namespace::autoclean;
 
 # VERSION
 

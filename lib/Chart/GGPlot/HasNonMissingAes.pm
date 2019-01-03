@@ -3,6 +3,7 @@ package Chart::GGPlot::HasNonMissingAes;
 # ABSTRACT: The role for the 'non_missing_aes' attr
 
 use Chart::GGPlot::Role;
+use namespace::autoclean;
 
 # VERSION
 

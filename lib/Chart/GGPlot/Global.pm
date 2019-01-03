@@ -3,6 +3,7 @@ package Chart::GGPlot::Global;
 # ABSTRACT: Various global variables and settings
 
 use Chart::GGPlot::Class;
+use namespace::autoclean;
 use MooseX::Singleton;
 
 # VERSION

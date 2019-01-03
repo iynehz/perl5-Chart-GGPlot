@@ -3,6 +3,7 @@ package Chart::GGPlot::Geom::Bar;
 # ABSTRACT: Class for bar geom
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
 use MooseX::Singleton;
 
 extends qw(Chart::GGPlot::Geom::Rect);

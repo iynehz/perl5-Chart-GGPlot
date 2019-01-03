@@ -3,6 +3,7 @@ package Chart::GGPlot::Stat::Count;
 # ABSTRACT: Statistic method that counts number of data in bin
 
 use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean -except => 'stat';
 use MooseX::Singleton;
 
 # VERSION
@@ -11,7 +12,7 @@ use Data::Frame::More;
 use PDL::Primitive qw(which);
 
 use Chart::GGPlot::Aes::Functions qw(aes);
-use Chart::GGPlot::Util qw(resolution);
+use Chart::GGPlot::Util qw(resolution stat);
 
 with qw(
   Chart::GGPlot::Stat

@@ -3,6 +3,7 @@ package Chart::GGPlot::Backend::Plotly;
 # ABSTRACT: Plotly backend for Chart::GGPlot
 
 use Chart::GGPlot::Class;
+use namespace::autoclean;
 
 # VERSION
 

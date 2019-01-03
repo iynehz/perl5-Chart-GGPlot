@@ -3,6 +3,7 @@ package Chart::GGPlot::Labeller;
 # ABSTRACT: Labeller functions for facets
 
 use Chart::GGPlot::Class;
+use namespace::autoclean;
 
 # VERSION
 
