@@ -122,10 +122,12 @@ package Chart::GGPlot::Backend::Plotly::Geom::Bar {
         );
 
         my ($x, $y) = map { $df->at($_)->unpdl } qw(x y);
+        my $width = ($df->at('xmax') - $df->at('xmin'))->unpdl;
 
         return Chart::Plotly::Trace::Bar->new(
             x         => $x,
             y         => $y,
+            width     => $width,
             marker    => $marker,
             hovertext => $df->at('hovertext')->unpdl,
             hoverinfo => [ ('text') x $df->nrow ],
