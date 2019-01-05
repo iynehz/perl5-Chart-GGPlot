@@ -11,7 +11,7 @@ my $diamonds = diamonds();
 my $p = ggplot(
     data    => $diamonds,
     mapping => aes( x => 'carat' )
-)->geom_histogram();
+)->geom_histogram( binwidth => 0.01 );
 
 
 $p->show();
