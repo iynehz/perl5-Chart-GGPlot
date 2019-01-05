@@ -61,6 +61,10 @@ fun ylim (@v) { limits( y => \@v ); }
 =cut
 
 fun limits ( $var, $lims ) {
+    state $check =
+      Type::Params::compile( Piddle1D->plus_coercions(PiddleFromAny) );
+    ($lims) = $check->($lims);
+
     if (is_discrete($lims)) {
         return _limits_factor( $var, $lims );
     }

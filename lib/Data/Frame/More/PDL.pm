@@ -114,6 +114,31 @@ sub repeat_to_length {
     return ( $x->length == $length ? $x : $x->slice( "0:" . ( $length - 1 ) ) );
 }
 
+sub as_pdlsv {
+    my ($self) = @_;
+
+    my $new_pdlsv = sub {
+        my ($x) = @_;
+        my $new = PDL::SV->new($x);
+        if ($self->badflag) {
+            $new = $new->setbadif($self->isbad);
+        }
+        return $new;
+    };
+
+    if ($self->$_DOES('PDL::Factor')) {
+        my $levels = $self->levels;
+        my $x = $self->unpdl->map( sub { $levels->at($_); } );
+        return $new_pdlsv->($x);
+    }
+    elsif ($self->$_DOES('PDL::DateTime')) {
+        return $new_pdlsv->($self->dt_unpdl);
+    }
+    else {
+        return $self->copy;
+    }
+}
+
 1;
 
 __END__
