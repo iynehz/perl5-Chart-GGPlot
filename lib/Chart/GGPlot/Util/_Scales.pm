@@ -20,6 +20,8 @@ use Time::Moment;
 use PDL::Primitive qw(which);
 use POSIX qw(ceil floor round log10);
 
+use Role::Tiny ();
+
 use Type::Params;
 use Types::PDL qw(Piddle Piddle1D PiddleFromAny);
 use Types::Standard qw(ArrayRef ConsumerOf Num Optional Str Maybe);
@@ -578,7 +580,6 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
 
     state $diff_zz = sub {
         my ($zz) = @_;
-        # TODO: $zz->diff->at(0) hangs
         my $zz_tm = $zz->dt_unpdl('Time::Moment');
         return $zz_tm->[0]->delta_seconds($zz_tm->[1]);
     };
@@ -589,6 +590,8 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
         my ($at, $s, $round) = @_;
         $round //= true;
 
+        Role::Tiny->apply_roles_to_object($at, 'PDL::Role::HasNames');
+        $at->names($at->dt_unpdl($s->{format}));
         return $at;
     };
 

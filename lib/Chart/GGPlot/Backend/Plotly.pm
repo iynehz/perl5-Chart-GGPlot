@@ -84,15 +84,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
                 $d->exists("${_}_raw") ? $d->at("${_}_raw")
               : $d->exists($_)         ? $d->at($_)
               :                          undef;
-            if (defined $col) {
-                if ( $col->$_DOES('PDL::Factor') ) {
-                    my $levels = $col->levels;
-                    $col = $col->unpdl->map( sub { $levels->at($_); } );
-                }
-                ( $var => $col );
-            } else {
-                ();
-            }
+            defined $col ? ( $var => $col->as_pdlsv ) : ();
         } @hover_aes;
         my $hover_text = [ 0 .. $d->nrow - 1 ]->map(
             sub { join( br(), pairmap { "$a: " . $b->at($_) } @hover_data ); }
@@ -206,7 +198,8 @@ method to_plotly ($plot_built) {
 
         my $axis_title = $labels->at($xy) // '';
 
-        my $labels       = $panel_params->{"$xy.labels"}->unpdl;
+        my $labels = $panel_params->{"$xy.labels"}->as_pdlsv->unpdl;
+
         my $major_source = $panel_params->{"$xy.major_source"}->unpdl;
         my %ticks = pairwise { $a => $b } @$major_source, @$labels;
 
@@ -220,6 +213,7 @@ method to_plotly ($plot_built) {
             title    => $axis_title,
             ticktext => $ticktext,
             tickvals => $tickvals,
+            zeroline => JSON::false,
         };
     }
 

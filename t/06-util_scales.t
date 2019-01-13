@@ -255,10 +255,11 @@ subtest pretty_dt => sub {
         'Util::_Scales::seq_dt'
     );
 
+    my $pretty_dt_rslt = Chart::GGPlot::Util::_Scales::pretty_dt(
+        PDL::DateTime->new_from_datetime( [qw(2008-01-01 2009-01-01)] ) );
+    DOES_ok($pretty_dt_rslt, [qw(PDL::DateTime PDL::Role::HasNames)]);
     pdl_is(
-        Chart::GGPlot::Util::_Scales::pretty_dt(
-            PDL::DateTime->new_from_datetime( [qw(2008-01-01 2009-01-01)] ),
-        ),
+        PDL::DateTime->new($pretty_dt_rslt->unpdl),
         PDL::DateTime->new_sequence( '2008-01-01', 5, 'quarter' ),
         'pretty_dt'
     );
@@ -277,17 +278,21 @@ subtest pretty_breaks => sub {
         pdl( 0 .. 5 ) * 20,
         'pretty_breaks()->(pdl(1..100))'
     );
-    pdl_is(
-        $f_default->(
+
+    my $pretty_dt_rslt1 = $f_default->(
             PDL::DateTime->new_from_datetime( [qw(2008-01-01 2009-01-01)] )
-        ),
+        );
+    DOES_ok($pretty_dt_rslt1, [qw(PDL::DateTime PDL::Role::HasNames)]);
+    pdl_is(
+        PDL::DateTime->new($pretty_dt_rslt1->unpdl),
         PDL::DateTime->new_sequence( '2008-01-01', 5, 'quarter' ),
 'pretty_breaks()->(PDL::DateTime->new_from_datetime( [qw(2008-01-01 2009-01-01)] )'
     );
-    pdl_is(
-        $f_default->(
+    my $pretty_dt_rslt2 = $f_default->(
             PDL::DateTime->new_from_datetime( [qw(2008-01-01 2090-01-01)] )
-        ),
+        );
+    pdl_is(
+        PDL::DateTime->new($pretty_dt_rslt2->unpdl),
         PDL::DateTime->new_sequence( '2000-01-01', 6, 'year', 20 ),
 'pretty_breaks()->(PDL::DateTime->new_from_datetime( [qw(2008-01-01 2090-01-01)] )'
     );

@@ -7,6 +7,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 # VERSION
 
 use List::AllUtils qw(pairgrep);
+use Module::Load;
 use Types::Standard qw(CodeRef Str);
 
 use Chart::GGPlot::Aes::Functions qw(:all);
@@ -32,6 +33,7 @@ my @export_ggplot = (
           scale_x_reverse scale_y_reverse
           scale_x_sqrt scale_y_sqrt
           scale_x_discrete scale_y_discrete
+          scale_x_datetime scale_y_datetime
           scale_color_hue scale_color_discrete
           scale_color_continuous scale_fill_continuous
           scale_color_brewer scale_fill_brewer
@@ -86,6 +88,9 @@ fun scale_type ($x) {
     }
     elsif ( $x->$_DOES('PDL::SV') ) {
         return 'discrete';
+    }
+    elsif ( $x->$_DOES('PDL::DateTime') ) {
+        return 'datetime';
     }
     elsif ( $x->$_DOES('PDL') ) {
         if ( $x->type eq 'byte' ) {
@@ -146,6 +151,7 @@ fun continuous_scale (
         $limits = $trans->transform->( pdl($limits) );
     }
 
+    load $super;
     return $super->new(
         pairgrep { defined $b } 
         (
@@ -562,6 +568,94 @@ for my $aes (qw(alpha size)) {
         scale_continuous_identity( %rest, aesthetics => $aes )
     };
 }
+
+fun datetime_scale (:$aesthetics, :$trans, :$palette,
+                    :$breaks = pretty_breaks(), :$minor_breaks = undef,
+                    :$labels = undef, :$date_breaks = undef,
+                    :$date_labels = undef,
+                    :$date_minor_breaks = undef, :$timezone = undef,
+                    :$guide = 'legend',
+                    %rest) {
+
+    # TODO: handle timezone
+
+    if ( defined $date_breaks ) {
+        $breaks = date_breaks($date_breaks);
+    }
+    if ( defined $date_minor_breaks ) {
+        $minor_breaks = date_breaks($date_minor_breaks);
+    }
+    if ( defined $date_labels ) {
+        $labels = sub {
+            my ($x) = @_;
+            return $x->as_pdlsv;
+        };
+    }
+
+    my $name = 'datetime';
+
+    state $positional_aes =
+      { map { $_ => 1 } qw(x xmin xmax xend y ymin ymax yend) };
+    my $scale_class;
+    if ( List::AllUtils::all { $positional_aes->exists($_) }
+        $aesthetics->flatten )
+    {
+        if ($name eq 'datetime') {
+            $scale_class = 'Chart::GGPlot::Scale::ContinuousDateTime';
+        }
+    }
+    else {
+        $scale_class = 'Chart::GGPlot::Scale::Continuous';
+    }
+
+    my $sc = continuous_scale(
+        aesthetics   => $aesthetics,
+        scale_name   => $name,
+        palette      => $palette,
+        breaks       => $breaks,
+        minor_breaks => $minor_breaks,
+        labels       => $labels,
+        guide        => $guide,
+        trans        => $trans,
+        super        => $scale_class,
+        %rest,
+    );
+
+    #$sc->timezone($timezone);
+    return $sc;
+}
+
+fun _scale_datetime ($aes) {
+    return fun(:$name = undef, :$breaks = undef, :$date_breaks = undef,
+               :$labels = undef, :$date_labels = undef, 
+               :$minor_breaks = undef, :$date_minor_breaks = undef,
+               :$timezone = undef,
+               :$limits = undef, :$expand = undef,
+               PositionEnum :$position = "bottom",
+               :$sec_axis = undef) {
+        my $sc = datetime_scale(
+            aesthetics        => $aes,
+            trans             => 'time',
+            name              => $name,
+            palette           => \&identify,
+            breaks            => $breaks,
+            date_breaks       => $date_breaks,
+            labels            => $labels,
+            date_labels       => $date_labels,
+            minor_breaks      => $minor_breaks,
+            date_minor_breaks => $date_minor_breaks,
+            timezone          => $timezone,
+            guide             => 'none',
+            limits            => $limits,
+            expand            => $expand,
+            position          => $position,
+        );
+        return $sc;
+    };
+}
+
+*scale_x_datetime = _scale_datetime([qw(x xmin xmax xend)]);
+*scale_y_datetime = _scale_datetime([qw(y ymin ymax yend)]);
 
 # TODO: remove this
 sub _na_value_color { $_[0] }

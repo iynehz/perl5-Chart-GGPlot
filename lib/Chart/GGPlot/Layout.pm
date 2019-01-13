@@ -114,8 +114,9 @@ method map_position (ArrayRef $data, $keep_raw_column=false) {
     my $layout = $self->layout;
 
     return $data->map(
-        fun($layer_data)
-        {
+        sub {
+            my ($layer_data) = @_;
+
             my $match_id =
               match( $layer_data->at('PANEL'), $layout->at('PANEL') );
 
@@ -202,8 +203,7 @@ method setup_panel_params () {
 
     my @params = pairwise {
         $self->coord->setup_panel_params( $a, $b, $self->coord_params );
-    }
-    @$scales_x, @$scales_y;
+    } @$scales_x, @$scales_y;
     $self->_set_panel_params( \@params );
 }
 

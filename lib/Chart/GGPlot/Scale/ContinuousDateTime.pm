@@ -1,6 +1,6 @@
-package Chart::GGPlot::Scale::ContinuousPosition;
+package Chart::GGPlot::Scale::ContinuousDateTime;
 
-# ABSTRACT: Continuous position scale
+# ABSTRACT: Continuous datetime scale
 
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
@@ -10,26 +10,31 @@ use namespace::autoclean;
 use Types::PDL qw(Piddle PiddleFromAny);
 use Types::Standard qw(InstanceOf Maybe);
 
+use Chart::GGPlot::Trans::Functions qw(time_trans);
 use Chart::GGPlot::Util qw(:all);
 
 extends qw(
   Chart::GGPlot::Scale::Continuous
 );
 
+has timezone => (is => 'rwp');
+
 with qw(
-    Chart::GGPlot::Scale::Positional
-    Chart::GGPlot::Scale::SupportsSecondaryAxis
+  Chart::GGPlot::Scale::Positional
+  Chart::GGPlot::Scale::SupportsSecondaryAxis
 );
 
-has '+limits' => (
-    isa     => Piddle->plus_coercions(PiddleFromAny),
-    coerce  => 1,
-);
+around transform($p) {
+    my $tz = $p->$_can('timezone');
+    if (not defined $self->timezone and defined $tz) {
+        $self->_set_timezone($tz);
+        $self->trans(time_trans($self->timezone));
+    }
+    return $self->$orig($p);
+}
 
 method map_to_limits ( $p, $limits = $self->get_limits ) {
-    my $scaled = $self->oob->( $p, $limits );
-    $scaled->setbadtoval($self->na_value);
-    return $scaled;
+    return $self->oob->( $p, $limits );
 }
 
 method break_info ($range = null()) {

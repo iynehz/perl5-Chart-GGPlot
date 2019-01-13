@@ -7,6 +7,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 # VERSION
 
 use PDL::Math;
+use Role::Tiny ();
 
 use Chart::GGPlot::Trans;
 use Chart::GGPlot::Types;
@@ -22,6 +23,7 @@ our @EXPORT_OK = qw(
   log10_trans    log2_trans
   log1p_trans    reciprocal_trans
   reverse_trans  sqrt_trans
+  time_trans
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
@@ -166,12 +168,40 @@ fun sqrt_trans() {
     );
 }
 
+fun time_trans ($tz=undef) {
+    state $fix = sub {
+        my ($p, $r) = @_;
+        if ( $p->$_DOES('PDL::Role::HasNames') ) {
+            Role::Tiny->apply_roles_to_object( $r, 'PDL::Role::HasNames' );
+            $r->names( $p->names );
+        }
+        if ($p->badflag) {
+            $r->setbadif($p->isbad);
+        }
+        return $r;
+    };
+
+    # TODO: we don't yet support timezone
+    my $from_time = fun($p) {
+        my $rslt = pdl( $p->unpdl );
+        return $fix->($p, $rslt);
+    };
+    my $to_time = fun($p) {
+        #TODO: See if there is a better way to do it.
+        my $rslt =
+          PDL::DateTime->new( $p->unpdl->map( sub { $_ eq 'BAD' ? 0 : $_ } ) );
+        return $fix->($p, $rslt);
+    };
+    _trans_new( 'time', $from_time, $to_time, breaks => pretty_breaks() );
+}
+
 for my $trans (
     asn_trans(),      atanh_trans(),
     identity_trans(), log_trans(),
     log10_trans(),    log2_trans(),
     log1p_trans(),    reciprocal_trans(),
     reverse_trans(),  sqrt_trans(),
+    time_trans(),
   )
 {
     register_trans($trans);

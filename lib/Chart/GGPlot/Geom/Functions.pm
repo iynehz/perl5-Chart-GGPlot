@@ -6,9 +6,6 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 # VERSION
 
-use Chart::GGPlot::Geom::Blank;
-use Chart::GGPlot::Geom::Point;
-use Chart::GGPlot::Geom::Rect;
 use Chart::GGPlot::Layer::Functions qw(layer);
 use Chart::GGPlot::Types;
 use Chart::GGPlot::Util qw(:all);
@@ -18,13 +15,12 @@ use parent qw(Exporter::Tiny);
 my @export_ggplot = qw(
   geom_blank
   geom_point
+  geom_path geom_line
   geom_bar geom_histogram
 );
 
 our @EXPORT_OK = (
     @export_ggplot,
-    qw(
-      )
 );
 
 our %EXPORT_TAGS = (
@@ -32,14 +28,10 @@ our %EXPORT_TAGS = (
     ggplot => \@export_ggplot,
 );
 
-fun geom_blank (
-    : $mapping     = undef,
-    : $data        = undef,
-    : $stat        = "identity",
-    : $position    = "identity",
-    : $show_legend = 'auto',
-    : $inherit_aes = true, %rest
-  ) {
+fun geom_blank (:$mapping = undef, :$data = undef,
+                :$stat = "identity", :$position = "identity",
+                :$show_legend = 'auto', :$inherit_aes = true,
+                %rest) {
     return layer(
         data        => $data,
         mapping     => $mapping,
@@ -53,15 +45,45 @@ fun geom_blank (
     );
 }
 
-fun geom_point (
-    : $mapping = undef,
-    : $data= undef,
-    : $stat = 'identity',
-    : $position = 'identity',
-    : $na_rm = false,
-    : $show_legend = 'auto',
-    : $inherit_aes = true, 
-    %rest) {
+fun geom_path (:$mapping = undef, :$data = undef, 
+               :$stat = 'identity', :$position = 'identity', 
+               :$na_rm = false,
+               :$show_legend = 'auto', :$inherit_aes = true, 
+               %rest) {
+    return layer(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => $stat,
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        geom        => 'path',
+        params      => { na_rm => $na_rm, %rest },
+    );
+}
+
+fun geom_line (:$mapping = undef, :$data = undef, 
+               :$stat = 'identity', :$position = 'identity', 
+               :$na_rm = false,
+               :$show_legend = 'auto', :$inherit_aes = true, 
+               %rest) {
+    return layer(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => $stat,
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        geom        => 'line',
+        params      => { na_rm => $na_rm, %rest },
+    );
+}
+
+fun geom_point (:$mapping = undef, :$data = undef,
+                :$stat = 'identity', :$position = 'identity',
+                :$na_rm = false,
+                :$show_legend = 'auto', :$inherit_aes = true, 
+                %rest) {
     return layer(
         data        => $data,
         mapping     => $mapping,
@@ -74,10 +96,11 @@ fun geom_point (
     );
 }
 
-fun geom_bar(:$mapping=undef, :$data=undef,
-             :$stat='count', :$position='stack', 
-             :$width=undef, :$na_rm=false,
-             :$show_legend='auto', :$inherit_aes=true, %rest) {
+fun geom_bar(:$mapping = undef, :$data = undef,
+             :$stat = 'count', :$position = 'stack', 
+             :$width = undef, :$na_rm = false,
+             :$show_legend = 'auto', :$inherit_aes = true,
+             %rest) {
     return layer(
         data        => $data,
         mapping     => $mapping,
@@ -94,18 +117,12 @@ fun geom_bar(:$mapping=undef, :$data=undef,
     );
 }
 
-fun geom_histogram (
-    : $data        = undef,
-    : $mapping     = undef,
-    : $stat        = "bin",
-    : $position    = "stack",
-    : $binwidth    = undef,
-    : $bins        = undef,
-    : $na_rm       = false,
-    : $show_legend = 'auto',
-    : $inherit_aes = true,
-    %rest
-  ) {
+fun geom_histogram (:$data = undef, :$mapping = undef,
+                    :$stat = "bin", :$position = "stack",
+                    :$binwidth = undef, :$bins = undef,
+                    :$na_rm = false,
+                    :$show_legend = 'auto', :$inherit_aes = true,
+                    %rest) {
     return layer(
         data        => $data,
         mapping     => $mapping,
