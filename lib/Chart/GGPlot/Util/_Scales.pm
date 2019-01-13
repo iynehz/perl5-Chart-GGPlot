@@ -8,20 +8,23 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 use Color::Brewer;
 use Convert::Color::LCh;
+use Data::Munge qw(elem rec);
 use Graphics::Color::RGB;
 use Machine::Epsilon qw(machine_epsilon);
 use Math::Gradient qw(multi_array_gradient);
+use Math::Round qw(nearest);
 use Math::Interpolate;
 use Scalar::Util qw(looks_like_number);
+use Time::Moment;
 
 use PDL::Primitive qw(which);
+use POSIX qw(ceil floor round log10);
 
 use Type::Params;
 use Types::PDL qw(Piddle Piddle1D PiddleFromAny);
-use Types::Standard qw(ArrayRef Num Optional Str);
+use Types::Standard qw(ArrayRef ConsumerOf Num Optional Str Maybe);
 
 use Chart::GGPlot::Types qw(:all);
-
 use Chart::GGPlot::Util::_Base qw(:all);
 use Chart::GGPlot::Util::_Labeling qw(:all);
 
@@ -35,6 +38,7 @@ our @EXPORT_OK = qw(
   area_pal
   identity_pal
   extended_breaks regular_minor_breaks
+  pretty pretty_breaks
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
@@ -389,4 +393,408 @@ fun regular_minor_breaks ( $reverse = false ) {
     }
 }
 
+=func pretty
+
+Compute a sequence of about n+1 equally spaced ‘round’ values which cover
+the range of the values in x. The values are chosen so that they are
+1, 2 or 5 times a power of 10.
+
+=cut
+
+# This is ported from R "labeling" package's rpretty(), which is unlike R's
+# pretty() function in that it does not handle DateTime objects.
+fun pretty($x, :$n=5, :$min_n = $n % 3, :$shrink_sml = 0.75,
+           :$high_u_bias = 1.5, :$u5_bias = 0.5 + 1.5 * $high_u_bias) {
+    my ($dmin, $dmax) = $x->minmax;
+    my $ndiv = $n;
+    my $h = $high_u_bias;
+    my $h5 = $u5_bias;
+    my $dx   = $dmax - $dmin;
+
+    my $cell;
+    my $i_small;
+    my $u;
+    if ($dx == 0 and $dmax == 0) {
+        $cell = $u = 1;
+        $i_small = true;
+    } else {
+        $cell = List::AllUtils::max(abs($dmin), abs($dmax));
+        $u = 1 + (($h5 >= 1.5 * $h + 0.5) ? 1 / (1 + $h) : 1.5/(1 + $h5));
+        $i_small = $dx < ($cell * $u * List::AllUtils::max(1, $ndiv) * 1e-7 * 3);
+    }
+    if ($i_small) {
+        if ($cell > 10) {
+            $cell = 9 + $cell / 10;
+        }
+        $cell = $cell * $shrink_sml;
+        if ($min_n > 1) {
+            $cell = $cell / $min_n;
+        }
+    }
+    else {
+        $cell = $dx;
+        if ($ndiv > 1) {
+            $cell = $cell / $ndiv;
+        }
+    }
+    $cell = List::AllUtils::max($cell, 20 * 1e-7);
+
+    my $base = 10 ** floor(log10($cell));
+    my $unit = $base;
+    if ((2 * $base) - $cell < $h * ($cell - $unit)) {
+        $unit = 2 * $base;
+        if ((5 * $base) - $cell < $h5 * ($cell - $unit)) {
+            $unit = 5 * $base;
+            if ((10 * $base) - $cell < $h * ($cell - $unit)) {
+                $unit = 10 * $base;
+            }
+        }
+    }
+
+    my $ns = floor($dmin/$unit + 1e-07);
+    my $nu = ceil($dmax/$unit - 1e-07);
+    while ($ns * $unit > $dmin + (1e-07 * $unit)) { $ns--; }
+    while ($nu * $unit < $dmax - (1e-07 * $unit)) { $nu++; }
+
+    my $k = floor(0.5 + $nu - $ns);
+    if ($k < $min_n) {
+        $k = $min_n - $k;
+        if ($ns >= 0) {
+            $nu = $nu + $k/2;
+            $ns = $ns - $k/2 + $k % 2;
+        }
+        else {
+            $ns = $ns - $k/2;
+            $nu = $nu + $k/2 + $k % 2;
+        }
+        $ndiv = $min_n;
+    }
+    else {
+        $ndiv = $k;
+    }
+    my $graphmin = $ns * $unit;
+    my $graphmax = $nu * $unit;
+
+    return seq_by($graphmin, $graphmax, $unit);
+}
+
+fun seq_dt (:$beg, :$end=undef, :$by, :$length=undef) {
+    state $check = Type::Params::compile(
+        ConsumerOf ['PDL::DateTime'],
+        Maybe [ ConsumerOf ['PDL::DateTime'] ],
+        Str
+    );
+    ($beg, $end, $by) = $check->($beg, $end, $by);
+
+    my $start_time = $beg->dt_at(0);
+
+    if ( $by ne 'halfmonth' ) {
+        my ( $step, $unit ) = split( /\s+/, $by );
+        unless (defined $length) {
+            my $delta_f = "delta_${unit}s";
+            no strict 'refs';
+            $length = $beg->dt_unpdl('Time::Moment')->[0]
+              ->$delta_f( $end->dt_unpdl('Time::Moment')->[0] ) / $step;
+            if ( ceil($length) == $length ) {
+                $length += 1;
+            }
+            $length = ceil($length);
+        }
+        return PDL::DateTime->new_sequence( $start_time, $length, $unit,
+            $step );
+    }
+
+    # else: by "halfmonth"
+    my $at =
+      defined $length
+      ? seq_dt( beg => $beg, by => '1 month', length => ceil( $length / 2 ) )
+      : seq_dt( beg => $beg, by => '1 month', end    => $end );
+
+    #TODO: $at->dt_day would hang here. For now let's workaround...
+    #my $md = List::AllUtils::uniq( @{ $at->dt_day } );
+    my @md = List::AllUtils::uniq( map { $_->day_of_month } @{ $at->dt_unpdl('Time::Moment') } );
+    die unless @md == 1;
+    
+    my $md = $md[0];
+    my $at2 =
+        $md < 15
+      ? $at->dt_add( day => 14 )
+      : $at->dt_add( day => 1 - $md, month => 1 );
+    my $rslt = PDL::DateTime->new(
+        [ sort { $a <=> $b } ( @{ $at->unpdl }, @{ $at2->unpdl } ) ] );
+    return $rslt;
+}
+
+fun dt_align ($pdldt, $unit, $start_on_monday=true) {
+    if (
+        elem(
+            $unit,
+            [
+                qw(
+                  second minute hour
+                  day week month quarter year
+                  )
+            ]
+        )
+      )
+    {
+        return $pdldt->dt_align($unit);
+    }
+
+    state $round_year = sub {
+        my ( $x, $n ) = @_;
+
+        return PDL::DateTime->new_from_datetime(
+            $x->dt_align('year')->dt_unpdl()->map(
+                sub {
+                    my ( $y, $m, $d ) = split( /\-/, $_ );
+                    $y = int( $y / $n ) * $n;
+                    "$y-$m-$d";
+                }
+            )
+        );
+    };
+
+    if ( $unit eq 'decade' ) {
+        return $round_year->( $pdldt, 10 );
+    }
+    elsif ( $unit eq 'century' ) {
+        return $round_year->( $pdldt, 100 );
+    }
+}
+
+# R pretty.Date()
+fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
+    state $check = Type::Params::compile(ConsumerOf['PDL::DateTime']);
+    ($x) = $check->($x);
+    
+    my $zz = my $rx = PDL::DateTime->new([$x->min, $x->max]);
+
+    my $MIN = 60;
+    my $HOUR = $MIN * 60;
+    my $DAY = $HOUR * 24;
+    my $YEAR = $DAY * 365.25;
+    my $MONTH = $YEAR / 12;
+
+    state $diff_zz = sub {
+        my ($zz) = @_;
+        # TODO: $zz->diff->at(0) hangs
+        my $zz_tm = $zz->dt_unpdl('Time::Moment');
+        return $zz_tm->[0]->delta_seconds($zz_tm->[1]);
+    };
+
+    my $D = $diff_zz->($zz);
+
+    my $make_output = sub {
+        my ($at, $s, $round) = @_;
+        $round //= true;
+
+        return $at;
+    };
+
+    if ($D < $n * $DAY) {
+        $zz = $zz;
+        my $r = round($n - $D / $DAY);
+        my $m = List::AllUtils::max(0, $r % 2);
+        my $m2 = $m + ($r % 2);
+        my $dd = seq_dt(
+            beg => PDL::DateTime->new( $zz->at(0) - $m * $DAY ),
+            end => PDL::DateTime->new( $zz->at(1) + $m2 * $DAY ),
+            by  => '1 day'
+        );
+        while ($dd->length < $min_n + 1) {
+            if ($m < $m2) {
+                $m = $m+1;
+            } else {
+                $m2 = $m2 + 1;
+            }
+        }   
+        return $make_output->($dd, { format => "%b %d" }, false);
+    } elsif ($D < 1) { 
+        my $m = List::AllUtils::min(30, List::AllUtils::max($D, $n/2));
+        # TODO
+        #$zz = ;
+    }
+    my $xspan = $diff_zz->($zz);
+    my $steps = [
+        { spec => '1 second',  secs => 1, format => '%S', start => 'minute' },
+        { spec => '2 second',  secs => 2 },
+        { spec => '5 second',  secs => 5 },
+        { spec => '10 second', secs => 10 },
+        { spec => '15 second', secs => 15 },
+        { spec => '30 second', secs => 30, format => '%H:%M:%S' },
+        { spec => '1 minute',  secs => $MIN, format => '%H:%M' },
+        { spec => '2 minute',  secs => 2 * $MIN, start => 'hour' },
+        { spec => '5 minute',  secs => 5 * $MIN },
+        { spec => '10 minute', secs => 10 * $MIN },
+        { spec => '15 minute', secs => 15 * $MIN },
+        { spec => '30 minute', secs => 30 * $MIN },
+        {
+            spec   => '1 hour',
+            secs   => $HOUR,
+            format => ( $xspan < $DAY ? '%H:%M' : '%b %d %H:%M' )
+        },
+        { spec => '3 hour',    secs => 3 * $HOUR,    start  => 'day' },
+        { spec => '6 hour',    secs => 6 * $HOUR,    format  => '%b %d %H:%M' },
+        { spec => '12 hour',   secs => 12 * $HOUR },
+        { spec => '1 day',     secs => $DAY,         format => '%b %d' },
+        { spec => '2 day',     secs => 2 * $DAY },
+        { spec => '1 week',    secs => 7 * $DAY,     start  => 'week' },
+        { spec => 'halfmonth', secs => 0.5 * $MONTH, start  => 'month' },
+        {
+            spec   => '1 month',
+            secs   => $MONTH,
+            format => ( $xspan < $YEAR ? '%b' : '%b %Y' )
+        },
+        { spec => '3 month',   secs => 3 * $MONTH, start  => 'year' },
+        { spec => '6 month',   secs => 6 * $MONTH, format => '%Y-%m' },
+        { spec => '1 year',    secs => $YEAR,      format => '%Y' },
+        { spec => '2 year',    secs => 2 * $YEAR,  start  => 'decade' },
+        { spec => '5 year',    secs => 5 * $YEAR },
+        { spec => '10 year',   secs => 10 * $YEAR },
+        { spec => '20 year',   secs => 20 * $YEAR, start  => 'century' },
+        { spec => '50 year',   secs => 50 * $YEAR },
+        { spec => '100 year',  secs => 100 * $YEAR },
+        { spec => '200 year',  secs => 200 * $YEAR },
+        { spec => '500 year',  secs => 500 * $YEAR },
+        { spec => '1000 year', secs => 1000 * $YEAR },
+    ];
+    for my $i (1 .. $#$steps) {
+        $steps->[$i]{format} //= $steps->[$i-1]{format};
+        $steps->[$i]{start} //= $steps->[$i-1]{start};
+    }
+
+    # crudely work out number of steps in the given interval
+    my $nsteps = $xspan / pdl($steps->map(sub { $_->{secs} }));
+    my $init_i = my $init_i0 = ($nsteps-$n)->abs->minimum_ind;
+
+    # calculate actual number of ticks in the given interval
+
+    my $calc_steps = sub {
+        my ( $s, $lim ) = @_;
+        $lim //= range_($zz);
+
+        my $spec  = $s->{spec};
+
+        my $start = dt_align( PDL::DateTime->new($lim->at(0)), $s->{start} );
+        my $at = seq_dt(
+            beg => $start,
+            end => PDL::DateTime->new( $lim->at(1) ),
+            by  => $spec
+        );
+        my $r1 = List::AllUtils::max(( $at <= $lim->at(0) )->sum - 1, 0);
+        my $r2 = $at->length - ( $at >= $lim->at(1) )->sum;
+        if ( $r2 == $at->length )
+        {    # not covering at right -- add point at right
+            my $nat = seq_dt(
+                beg => PDL::DateTime->new( $at->at(-1) ),
+                by  => $spec,
+                length => 2
+            )->slice( pdl( [1] ) );
+            if ( !(( $nat > $at->at(-1) )->all) ) {    # failed
+                $r2 = $at->length - 1;
+            }
+            $at = $at->glue( 0, $nat );
+        }
+        return $at->slice( pdl( [ $r1 .. $r2 ] ) );
+    };
+
+    my $init_at = $calc_steps->(my $st_i = $steps->[$init_i]);
+
+    # bump it up if below acceptable threshold
+    my $R = true;
+    my $L_fail = my $R_fail = false;
+    my $init_n = $init_at->length - 2;
+    while ($init_n < $min_n) {
+        if ($init_i == 0) {  # keep steps->[0]
+            # add new interval right or left
+            if ($R) {
+                my $nat = seq_dt(beg => $init_at->at(-1), by => $st_i->{spec}, length => 2)->slice(pdl([1]));
+                $R_fail = ($nat->isbad->at(0) or $nat->at(0) > $init_at->at(-1));
+                unless ($R_fail) {
+                    $init_at->dt_set(-1, $nat->dt_at(0));
+                } 
+            } else {    # left
+                my $nat = seq_dt(beg => $init_at->at(-1), by => "-$st_i->{spec}", length => 2)->slice(pdl([1]));
+                $L_fail = ($nat->isbad->at(0) or $nat->at(0) < $init_at->at(0));
+                unless ($L_fail) {
+                    $init_at->dt_set(0, $nat->dt_at(0));
+                } 
+            }
+            if ($R_fail and $L_fail) {
+                die q{failed to add more ticks; $min_n too large?};
+            }
+            $R = !$R;   # alternating right <-> left
+        } else {    # smaller step sizes
+            $init_i = $init_i - 1;
+            $st_i = $steps->[$init_i];
+            $init_at = $calc_steps->($st_i);
+        }
+    }
+
+    if ($init_n == $n - 1 ) {   # perfect
+        return $make_output->($init_at, $st_i);
+    }
+    # else: have a different dn
+    my $dn = $init_n - ($n - 1);
+    if ($dn > 0) {
+        # ticks "outside", on left and right, keep at least one on each side
+        my $nl = ($init_at <= $rx->at(0))->sum - 1;
+        my $nr = ($init_at >= $rx->at(1))->sum - 1;
+        if ($nl > 0 or $nr > 0) {
+            my $n_c = $nl + $nr;
+            if ($dn < $n_c) { # remove $dn, not all
+                $nl = round($dn * $nl / $n_c);
+                $nr = $dn - $nl;
+            }
+            # remove nl on left,  nr on right
+            $init_at = $init_at->slice(pdl([$nl .. $init_at->length-$nr - 1]));
+        }
+    } else {    # too few ticks
+        ;
+    }
+
+    $dn = $init_at->length - 1 - $n;
+    if (    $dn == 0    # perfect
+            or ($dn > 0 and $init_i < $init_i0)    # too many, but we tried $init_i + 1 already
+            or ($dn < 0 and $init_i == 0))  # too few but $init_i == 0
+    {
+        return $make_output->($init_at, $st_i);
+    }
+
+    my $new_i =
+      ( $dn > 0
+        ? List::AllUtils::min( $init_i + 1, $steps->length - 1 )
+        : $init_i - 1 );
+    my $new_at = $calc_steps->($steps->[$new_i]);
+    my $new_n = $new_at->length - 1;
+
+    # work out whether new.at or init.at is better
+    if ($new_n < $min_n) {
+        $new_n = "-Inf";
+    }
+    if (abs($new_n - $n) < abs($dn)) {
+        return $make_output->($new_at, $steps->[$new_i]);
+    } else {
+        return $make_output->($init_at, $st_i);
+    }
+}
+
+=func pretty_breaks
+
+Pretty breaks. Uses default break algorithm as implemented in C<pretty()>.
+
+=cut
+
+fun pretty_breaks($n=5, %rest) {
+    return sub {
+        my ($x) = @_;
+
+        my $f = $x->$_DOES('PDL::DateTime') ? 'pretty_dt' : 'pretty';
+        no strict 'refs';
+        return $f->($x, n=>$n, %rest);
+    };
+}
+
 1;
+

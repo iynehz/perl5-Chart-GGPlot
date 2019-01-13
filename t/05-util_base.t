@@ -31,7 +31,18 @@ subtest seq => sub {
     pdl_is( seq_n( 15, 15, 1 ), pdl([ 15 ]), "seq_n()" );
 };
 
-pdl_is( range_( pdl( 1 .. 4 ) ), pdl([ 1, 4 ]), 'range_()' );
+subtest range_ => sub {
+    pdl_is( range_( pdl( 1 .. 4 ) ), pdl( [ 1, 4 ] ), 'range_($pdl)' );
+    pdl_is(
+        range_(
+            PDL::DateTime->new_from_datetime(
+                [qw(2019-01-01 2019-02-01 2018-01-01)]
+            )
+        ),
+        PDL::DateTime->new_from_datetime( [qw(2018-01-01 2019-02-01)] ),
+        'range_($pdldt)'
+    );
+};
 
 subtest match => sub {
     pdl_is(

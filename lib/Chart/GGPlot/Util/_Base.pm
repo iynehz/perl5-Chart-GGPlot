@@ -26,8 +26,9 @@ fun range_ (Piddle $p, $na_rm = false, $finite = false) {
             return pdl( [ 'nan', 'nan' ] )->setnantobad;
         }
     }
-    my $p1 = $finite ? $p->index( which( $p->isfinite ) ) : $p;
-    return pdl( [ $p1->min, $p1->max ] );
+    my $p = $finite ? $p->index( which( $p->isfinite ) ) : $p;
+    my $class = ref($p);
+    return $class->new( [ $p->min, $p->max ] );
 }
 
 # the R seq function is implemented by seq_n and seq_by here,

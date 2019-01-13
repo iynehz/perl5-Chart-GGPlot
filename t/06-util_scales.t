@@ -173,6 +173,126 @@ subtest hue_pal => sub {
     );
 };
 
+subtest 'pretty' => sub {
+    pdl_is(
+        pretty( pdl( 1 .. 15 ) ),
+        pdl( [ 0 .. 8 ] ) * 2,
+        'pretty(pdl(1..15))'
+    );
+    pdl_is(
+        pretty( pdl( 1 .. 15 ), high_u_bias => 2 ),
+        pdl( [ 0, 5, 10, 15 ] ),
+        'pretty(pdl(1..15),h=>2)'
+    );
+    pdl_is(
+        pretty( pdl( 1 .. 15 ), n => 4 ),
+        pdl( [ 0, 5, 10, 15 ] ),
+        'pretty(pdl(1..15),n=>4)'
+    );
+    pdl_is(
+        pretty( pdl( 2 .. 30 ) ),
+        pdl( [ 0, 5, 10, 15, 20, 25, 30 ] ),
+        'pretty(pdl(2..30))'
+    );
+    pdl_is(
+        pretty( pdl( 1 .. 20 ) ),
+        pdl( [ 0, 5, 10, 15, 20 ] ),
+        'pretty(pdl(1..20))'
+    );
+    pdl_is(
+        pretty( pdl( 1 .. 20 ), n => 2 ),
+        pdl( [ 0, 10, 20 ] ),
+        'pretty(pdl(1..20),n=>2)'
+    );
+    pdl_is(
+        pretty( pdl( 1 .. 20 ), n => 10 ),
+        pdl( [ 0 .. 10 ] ) * 2,
+        'pretty(pdl(1..20),n=>10)'
+    );
+};
+
+subtest pretty_dt => sub {
+    pdl_is(
+        Chart::GGPlot::Util::_Scales::seq_dt(
+            beg => PDL::DateTime->new_from_datetime('2018-01-01'),
+            end => PDL::DateTime->new_from_datetime('2019-01-01'),
+            by  => '1 month'
+        ),
+        PDL::DateTime->new_sequence( '2018-01-01', 13, 'month' ),
+        'Util::_Scales::seq_dt'
+    );
+
+    pdl_is(
+        Chart::GGPlot::Util::_Scales::seq_dt(
+            beg => PDL::DateTime->new_from_datetime('2018-01-01'),
+            end => PDL::DateTime->new_from_datetime('2019-01-25'),
+            by  => '1 month'
+        ),
+        PDL::DateTime->new_sequence( '2018-01-01', 13, 'month' ),
+        'Util::_Scales::seq_dt'
+    );
+
+    pdl_is(
+        Chart::GGPlot::Util::_Scales::seq_dt(
+            beg => PDL::DateTime->new_from_datetime('2018-01-01'),
+            end => PDL::DateTime->new_from_datetime('2019-01-05'),
+            by  => 'halfmonth'
+        ),
+        PDL::DateTime->new_from_datetime(
+            [
+                (
+                    map {
+                        (
+                            sprintf( "2018-%02s-01", $_ ),
+                            sprintf( "2018-%02s-15", $_ )
+                        )
+                    } ( 1 .. 12 )
+                ),
+                '2019-01-01',
+                '2019-01-15'
+            ]
+        ),
+        'Util::_Scales::seq_dt'
+    );
+
+    pdl_is(
+        Chart::GGPlot::Util::_Scales::pretty_dt(
+            PDL::DateTime->new_from_datetime( [qw(2008-01-01 2009-01-01)] ),
+        ),
+        PDL::DateTime->new_sequence( '2008-01-01', 5, 'quarter' ),
+        'pretty_dt'
+    );
+};
+
+subtest pretty_breaks => sub {
+    my $f_default = pretty_breaks();
+
+    pdl_is(
+        $f_default->( pdl( 1 .. 10 ) ),
+        pdl( 0 .. 5 ) * 2,
+        'pretty_breaks()->(pdl(1..10))'
+    );
+    pdl_is(
+        $f_default->( pdl( 1 .. 100 ) ),
+        pdl( 0 .. 5 ) * 20,
+        'pretty_breaks()->(pdl(1..100))'
+    );
+    pdl_is(
+        $f_default->(
+            PDL::DateTime->new_from_datetime( [qw(2008-01-01 2009-01-01)] )
+        ),
+        PDL::DateTime->new_sequence( '2008-01-01', 5, 'quarter' ),
+'pretty_breaks()->(PDL::DateTime->new_from_datetime( [qw(2008-01-01 2009-01-01)] )'
+    );
+    pdl_is(
+        $f_default->(
+            PDL::DateTime->new_from_datetime( [qw(2008-01-01 2090-01-01)] )
+        ),
+        PDL::DateTime->new_sequence( '2000-01-01', 6, 'year', 20 ),
+'pretty_breaks()->(PDL::DateTime->new_from_datetime( [qw(2008-01-01 2090-01-01)] )'
+    );
+};
+
 # Util::_Labeling
 
 # this is from in R `labeling` package's doc
