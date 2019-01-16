@@ -18,7 +18,7 @@ use Scalar::Util qw(looks_like_number);
 use Time::Moment;
 
 use PDL::Primitive qw(which);
-use POSIX qw(ceil floor round log10);
+use POSIX qw(ceil floor log10);
 
 use Role::Tiny ();
 
@@ -43,6 +43,15 @@ our @EXPORT_OK = qw(
   pretty pretty_breaks
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
+
+# POSIX::round does not exist in Perl >=5.20
+sub round {
+    if (defined &POSIX::round) {
+        goto \&POSIX::round;
+    } else {
+        floor($_[0] + 0.5);
+    }
+}
 
 ## color
 
