@@ -31,7 +31,7 @@ subtest is_discrete => sub {
     ok( is_discrete( PDL::Factor->new( [qw(foo bar)] ) ),
         'is_discrete($pdlfactor)' );
     ok( is_discrete( PDL::SV->new( [qw(foo bar)] ) ), 'is_discrete($pdlsv)' );
-    ok( !is_discrete( [qw(foo bar)] ), 'not is_discrete($aref)' );
+    ok( !is_discrete( PDL->new([1 .. 10]) ), 'not is_discrete($aref)' );
 };
 
 subtest factor => sub {

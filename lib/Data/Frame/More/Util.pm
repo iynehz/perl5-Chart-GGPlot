@@ -55,11 +55,23 @@ fun ifelse ($test, $yes, $no) {
     return $yes;
 }
 
-fun is_discrete ($x) {
+=func is_discrete
+
+    my $bool = is_discrete(Piddle $x);
+
+Returns true if C<$x> is discrete, that is, an object of below types,
+
+=for :list
+* PDL::Factor
+* PDL::SV
+
+=cut
+
+fun is_discrete (Piddle $x) {
     return (
              $x->$_DOES('PDL::Factor')
           or $x->$_DOES('PDL::SV')
-          or ( $x->$_DOES('PDL') and $x->type eq 'byte' )
+          or $x->type eq 'byte'
     );
 }
 

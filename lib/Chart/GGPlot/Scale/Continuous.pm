@@ -105,7 +105,6 @@ method get_breaks ( $limits=$self->get_limits ) {
     $limits = $self->trans->inverse->($limits);
 
     my $breaks;
-
     if ( zero_range($limits) ) {
         $breaks = pdl( [ $limits->at(0) ] );
     }
@@ -191,10 +190,10 @@ method break_info ($range=$self->dimension) {
     my $labels = $self->get_labels($major);
 
     # drop oob breaks/labels by testing major == NA
-    unless ( $labels->isempty ) {
-        $labels = $labels->slice( which( $labels->isgood ) );
+    if ( not $labels->isempty and $major->badflag ) {
+        $labels = $labels->slice( which( $major->isgood ) );
     }
-    unless ( $major->isempty ) {
+    if ( not $major->isempty and $major->badflag ) {
         $major = $major->slice( which( $major->isgood ) );
     }
 

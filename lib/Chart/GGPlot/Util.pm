@@ -8,9 +8,14 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 use Data::Dumper::Concise ();
 
-#use Devel::StackTrace;
 use Data::Frame::More;
-use PDL::Constants qw(PI);
+
+#TODO: Watch https://github.com/kmx/pdl-datetime/issues/1
+# PDL::Constants uses PDL::Complex which has conflict with PDL::DateTime
+#use PDL::Constants qw(PI);
+use Math::Trig ();
+use constant PI => Math::Trig::pi;
+
 use PDL::Primitive;
 use Package::Stash;
 use Types::PDL qw(Piddle1D PiddleFromAny);
@@ -30,6 +35,7 @@ my @export_ggplot = qw(
 my @export_all = (
     @export_ggplot,
     qw(
+      PI
       pt stroke
       isnt_null_or
       clist

@@ -8,7 +8,6 @@ use namespace::autoclean;
 # VERSION
 
 use List::AllUtils;
-use PDL::Constants qw(PI);
 use PDL::Primitive qw(which);
 use Types::Standard qw(Bool Enum Int Num);
 

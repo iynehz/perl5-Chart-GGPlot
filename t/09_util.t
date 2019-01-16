@@ -4,7 +4,6 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 use Data::Frame::More;
 use Data::Frame::More::Examples qw(airquality);
-use PDL::Constants qw(PI);
 use PDL::Core qw(long);
 use Chart::GGPlot::Util qw(:all !match);
 

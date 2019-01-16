@@ -20,6 +20,7 @@ use Log::Any qw($log);
 use Log::Any::Adapter;
 use Safe::Isa            ();
 use PerlX::Maybe         ();
+#use PerlX::Assert        ();
 use Syntax::Keyword::Try ();
 use Module::Load;
 use Moose 2.1400;
@@ -103,6 +104,10 @@ sub _import_tag {
         Syntax::Keyword::Try->import::into($target);
         boolean->import::into($target);
 
+        # TODO: See if I can help this issue
+        #  https://rt.cpan.org/Public/Bug/Display.html?id=123935
+        #PerlX::Assert->import::into($target);
+
         Moose::Autobox->import::into($target);
 
         Data::Frame::More->import::into($target);
@@ -135,14 +140,15 @@ sub _import_tag {
     elsif ( $tag eq ':pdl' ) {
         require PDL::Lite;
         require PDL::Core;
-        require PDL::IO::Dumper;
+        #require PDL::IO::Dumper;
         require PDL::SV;
         require PDL::Factor;
+        require PDL::DateTime;
         require Role::Tiny;
 
         PDL::Lite->import::into($target);
         PDL::Core->import::into( $target, qw(pdl null) );
-        PDL::IO::Dumper->import::into($target);
+        #PDL::IO::Dumper->import::into($target);
 
         Role::Tiny->apply_roles_to_package( 'PDL', 'Data::Frame::More::PDL' );
 

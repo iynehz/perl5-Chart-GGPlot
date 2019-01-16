@@ -28,7 +28,12 @@ has minor_breaks => (
 has format => (
     is      => 'ro',
     isa     => CodeRef,
-    default => sub { sub { $_[0] } },
+    default => sub {
+        sub {
+            my ($x) = @_;
+            return ( $x->$_call_if_can('names') // $x );
+        }
+    },
 );
 has domain => (
     is      => 'ro',

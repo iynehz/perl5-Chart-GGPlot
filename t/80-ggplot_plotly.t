@@ -3,7 +3,7 @@
 use Chart::GGPlot::Setup qw(:base :pdl);
 
 use Data::Frame::More;
-use Data::Frame::More::Examples qw(mtcars mpg);
+use Data::Frame::More::Examples qw(mtcars mpg economics);
 
 use Test2::V0;
 use Test2::Tools::DataFrame;
@@ -197,6 +197,75 @@ subtest geom_bar_1 => sub {
         'x.labels',
     );
     pdl_is( $panel_params->{'x.major_source'}, pdl(0 .. 6), 'x.major_source');
+};
+
+subtest geom_line_1 => sub {
+    my $economics = economics();
+
+    my $p = ggplot(
+        data    => $economics,
+        mapping => aes( x => 'date', y => 'unemploy' )
+    )->geom_line();
+
+    my $built = $p->backend->build($p);
+    my $data  = $built->data;
+    diag($data->[0]->string);
+
+    my $x_raw = PDL::DateTime->new_sequence('1967-07-01', 10, 'month');
+    my $x = pdl($x_raw->unpdl);
+    my $y = $economics->at('unemploy')->slice(pdl(0 .. 9));
+
+    my $data_expected = Data::Frame::More->new(
+        columns => [
+            x        => $x,
+            y        => $y,
+            PANEL    => pdl(0),
+            group    => pdl(0),
+            x_raw    => $x_raw,
+            y_raw    => $y,
+            alpha    => NA(),
+            color    => PDL::SV->new( ['black'] ),
+            linetype => PDL::SV->new( ['solid'] ),
+            size     => pdl(0.5),
+        ]
+    );
+
+    my $data0 = $data->[0]->head(10);
+    dataframe_is( $data0->head(10), $data_expected, '$built->data' );
+
+    my $layout = $built->layout;
+
+    my $scales = $layout->get_scales(0);
+    my $scale_x = $scales->at('x');
+    isa_ok( $scale_x, [qw(Chart::GGPlot::Scale::ContinuousDateTime)],
+        '$scale_x is Chart::GGPlot::Scale::ContinuousDateTime object' );
+
+    my $scale_x_breaks = $scale_x->get_breaks();
+    DOES_ok($scale_x_breaks, [qw(PDL PDL::Role::HasNames)]);
+    pdl_is(
+        pdl(
+            $scale_x_breaks->unpdl->map(
+                sub {
+                    $_ eq 'BAD' ? 'nan' : $_;
+                }
+            )
+        )->setnantobad,
+        pdl(qw(nan 0 3.155328e+14 6.31152e+14 9.466848e+14 1.262304e+15 nan))
+          ->setnantobad,
+        '$scale_x->get_breaks()'
+    );
+    pdl_is( $scale_x->get_labels(),
+        PDL::SV->new( [qw(1960 1970 1980 1990 2000 2010 2020)] ), 
+        '$scale_x->get_labels()' );
+
+    my $panel_params = $layout->panel_params->at(0);
+    pdl_is(
+        $panel_params->{'x.labels'},
+        PDL::SV->new(
+            [qw(1970 1980 1990 2000 2010)]
+        ),
+        'x.labels',
+    );
 };
 
 done_testing();

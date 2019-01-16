@@ -15,10 +15,12 @@ use Data::Frame::More;
 use parent qw(Exporter::Tiny);
 
 my %data_setup = (
-    airquality => {},
-    diamonds   => {},
-    mpg        => {},
-    mtcars     => {},
+    airquality     => {},
+    diamonds       => {},
+    mpg            => {},
+    mtcars         => {},
+    economics      => { col_types => { date => 'PDL::DateTime' } },
+    economics_long => { col_types => { date => 'PDL::DateTime' } },
 );
 my @data_names = keys %data_setup;
 
