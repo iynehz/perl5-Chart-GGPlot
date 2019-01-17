@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 with qw(Chart::GGPlot::Backend);
 
-use Chart::Plotly qw(show_plot);
+use Chart::Plotly 0.022 qw(show_plot);
 use Chart::Plotly::Plot;
 use Data::Munge qw(elem);
 use JSON;

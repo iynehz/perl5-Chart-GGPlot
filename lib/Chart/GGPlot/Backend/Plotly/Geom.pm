@@ -74,10 +74,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Line {
             (
                 $use_webgl ? () : (
                     hovertext => $df->at('hovertext')->unpdl,
-
-                    # TODO: To ask Chart::Plotly to remove the Maybe[ArrayRef]
-                    #  requirement, so we can use a single string here.
-                    hoverinfo => [ ('text') x $df->nrow ],
+                    hoverinfo => 'text',
                 )
             ),
         );
