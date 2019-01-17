@@ -11,6 +11,8 @@ with qw(Chart::GGPlot::Backend);
 
 use Chart::Plotly 0.022 qw(show_plot);
 use Chart::Plotly::Plot;
+use Chart::Plotly::Image::Orca;
+
 use Data::Munge qw(elem);
 use JSON;
 use List::AllUtils qw(pairmap pairwise);
@@ -283,15 +285,19 @@ Not implemented yet.
 
 =cut
 
-method show ($ggplot, HashRef $opts={}) {
+method ggplotly ($ggplot) {
     my $plot_built = $self->build($ggplot);
-    my $plotly     = $self->to_plotly($plot_built);
-    show_plot($plotly);
+    return $self->to_plotly($plot_built);
+}
+
+method show ($ggplot, HashRef $opts={}) {
+    my $plotly = $self->ggplotly($ggplot);
+    show_plot( $plotly );
 }
 
 method save ($ggplot, $filename, HashRef $opts={}) {
-    # TODO: https://github.com/pablrod/p5-Chart-Plotly/issues/8
-    ...;
+    my $plotly = $self->ggplotly($ggplot);
+    Chart::Plotly::Image::Orca::orca( plot => $plotly, file => $filename );
 }
 
 1;
