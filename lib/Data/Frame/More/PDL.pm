@@ -128,7 +128,7 @@ sub as_pdlsv {
 
     if ($self->$_DOES('PDL::Factor')) {
         my $levels = $self->levels;
-        my $x = $self->unpdl->map( sub { $levels->at($_); } );
+        my $x = [ map { $levels->[$_]; } @{$self->unpdl} ];
         return $new_pdlsv->($x);
     }
     elsif ($self->$_DOES('PDL::DateTime')) {
