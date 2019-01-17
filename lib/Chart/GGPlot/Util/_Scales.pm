@@ -44,7 +44,7 @@ our @EXPORT_OK = qw(
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-# POSIX::round does not exist in Perl >=5.20
+# POSIX::round does not exist in Perl <=5.20
 sub round {
     if (defined &POSIX::round) {
         goto \&POSIX::round;
