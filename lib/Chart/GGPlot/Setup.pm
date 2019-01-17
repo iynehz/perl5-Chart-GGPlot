@@ -18,7 +18,7 @@ use Data::Frame::More ();
 use Function::Parameters 2.0;
 use Log::Any qw($log);
 use Log::Any::Adapter;
-use Safe::Isa            ();
+use Safe::Isa 1.000010   ();
 use PerlX::Maybe         ();
 #use PerlX::Assert        ();
 use Syntax::Keyword::Try ();
