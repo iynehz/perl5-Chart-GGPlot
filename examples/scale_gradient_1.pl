@@ -1,11 +1,15 @@
-#!perl
+#!/usr/bin/env perl
 
 use 5.014;
 use warnings;
 
+use Getopt::Long;
 use Chart::GGPlot::Functions qw(:all);
 use Data::Frame::More;
 use PDL::Primitive qw(random grandom);
+
+my $save_as;
+GetOptions( 'o=s' => \$save_as );
 
 my $df = Data::Frame::More->new(
     columns => [
@@ -21,5 +25,9 @@ my $p = ggplot(
     mapping => aes( x => 'x', y => 'y' )
 )->geom_point( mapping => aes( color => 'z2' ) );
 
-$p->show();
+if (defined $save_as) {
+    $p->save($save_as);
+} else {
+    $p->show();
+}
 

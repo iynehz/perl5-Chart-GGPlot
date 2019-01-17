@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/env perl
 
 # This example defaultly uses ggplot's "scattergl" trace. Generally to
 #  force using "scatter" trace you can use below variable,
@@ -19,8 +19,12 @@
 use 5.014;
 use warnings;
 
+use Getopt::Long;
 use Chart::GGPlot::Functions qw(:all);
 use Data::Frame::More::Examples qw(diamonds);
+
+my $save_as;
+GetOptions( 'o=s' => \$save_as );
 
 my $diamonds = diamonds();
 
@@ -29,6 +33,9 @@ my $p = ggplot(
     mapping => aes( x => 'carat', y => 'price' )
 )->geom_point( alpha => 0.1 );
 
-
-$p->show();
+if (defined $save_as) {
+    $p->save($save_as);
+} else {
+    $p->show();
+}
 
