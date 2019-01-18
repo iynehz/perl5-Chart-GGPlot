@@ -2,7 +2,7 @@ package Data::Frame::More::Autobox::Array;
 
 # ABSTRACT: Addtitional Array role for Moose::Autobox
 
-use 5.014;
+use 5.016;
 use Moose::Role;
 use Function::Parameters;
 

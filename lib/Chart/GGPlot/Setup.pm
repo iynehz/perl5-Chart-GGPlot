@@ -2,13 +2,13 @@ package Chart::GGPlot::Setup;
 
 # ABSTRACT: Import stuffs into Chart::GGPlot classes
 
-use strict;
+use 5.016;
 use warnings;
 
 # VERSION
 
 use utf8;
-use feature ':5.14';
+use feature ':5.16';
 
 use Import::Into;
 
@@ -93,7 +93,7 @@ sub _import_tag {
         strict->import::into($target);
         warnings->import::into($target);
         utf8->import::into($target);
-        feature->import::into( $target, ':5.14' );
+        feature->import::into( $target, ':5.16' );
 
         Carp->import::into($target);
         Data::Dumper->import::into($target);

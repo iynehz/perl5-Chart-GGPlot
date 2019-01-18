@@ -16,7 +16,7 @@
 #   BROWSER=chromium-browser
 
 
-use 5.014;
+use 5.016;
 use warnings;
 
 use Getopt::Long;
