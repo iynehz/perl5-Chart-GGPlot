@@ -12,7 +12,7 @@ use Data::Munge qw(elem rec);
 use Graphics::Color::RGB;
 use Machine::Epsilon qw(machine_epsilon);
 use Math::Gradient qw(multi_array_gradient);
-use Math::Round qw(nearest);
+use Math::Round qw(nearest round);
 use Math::Interpolate;
 use Scalar::Util qw(looks_like_number);
 use Time::Moment;
@@ -43,15 +43,6 @@ our @EXPORT_OK = qw(
   pretty pretty_breaks
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
-
-# POSIX::round does not exist in Perl <=5.20
-sub round {
-    if (defined &POSIX::round) {
-        goto \&POSIX::round;
-    } else {
-        floor($_[0] + 0.5);
-    }
-}
 
 ## color
 
