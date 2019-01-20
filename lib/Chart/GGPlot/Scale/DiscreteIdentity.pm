@@ -14,8 +14,8 @@ extends qw(
 );
 
 method map_to_limits ( $p, $limits = $self->get_limits ) {
-    if (is_factor($p)) {
-        return as_character($p);
+    if ($p->$_DOES('PDL::Factor')) {
+        return $p->as_pdlsv;
     } else {
         return $p;
     }

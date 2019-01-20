@@ -39,7 +39,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Path {
     use Chart::Plotly::Trace::Scattergl::Marker;
     use List::AllUtils qw(pairmap);
 
-    use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb);
+    use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb group_to_NA);
     use Chart::GGPlot::Util qw(ifelse);
 
     sub mode {
@@ -51,6 +51,8 @@ package Chart::GGPlot::Backend::Plotly::Geom::Path {
     }
 
     classmethod to_trace ($df, %rest) {
+        $df = group_to_NA($df);
+
         my $use_webgl = $class->use_webgl($df);
         my $plotly_trace_class =
           $use_webgl
@@ -61,7 +63,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Path {
             $log->debug($use_webgl ? "to use webgl" : "not to use webgl");
         }
 
-        my ( $x, $y ) = map { $df->at($_)->unpdl } qw(x y);
+        my ( $x, $y ) = map { $df->at($_) } qw(x y);
         my $marker = $class->marker($df, %rest);
 
         my $mode = $class->mode;
@@ -81,13 +83,13 @@ package Chart::GGPlot::Backend::Plotly::Geom::Path {
             $line = {
                 color => $color->at(0),
                 width => $size->at(0),
-                dash => $linetype,
+                ( $linetype ne 'solid' ? ( dash        => $linetype )  : () ),
             };
         }
 
         return $plotly_trace_class->new(
-            x    => $x,
-            y    => $y,
+            x    => $x->unpdl,
+            y    => $y->unpdl,
             mode => $mode,
             maybe
               line => $line,

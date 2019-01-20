@@ -77,16 +77,21 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
             )
         );
 
+        my %seen_hover_aes;
         my @hover_data = map {
             my $var = $labels->at($_);
-            if ( $var->$_DOES('Eval::Quosure') ) {
-                $var = $var->expr;
+            if ($seen_hover_aes{$var}++) {
+                ();
+            } else {
+                if ( $var->$_DOES('Eval::Quosure') ) {
+                    $var = $var->expr;
+                }
+                my $col =
+                    $d->exists("${_}_raw") ? $d->at("${_}_raw")
+                  : $d->exists($_)         ? $d->at($_)
+                  :                          undef;
+                defined $col ? ( $var => $col->as_pdlsv ) : ();
             }
-            my $col =
-                $d->exists("${_}_raw") ? $d->at("${_}_raw")
-              : $d->exists($_)         ? $d->at($_)
-              :                          undef;
-            defined $col ? ( $var => $col->as_pdlsv ) : ();
         } @hover_aes;
         my $hover_text = [ 0 .. $d->nrow - 1 ]->map(
             sub { join( br(), pairmap { "$a: " . $b->at($_) } @hover_data ); }

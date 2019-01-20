@@ -553,7 +553,7 @@ fun scale_discrete_identity ( :$aesthetics, :$guide='none', %rest ) {
     );
 }
 
-for my $aes (qw(fill shape linetype)) {
+for my $aes (qw(fill shape linetype color)) {
     my $scale_func = "scale_${aes}_identity";
     no strict 'refs';
     *{$scale_func} = fun(%rest) {

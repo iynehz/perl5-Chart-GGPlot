@@ -5,14 +5,14 @@ use warnings;
 
 use Getopt::Long;
 use Chart::GGPlot::Functions qw(:all);
-use Data::Frame::More::Examples qw(economics);
+use Data::Frame::More::Examples qw(economics_long);
 
 my $save_as;
 GetOptions( 'o=s' => \$save_as );
 
 my $p = ggplot(
-    data    => economics(),
-    mapping => aes( x => 'date', y => 'unemploy' )
+    data    => economics_long(),
+    mapping => aes( x => 'date', y => 'value01', color => 'variable' )
 )->geom_line();
 
 if (defined $save_as) {

@@ -2,6 +2,7 @@ package Data::Frame::More::PDL;
 
 # ABSTRACT: A mixin to add some methods to PDL
 
+use 5.010;
 use strict;
 use warnings;
 
@@ -9,8 +10,8 @@ use warnings;
 
 use Role::Tiny;
 
+use List::AllUtils qw(pairmap);
 use PDL::Core qw(pdl);
-use PDL::Lite;
 use PDL::Primitive qw(which);
 use POSIX qw(ceil);
 use Safe::Isa;
@@ -19,7 +20,7 @@ use Type::Params;
 
 my $PositiveInt = Int->where( sub { $_ > 0 } );
 
-=func length()
+=method length()
 
 Returns the length of the first dimension.
 
@@ -27,7 +28,7 @@ Returns the length of the first dimension.
 
 sub length { $_[0]->dim(0); }
 
-=func diff($lag=1)
+=method diff($lag=1)
 
 =cut
 
@@ -39,11 +40,11 @@ sub diff {
     return $self->slice( $idx + $lag ) - $self->slice($idx);
 }
 
-=func flatten()
+=method flatten()
 
 This is same as C<@{$self-E<gt>unpdl}>.
 
-=func flatten_deep()
+=method flatten_deep()
 
 This is same as C<list()>.
 
@@ -53,13 +54,13 @@ sub flatten { @{ $_[0]->unpdl }; }
 
 sub flatten_deep { $_[0]->list; }
 
-=func repeat($n)
+=method repeat($n)
 
 Repeat on the first dimension for C<$n> times.
 
 Only works with 1D piddle.  
 
-=func repeat_to_length($length)
+=method repeat_to_length($length)
 
 Repeat to have the given length.
 
@@ -137,6 +138,38 @@ sub as_pdlsv {
     else {
         return $self->copy;
     }
+}
+
+=method id
+
+Compute a unique numeric id for each element in a piddle.
+
+=cut
+
+sub id {
+    my ($self) = @_;
+
+    my %uniq_values;
+    my @uniq_indices;
+    for my $ridx ( 0 .. $self->length - 1 ) {
+        my $value = $self->at($ridx);
+        if ( not exists $uniq_values{$value} ) {
+            $uniq_values{$value} = [];
+            push @uniq_indices, $ridx;
+        }
+        push @{ $uniq_values{$value} }, $ridx;
+    }    
+
+    my %index_to_value = pairmap { $b->[0] => $a } %uniq_values;
+
+    my $rslt = PDL::Core::zeros( $self->length );
+    for my $i ( 1 .. $#uniq_indices ) {
+        my $value =
+          $index_to_value{ $uniq_indices[ $i ] }; 
+        my $indices = $uniq_values{$value};
+        $rslt->slice( pdl($indices) ) .= $i;
+    }
+    return $rslt;
 }
 
 1;

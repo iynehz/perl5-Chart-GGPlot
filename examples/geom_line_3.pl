@@ -13,7 +13,7 @@ GetOptions( 'o=s' => \$save_as );
 my $p = ggplot(
     data    => economics(),
     mapping => aes( x => 'date', y => 'unemploy' )
-)->geom_line();
+)->geom_line(color => 'red');
 
 if (defined $save_as) {
     $p->save($save_as);

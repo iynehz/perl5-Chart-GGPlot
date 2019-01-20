@@ -154,9 +154,13 @@ method add_defaults ($data, $aesthetics) {
     # No new aesthetics, so no new scales to add
     return if ( $new_aesthetics->isempty );
 
+    state $skip_aes = {
+        group => 1,
+    };
+
     my %datacols = pairmap { $a => $data->eval_tidy($b) }
-    ( $aesthetics->hslice($new_aesthetics)->flatten );
-    for my $aes ( sort keys %datacols ) {
+        ( $aesthetics->hslice($new_aesthetics)->flatten );
+    for my $aes ( sort grep { not $skip_aes->{$_} } keys %datacols ) {
         my ( $scale_f, $func_name ) = find_scale( $aes, $datacols{$aes} );
         unless ( defined $scale_f ) {
             die sprintf(
@@ -165,7 +169,7 @@ method add_defaults ($data, $aesthetics) {
         }
         $log->debugf(
             "ScalesList::add_defaults : Got scale function %s for aes %s",
-            $func_name, $aes );
+            $func_name, $aes ) if $log->is_debug;
         $self->add( $scale_f->() );
     }
 }

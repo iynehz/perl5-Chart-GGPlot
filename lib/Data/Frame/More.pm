@@ -772,7 +772,7 @@ method id () {
       $self->select_rows( \@uniq_rindices )->sorti( $self->names );
 
     my $rslt = PDL::Core::zeros( $self->nrow );
-    for my $i ( 0 .. $#uniq_rindices ) {
+    for my $i ( 1 .. $#uniq_rindices ) {
         my $serialized =
           $rindex_to_serialized{ $uniq_rindices[ $rindices_sorted->at($i) ] };
         my $rindices = $uniq_serialized{$serialized};

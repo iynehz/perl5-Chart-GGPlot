@@ -334,7 +334,9 @@ classmethod add_group ($data) {
     return $data if $data->isempty;
 
     if ( $data->exists('group') ) {
-        $data->set( 'group', $data->at('group')->id );
+        my $group = $data->at('group');
+        $data->set( 'group', $group->id );
+        $data->set( 'group_raw', $group );
     }
     else {
         my $discrete_columns = $data->names->grep(
