@@ -29,8 +29,8 @@ package Chart::GGPlot::Backend::Plotly::Geom::Blank {
     __PACKAGE__->meta->make_immutable;
 }
 
-package Chart::GGPlot::Backend::Plotly::Geom::Line {
-    use Chart::GGPlot::Class;
+package Chart::GGPlot::Backend::Plotly::Geom::Path {
+    use Chart::GGPlot::Class qw(:pdl);
     with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
     use Chart::Plotly::Trace::Scatter;
@@ -39,6 +39,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Line {
     use Chart::Plotly::Trace::Scattergl::Marker;
     use List::AllUtils qw(pairmap);
 
+    use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb);
     use Chart::GGPlot::Util qw(ifelse);
 
     sub mode {
@@ -63,16 +64,42 @@ package Chart::GGPlot::Backend::Plotly::Geom::Line {
         my ( $x, $y ) = map { $df->at($_)->unpdl } qw(x y);
         my $marker = $class->marker($df, %rest);
 
+        my $mode = $class->mode;
+        my $line;
+        if ($mode eq 'lines') {
+
+            # TODO: plotly does not yet support gradient line color and width
+            #  See https://github.com/plotly/plotly.js/issues/581
+
+            my $color = to_rgb($df->at('color')->slice(pdl(0)));
+            my $size = cex_to_px( $df->at('size')->slice(pdl(0)));
+            $size = ifelse( $size < 2, 2, $size );
+
+            # plotly supports solid, dashdot, dash, dot
+            my $linetype = $df->at('linetype')->at(0);
+
+            $line = {
+                color => $color->at(0),
+                width => $size->at(0),
+                dash => $linetype,
+            };
+        }
+
         return $plotly_trace_class->new(
-            x      => $x,
-            y      => $y,
-            mode   => $class->mode,
-            maybe marker => $marker,
+            x    => $x,
+            y    => $y,
+            mode => $mode,
+            maybe
+              line => $line,
+            maybe
+              marker => $marker,
 
             # TODO: hovertext for webgl does not seem to work. Maybe it's
-            #  because of large data count. To revisit this in future. 
+            #  because of large data count. To revisit this in future.
             (
-                $use_webgl ? () : (
+                $use_webgl
+                ? ()
+                : (
                     hovertext => $df->at('hovertext')->unpdl,
                     hoverinfo => 'text',
                 )
@@ -83,9 +110,16 @@ package Chart::GGPlot::Backend::Plotly::Geom::Line {
     __PACKAGE__->meta->make_immutable;
 }
 
+package Chart::GGPlot::Backend::Plotly::Geom::Line {
+    use Chart::GGPlot::Class;
+    extends qw(Chart::GGPlot::Backend::Plotly::Geom::Path);
+
+    __PACKAGE__->meta->make_immutable;
+}
+
 package Chart::GGPlot::Backend::Plotly::Geom::Point {
     use Chart::GGPlot::Class;
-    extends qw(Chart::GGPlot::Backend::Plotly::Geom::Line);
+    extends qw(Chart::GGPlot::Backend::Plotly::Geom::Path);
 
     use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb);
     use Chart::GGPlot::Util qw(ifelse);

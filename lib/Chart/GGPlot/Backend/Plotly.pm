@@ -59,7 +59,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
         Dumper( \@split_legend ) )
       if $log->is_debug;
 
-    my $split_by = [ @split_legend, $self->_split_on($data) ];
+    my $split_by = [ @split_legend, @{$self->_split_on($data)} ];
     my $split_vars = $split_by->intersect($data->names);
 
     my $panel_to_traces = fun( $d, $panel_params ) {
