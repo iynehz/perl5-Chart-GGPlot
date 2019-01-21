@@ -270,6 +270,9 @@ method to_plotly ($plot_built) {
         }
     }
 
+    # hovermode
+    $plotly_layout{hovermode} = 'closest';
+
     $log->debug( "plotly layout : " . Dumper( \%plotly_layout ) )
       if $log->is_debug;
 
