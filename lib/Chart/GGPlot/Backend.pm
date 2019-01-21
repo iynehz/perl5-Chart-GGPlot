@@ -10,13 +10,29 @@ use namespace::autoclean;
 use Chart::GGPlot::Layout;
 use Chart::GGPlot::Built;
 
+=method show
+    
+    $backend->show($ggplot, HashRef $opts={});
+
+Show the plot (like in web browser).
+
+=method save
+
+    $backend->save($ggplot, $filename, HashRef $opts={});
+
+Export the plot to a static image file.
+
+=cut
+
 requires 'show';
 requires 'save';
 
 =classmethod build
 
+    my $built = $backend->build($ggplot);
+
 This method takes a Chart::GGPlot object, and performs all steps necessary
-to produce an Chart::GGPlot::Built object that can be rendered.
+to produce a Chart::GGPlot::Built object that can be rendered.
 
 =cut
 
@@ -125,6 +141,10 @@ classmethod build($ggplot) {
 1;
 
 __END__
+
+=head1 DESCRIPTION
+
+This module is the role for Chart::GGPlot backend classes. 
 
 =head1 SEE ALSO
 

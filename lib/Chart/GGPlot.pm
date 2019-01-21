@@ -139,16 +139,16 @@ method labels () {
 
 =method show
 
-    $ggplot->show(HashRef $opts={})
+    $ggplot->show(HashRef $opts={});
 
-Show the plot.
+Show the plot (like in web browser).
 Implementation depends on the plotting backend.
 
 =method save
 
-    $ggplot->save($filename, HashRef $opts={})
+    $ggplot->save($filename, HashRef $opts={});
 
-Save the plot to file.
+Export the plot to a static image file.
 Implementation depends on the plotting backend.
 
 =cut

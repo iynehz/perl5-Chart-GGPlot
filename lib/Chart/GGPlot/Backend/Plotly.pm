@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 with qw(Chart::GGPlot::Backend);
 
-use Chart::Plotly 0.022 qw(show_plot);
+use Chart::Plotly 0.023 qw(show_plot);
 use Chart::Plotly::Plot;
 use Chart::Plotly::Image::Orca;
 
@@ -284,12 +284,22 @@ method to_plotly ($plot_built) {
 }
 
 =method show
+    
+    $backend->show($ggplot, HashRef $opts={});
 
-Show the plot in browser. 
+Show the plot like in web browser.
 
 =method save
 
-Not implemented yet.
+    $backend->save($ggplot, $filename, HashRef $opts={});
+
+Export the plot to a static image file.
+
+Below options are supported for C<$opts>:
+
+=for :list
+* width
+* height
 
 =cut
 
@@ -305,7 +315,15 @@ method show ($ggplot, HashRef $opts={}) {
 
 method save ($ggplot, $filename, HashRef $opts={}) {
     my $plotly = $self->ggplotly($ggplot);
-    Chart::Plotly::Image::Orca::orca( plot => $plotly, file => $filename );
+    my $good = Chart::Plotly::Image::Orca::orca(
+        #<<< no perltidy
+                plot => $plotly,
+                file => $filename,
+        maybe   width => $opts->{width},
+        maybe   height => $opts->{height},
+        #>>>
+    );
+    die "Failed to save image via plotly-orca" unless $good;
 }
 
 1;
