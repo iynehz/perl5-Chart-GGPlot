@@ -289,11 +289,11 @@ fun _color_ramp ($colors) {
       } multi_array_gradient( 10, @hot_spots );
 
     return fun( Piddle $p) {
-        my @rslt = map {
-            my $i = int( $_ * scalar(@gradient) );
-            $gradient[$i];
-        } $p->flatten;
-        return PDL::SV->new( \@rslt );
+        my @mapped = map { $gradient[$_] }
+          ( $p * ( @gradient - 1 ) + 0.5 )->floor->flatten;
+        my $rslt = PDL::SV->new( \@mapped );
+        $rslt = $rslt->setbadif( $p->isbad ) if $p->badflag;
+        return $rslt;
     };
 }
 
