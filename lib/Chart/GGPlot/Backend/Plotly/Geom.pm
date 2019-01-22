@@ -33,11 +33,8 @@ package Chart::GGPlot::Backend::Plotly::Geom::Path {
     use Chart::GGPlot::Class qw(:pdl);
     with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
-    use Chart::Plotly::Trace::Scatter;
-    use Chart::Plotly::Trace::Scatter::Marker;
-    use Chart::Plotly::Trace::Scattergl;
-    use Chart::Plotly::Trace::Scattergl::Marker;
     use List::AllUtils qw(pairmap);
+    use Module::Load;
 
     use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb group_to_NA);
     use Chart::GGPlot::Util qw(ifelse);
@@ -58,6 +55,8 @@ package Chart::GGPlot::Backend::Plotly::Geom::Path {
           $use_webgl
           ? 'Chart::Plotly::Trace::Scattergl'
           : 'Chart::Plotly::Trace::Scatter';
+
+        autoload $plotly_trace_class;
 
         if ($log->is_debug) {
             $log->debug($use_webgl ? "to use webgl" : "not to use webgl");
@@ -123,6 +122,8 @@ package Chart::GGPlot::Backend::Plotly::Geom::Point {
     use Chart::GGPlot::Class;
     extends qw(Chart::GGPlot::Backend::Plotly::Geom::Path);
 
+    use Module::Load;
+
     use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb);
     use Chart::GGPlot::Util qw(ifelse);
 
@@ -148,6 +149,8 @@ package Chart::GGPlot::Backend::Plotly::Geom::Point {
           : 'Chart::Plotly::Trace::Scatter';
         my $plotly_marker_class = "${plotly_trace_class}::Marker";
 
+        autoload $plotly_marker_class;
+
         return $plotly_marker_class->new(
             color => $fill->unpdl,
             size  => $size->unpdl,
@@ -169,15 +172,16 @@ package Chart::GGPlot::Backend::Plotly::Geom::Bar {
     use Chart::GGPlot::Class;
     with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
-    use Chart::Plotly::Trace::Bar;
-    use Chart::Plotly::Trace::Bar::Marker;
     use List::AllUtils qw(pairmap);
+    use Module::Load;
 
     use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb);
     use Chart::GGPlot::Util qw(ifelse);
 
     classmethod to_trace ($df, %rest) {
-        #my $color   = to_rgb($df->at('color'));
+        autoload Chart::Plotly::Trace::Bar;
+        autoload Chart::Plotly::Trace::Bar::Marker;
+
         my $fill    = to_rgb($df->at('fill'));
         my $opacity = $df->at('alpha')->setbadtoval(1);
 
