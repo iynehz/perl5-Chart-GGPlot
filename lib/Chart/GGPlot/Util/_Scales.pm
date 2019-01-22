@@ -8,7 +8,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 use Color::Brewer;
 use Convert::Color::LCh;
-use Data::Munge qw(elem rec);
+use Data::Munge qw(elem);
 use Graphics::Color::RGB;
 use Machine::Epsilon qw(machine_epsilon);
 use Math::Gradient qw(multi_array_gradient);
