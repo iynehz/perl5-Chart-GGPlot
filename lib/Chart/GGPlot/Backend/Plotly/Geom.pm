@@ -56,7 +56,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Path {
           ? 'Chart::Plotly::Trace::Scattergl'
           : 'Chart::Plotly::Trace::Scatter';
 
-        autoload $plotly_trace_class;
+        load $plotly_trace_class;
 
         if ($log->is_debug) {
             $log->debug($use_webgl ? "to use webgl" : "not to use webgl");
@@ -149,7 +149,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Point {
           : 'Chart::Plotly::Trace::Scatter';
         my $plotly_marker_class = "${plotly_trace_class}::Marker";
 
-        autoload $plotly_marker_class;
+        load $plotly_marker_class;
 
         return $plotly_marker_class->new(
             color => $fill->unpdl,
@@ -179,8 +179,8 @@ package Chart::GGPlot::Backend::Plotly::Geom::Bar {
     use Chart::GGPlot::Util qw(ifelse);
 
     classmethod to_trace ($df, %rest) {
-        autoload Chart::Plotly::Trace::Bar;
-        autoload Chart::Plotly::Trace::Bar::Marker;
+        load Chart::Plotly::Trace::Bar;
+        load Chart::Plotly::Trace::Bar::Marker;
 
         my $fill    = to_rgb($df->at('fill'));
         my $opacity = $df->at('alpha')->setbadtoval(1);
