@@ -243,17 +243,15 @@ classmethod scale_apply ($data, $vars, $method,
         $vars->map(
             fun($var)
             {
-                my $pieces = pdl(
-                    [ 0 .. $n - 1 ]->map(
-                        sub {
+                my $pieces = [ 0 .. $n - 1 ]->map(
+                    sub {
                        # if $method is 'train', then $scale is just trained here
-                            my $scale = $scales->at($_);
-                            $scale->$method(
-                                $data->at($var)->slice( $scale_indices->at($_) )
-                            )->flatten;
-                        }
-                    )
+                        my $scale = $scales->at($_);
+                        $scale->$method(
+                            $data->at($var)->slice( $scale_indices->at($_) ) );
+                    }
                 );
+                $pieces = $pieces->[0]->glue( 0, @$pieces[ 1 .. $#$pieces ] );
 
                 # Join pieces back together, if necessary
 
