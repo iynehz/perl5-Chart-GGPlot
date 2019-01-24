@@ -216,7 +216,7 @@ method compute_aesthetics ( $data, $plot ) {
 
     # Drop aesthetics that are set or calculated
     my $set        = $aesthetics->keys->intersect( $self->aes_params->keys );
-    my $calculated = $self->_calculated_aes($aesthetics);
+    my $calculated = $self->calculated_aes($aesthetics);
 
     # !set and !calculated
     $aesthetics = $aesthetics->hslice(
@@ -270,7 +270,7 @@ method map_statistic ( $data, $plot ) {
     $aesthetics = $aesthetics->defaults( $self->stat->default_aes );
     #$aesthetics = compact($aesthetics);
 
-    my $new = $aesthetics->hslice( $self->_calculated_aes($aesthetics) );
+    my $new = $aesthetics->hslice( $self->calculated_aes($aesthetics) );
     #say Dumper($new->keys);
     return $data if ( $new->isempty );
 
@@ -318,7 +318,7 @@ method finish_statistics ($data) {
 }
 
 # return an arrayref of keys.
-method _calculated_aes ($aesthetics) {
+method calculated_aes ($aesthetics) {
     # TODO: better to use PPR to make sure the function is "stat"?
     return [
         pairkeys(

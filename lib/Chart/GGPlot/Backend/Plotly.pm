@@ -40,7 +40,11 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
     my $short           = $class_geom =~ s/^Chart::GGPlot::Geom:://r;
     my $class_geom_impl = "Chart::GGPlot::Backend::Plotly::Geom::$short";
 
-    my $params = $layer->geom_params->hslice( $class_geom->parameters );
+    my $geom_params = $layer->geom_params;
+    my $stat_params = $layer->stat_params;
+    my $aes_params  = $layer->aes_params;
+    my $param = $geom_params->merge($stat_params)->merge($aes_params);
+
     my $coord  = $layout->coord;
 
     my %discrete_scales = map {
@@ -62,24 +66,38 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
     my $split_by = [ @split_legend, @{$self->_split_on($data)} ];
     my $split_vars = $split_by->intersect($data->names);
 
+    my $hover_text_aes;     # which aes shall be displayed in hover text?
+    {
+        # While $plot->labels also looks like containing what we need,
+        # actually it be cleared or set to other values, so it can't
+        # really be used for generating the hovertext. Here we would
+        # get the aes from $layer->mapping and $layer->stat.
+        my $map      = $layer->mapping;
+        my $calc_aes = $layer->stat->default_aes->hslice(
+            $layer->calculated_aes( $layer->stat->default_aes ) );
+        $map = $map->merge($calc_aes);
+        if ( $layer->inherit_aes ) {
+            $map = $map->merge( $plot->mapping );
+        }
+        $hover_text_aes = Chart::GGPlot->make_labels($map);
+    }
+
+    # put x and y at first in plotly hover text
+    my $all_aesthetics = Chart::GGPlot::Aes->all_aesthetics;
+    my @hover_aes_ordered = (
+        qw(x y),
+        (
+            sort grep {
+                $_ ne 'x' and $_ ne 'y' and elem( $_, $all_aesthetics )
+            } @{$hover_text_aes->keys}
+        )
+    );
+
     my $panel_to_traces = fun( $d, $panel_params ) {
-
-        my $all_aesthetics = Chart::GGPlot::Aes->all_aesthetics;
-
-        my $labels = $plot->labels;
-        # put x and y at first in plotly hover text
-        my @hover_aes = (
-            qw(x y),
-            (
-                sort grep {
-                    $_ ne 'x' and $_ ne 'y' and elem( $_, $all_aesthetics )
-                } @{ $labels->keys }
-            )
-        );
 
         my %seen_hover_aes;
         my @hover_data = map {
-            my $var = $labels->at($_);
+            my $var = $hover_text_aes->at($_);
             if ($seen_hover_aes{$var}++) {
                 ();
             } else {
@@ -92,7 +110,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
                   :                          undef;
                 defined $col ? ( $var => $col->as_pdlsv ) : ();
             }
-        } @hover_aes;
+        } @hover_aes_ordered;
         my $hover_text = [ 0 .. $d->nrow - 1 ]->map(
             sub { join( br(), pairmap { "$a: " . $b->at($_) } @hover_data ); }
         );
