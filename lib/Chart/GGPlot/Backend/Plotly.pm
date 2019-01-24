@@ -219,8 +219,8 @@ method to_plotly ($plot_built) {
 
         my $axis_title = $sc->name // $labels->at($xy) // '';
 
+        my $range = $panel_params->{"$xy.range"}->unpdl;
         my $labels = $panel_params->{"$xy.labels"}->as_pdlsv->unpdl;
-
         my $major_source = $panel_params->{"$xy.major_source"}->unpdl;
         my %ticks = pairwise { $a => $b } @$major_source, @$labels;
 
@@ -232,6 +232,7 @@ method to_plotly ($plot_built) {
 
         $plotly_layout{"${xy}axis"} = {
             title    => $axis_title,
+            range    => $range,
             ticktext => $ticktext,
             tickvals => $tickvals,
             zeroline => JSON::false,
