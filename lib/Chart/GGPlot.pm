@@ -15,7 +15,7 @@ use String::Util qw(trim);
 use Types::Standard qw(ArrayRef ConsumerOf HashRef InstanceOf);
 
 use Chart::GGPlot::Built;
-use Chart::GGPlot::Coord::Functions;
+use Chart::GGPlot::Coord::Functions ();
 use Chart::GGPlot::Guides;
 use Chart::GGPlot::Layout;
 use Chart::GGPlot::Params;
@@ -32,6 +32,7 @@ method AUTOCAN ($method) {
           Chart::GGPlot::Guide::Functions
           Chart::GGPlot::Labels::Functions
           Chart::GGPlot::Scale::Functions
+          Chart::GGPlot::Limits
         );
 
         for (@namespaces) {
