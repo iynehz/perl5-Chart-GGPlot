@@ -194,16 +194,12 @@ method to_plotly ($plot_built) {
         $plotly_layout{title} = $labels->{title};
     }
     for my $xy (qw(x y)) {
+        my $sc =
+            $plot->coordinates->DOES('Chart::GGPlot::Coord::Flip')
+          ? $scales->{ $xy eq 'x' ? 'y' : 'x' }
+          : $scales->{$xy};
 
-        #my $sc;
-        #if ( $plot->coordinates->DOES('Chart::GGPlot::Coord::Flip') ) {
-        #    $sc = $scales->{ ( $xy eq 'x' ? 'y' : 'x' ) };
-        #}
-        #else {
-        #    $sc = $scales->{$xy};
-        #}
-
-        my $axis_title = $labels->at($xy) // '';
+        my $axis_title = $sc->name // $labels->at($xy) // '';
 
         my $labels = $panel_params->{"$xy.labels"}->as_pdlsv->unpdl;
 
