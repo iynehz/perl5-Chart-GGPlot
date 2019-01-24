@@ -207,6 +207,11 @@ method add_labels ($labels) {
     return $self;
 }
 
+method add_scale ($scale) {
+    $self->scales->add($scale);
+    return $self;
+}
+
 use Scalar::Util qw(looks_like_number);
 
 classmethod make_labels($mapping) {

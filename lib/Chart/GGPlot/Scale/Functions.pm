@@ -139,6 +139,7 @@ fun continuous_scale (
     %rest
   ) {
     _check_breaks_labels( $breaks, $labels );
+
     if (    (  $breaks and $breaks->isempty )
         and !is_position_aes($aesthetics)
         and $guide ne "none" )
