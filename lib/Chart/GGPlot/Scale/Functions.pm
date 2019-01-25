@@ -8,7 +8,9 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 use List::AllUtils qw(pairgrep);
 use Module::Load;
-use Types::Standard qw(CodeRef Str);
+use Type::Params;
+use Types::PDL qw(Piddle PiddleFromAny);
+use Types::Standard qw(Any CodeRef Maybe Str);
 
 use Chart::GGPlot::Aes::Functions qw(:all);
 use Chart::GGPlot::Range::Functions qw(:all);
@@ -104,8 +106,16 @@ fun scale_type ($x) {
 }
 
 fun _check_breaks_labels ( $breaks, $labels ) {
-    return true if is_null($breaks);
-    return true if is_null($labels);
+    state $check = Type::Params::compile(
+        Maybe [ Piddle->plus_coercions(PiddleFromAny) ],
+        Maybe [ Piddle->plus_coercions( Any, sub { PDL::SV->new($_) } ) ]
+    );
+    ( $breaks, $labels ) = $check->( $breaks, $labels );
+
+    return ( $breaks, $labels )
+      unless ( defined $breaks and !$breaks->isempty );
+    return ( $breaks, $labels )
+      unless ( defined $labels and !$labels->isempty );
 
     # In R code there is check for is.atomic(breaks) && is.atomic(labels).
     # List or function is not atomic in R.
@@ -116,31 +126,23 @@ fun _check_breaks_labels ( $breaks, $labels ) {
         die("`breaks` and `labels` must have the same length");
     }
 
-    return true;
+    return ($breaks, $labels);
 }
 
-fun continuous_scale (
-    : $aesthetics,
-    : $scale_name,
-    : $palette,
-    : $name         = undef,
-    : $breaks       = null(),
-    : $minor_breaks = undef,
-    : $labels       = undef,
-    : $limits       = null(),
-    : $rescaler     = \&rescale,
-    : $oob          = \&censor,
-    : $expand       = undef,
-    : $na_value     = 'nan',
-    : $trans        = "identity",
-    : $guide        = "legend",
-    PositionEnum : $position = "left",
-    : $super        = 'Chart::GGPlot::Scale::Continuous',
-    %rest
+fun continuous_scale (:$aesthetics, :$scale_name,
+                      :$palette, :$name=undef,
+                      :$breaks=undef, :$minor_breaks=undef,
+                      :$labels=undef, :$limits=null(),
+                      :$rescaler=\&rescale, :$oob=\&censor, :$expand=undef,
+                      :$na_value='nan',
+                      :$trans="identity", :$guide="legend",
+                      PositionEnum :$position="left",
+                      :$super='Chart::GGPlot::Scale::Continuous',
+                      %rest
   ) {
-    _check_breaks_labels( $breaks, $labels );
+    ($breaks, $labels) = _check_breaks_labels( $breaks, $labels );
 
-    if (    (  $breaks and $breaks->isempty )
+    if (    ( defined $breaks and $breaks->isempty )
         and !is_position_aes($aesthetics)
         and $guide ne "none" )
     {
@@ -177,25 +179,17 @@ fun continuous_scale (
     );
 }
 
-fun discrete_scale (
-    : $aesthetics,
-    : $scale_name,
-    : $palette,
-    : $name         = undef,
-    : $breaks       = undef,
-    : $labels       = undef,
-    : $limits       = PDL::SV->new([]),
-    : $expand       = undef,
-    : $na_translate = true,
-    : $na_value     = undef,
-    : $drop         = true,
-    : $guide        = "legend",
-    PositionEnum : $position = "left",
-    : $super = 'Chart::GGPlot::Scale::Discrete',
-    %rest
+fun discrete_scale (:$aesthetics, :$scale_name,
+                    :$palette, :$name=undef,
+                    :$breaks=undef, :$labels=undef,
+                    :$limits=PDL::SV->new([]),
+                    :$expand=undef, :$na_translate=true, :$na_value=undef,
+                    :$drop=true, :$guide="legend",
+                    PositionEnum :$position = "left",
+                    :$super = 'Chart::GGPlot::Scale::Discrete',
+                    %rest
   ) {
-
-    _check_breaks_labels( $breaks, $labels );
+    ($breaks, $labels) = _check_breaks_labels( $breaks, $labels );
 
     if (    ( defined $breaks and $breaks->isempty )
         and !is_position_aes($aesthetics)
@@ -448,23 +442,25 @@ fun _scale_position_continuous ($aes) {
         }
 
         return continuous_scale(
-            aesthetics   => $aes,
-            scale_name   => 'position_c',
-            palette      => \&identity,
-            name         => $name,
-            breaks       => $breaks,
-            minor_breaks => $minor_breaks,
-            labels       => $labels,
-            limits       => $limits,
-            expand       => $expand,
-            oob          => $oob,
-            na_value     => $na_value,
-            trans        => $trans,
-            guide        => "none",
-            position     => $position,
-            ( $sec_axis ? ( secondary_axis => $sec_axis ) : () ),
-            super => 'Chart::GGPlot::Scale::ContinuousPosition',
-            %rest
+            pairgrep { defined $b } (
+                aesthetics   => $aes,
+                scale_name   => 'position_c',
+                palette      => \&identity,
+                name         => $name,
+                breaks       => $breaks,
+                minor_breaks => $minor_breaks,
+                labels       => $labels,
+                limits       => $limits,
+                expand       => $expand,
+                oob          => $oob,
+                na_value     => $na_value,
+                trans        => $trans,
+                guide        => "none",
+                position     => $position,
+                ( $sec_axis ? ( secondary_axis => $sec_axis ) : () ),
+                super => 'Chart::GGPlot::Scale::ContinuousPosition',
+                %rest
+            )
         );
     };
 }
@@ -482,24 +478,28 @@ fun scale_size_continuous (:$name=undef, :$breaks=undef, :$labels=undef,
                           :$limits=[], :$range=[1, 6],
                           :$trans='identity', :$guide='legend') {
     return continuous_scale(
-        aesthetics => 'size',
-        scale_name => 'area',
-        palette    => area_pal($range),
-        name       => $name,
-        breaks     => $breaks,
-        labels     => $labels,
-        limits     => $limits,
-        trans      => $trans,
-        guide      => "none",
+        pairgrep { defined $b } (
+            aesthetics => 'size',
+            scale_name => 'area',
+            palette    => area_pal($range),
+            name       => $name,
+            breaks     => $breaks,
+            labels     => $labels,
+            limits     => $limits,
+            trans      => $trans,
+            guide      => "none",
+        )
     );
 }
 
 fun scale_alpha_continuous (:$range=[0, 1], %rest) {
     return continuous_scale(
-        aesthetics => "alpha",
-        scale_name => "alpha_c",
-        palette    => rescale_pal($range),
-        %rest
+        pairgrep { defined $b } (
+            aesthetics => "alpha",
+            scale_name => "alpha_c",
+            palette    => rescale_pal($range),
+            %rest
+        )
     );
 }
 *scale_alpha = \&scale_alpha_continuous;
@@ -516,15 +516,17 @@ for my $trans (qw(log10 reverse sqrt)) {
 fun _scale_discrete ($aes) {
     return fun( : $expand = undef, : $position = "bottom", %rest ) {
         return discrete_scale(
-            aesthetics => $aes,
-            scale_name => 'position_c',
-            palette    => \&identity,
-            expand     => $expand,
-            guide      => "none",
-            position   => $position,
-            range_c    => continuous_range(),
-            super      => 'Chart::GGPlot::Scale::DiscretePosition',
-            %rest
+            pairgrep { defined $b } (
+                aesthetics => $aes,
+                scale_name => 'position_c',
+                palette    => \&identity,
+                expand     => $expand,
+                guide      => "none",
+                position   => $position,
+                range_c    => continuous_range(),
+                super      => 'Chart::GGPlot::Scale::DiscretePosition',
+                %rest
+            )
         );
     };
 }
@@ -534,23 +536,27 @@ fun _scale_discrete ($aes) {
 
 fun scale_continuous_identity ( :$aesthetics, :$guide='none', %rest ) {
     return continuous_scale(
-        aesthetics => $aesthetics,
-        scale_name => 'identity',
-        palette    => identity_pal(),
-        guide      => $guide,
-        super      => 'Chart::GGPlot::Scale::ContinuousIdentity',
-        %rest,
+        pairgrep { defined $b } {
+            aesthetics => $aesthetics,
+            scale_name => 'identity',
+            palette    => identity_pal(),
+            guide      => $guide,
+            super      => 'Chart::GGPlot::Scale::ContinuousIdentity',
+            %rest,
+        }
     );
 }
 
 fun scale_discrete_identity ( :$aesthetics, :$guide='none', %rest ) {
     return discrete_scale(
-        aesthetics => $aesthetics,
-        scale_name => 'identity',
-        palette    => identity_pal(),
-        guide      => $guide,
-        super      => 'Chart::GGPlot::Scale::DiscreteIdentity',
-        %rest,
+        pairgrep { defined $b } (
+            aesthetics => $aesthetics,
+            scale_name => 'identity',
+            palette    => identity_pal(),
+            guide      => $guide,
+            super      => 'Chart::GGPlot::Scale::DiscreteIdentity',
+            %rest,
+        )
     );
 }
 
@@ -610,16 +616,18 @@ fun datetime_scale (:$aesthetics, :$trans, :$palette,
     }
 
     my $sc = continuous_scale(
-        aesthetics   => $aesthetics,
-        scale_name   => $name,
-        palette      => $palette,
-        breaks       => $breaks,
-        minor_breaks => $minor_breaks,
-        labels       => $labels,
-        guide        => $guide,
-        trans        => $trans,
-        super        => $scale_class,
-        %rest,
+        pairgrep { defined $b } (
+            aesthetics   => $aesthetics,
+            scale_name   => $name,
+            palette      => $palette,
+            breaks       => $breaks,
+            minor_breaks => $minor_breaks,
+            labels       => $labels,
+            guide        => $guide,
+            trans        => $trans,
+            super        => $scale_class,
+            %rest,
+        )
     );
 
     #$sc->timezone($timezone);

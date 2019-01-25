@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle PiddleFromAny);
-use Types::Standard qw(Any ArrayRef CodeRef Maybe Str InstanceOf);
+use Types::Standard qw(Any ArrayRef CodeRef Maybe Str InstanceOf ConsumerOf);
 use Type::Params;
 
 use Chart::GGPlot::Trans;
@@ -101,7 +101,7 @@ has na_value => ( is => 'rw', default => "nan" );
 has expand   => ( is => 'rw', default => undef );
 has name     => ( is => 'rw', default => undef );
 has breaks   => ( is => 'rw', default => undef );
-has labels   => ( is => 'rw', isa     => Maybe [ArrayRef], default => undef );
+has labels   => ( is => 'rw', isa     => Maybe[ConsumerOf['PDL::SV']], default => undef );
 has guide    => ( is => 'ro', default => "legend" );
 has position => ( is => 'rw', isa     => PositionEnum, default => "left" );
 has trans    => ( is => 'rw', isa     => InstanceOf ["Chart::GGPlot::Trans"] );
