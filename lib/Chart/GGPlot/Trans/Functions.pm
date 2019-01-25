@@ -83,7 +83,7 @@ fun asn_trans() {
     _trans_new(
         'asn',
         fun($p) { $p->sqrt->asin * 2; },
-        fun($p) { ( $p/2 )->sin->power(2, 0); },
+        fun($p) { ( $p/2 )->sin ** 2; },
     );
 }
 
@@ -98,8 +98,8 @@ fun boxcox_trans($x) {
     if ( abs($x) < 1e-07 ) { return ( log_trans() ); }
     _trans_new(
         'pow-' . $x,
-        fun($p) { ($p->power($x, 0) - 1) / $x * sign( $p -1) },
-        fun($p) { ($p->abs * $x + 1 * sign($p))->power(1/$x) },
+        fun($p) { ($p ** $x - 1) / $x * sign( $p -1) },
+        fun($p) { ($p->abs * $x + 1 * sign($p)) ** (1/$x) },
     );
 }
 
@@ -107,7 +107,7 @@ fun boxcox_trans($x) {
 fun exp_trans( $base = exp(1) ) {
     _trans_new(
         'power-' . $base,
-        fun($p) { PDL->new($base)->power($p) },
+        fun($p) { pdl($base) ** $p },
         fun($p) { $p->log / log($base) },
     );
 }
@@ -118,7 +118,7 @@ fun log_trans( $base = undef ) {
     $base //= exp(1);
     _trans_new( $name,
         fun($p) { $p->log / log($base) },
-        fun($p) { PDL->new($base)->power($p) }
+        fun($p) { pdl($base) ** $p }
     );
 }
 
@@ -163,8 +163,8 @@ fun sqrt_trans() {
     _trans_new(
         'reverse',
         fun($p) { $p->sqrt },
-        fun($p) { $p->power(2, 0) },
-        domain => PDL->new([ 0, 'inf' ])
+        fun($p) { $p ** 2 },
+        domain => pdl([ 0, 'inf' ])
     );
 }
 
