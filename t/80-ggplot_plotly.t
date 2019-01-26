@@ -34,11 +34,11 @@ subtest geom_point_1 => sub {
     my $data_expected = Data::Frame::More->new(
         columns => [
             x      => $mtcars->at('wt'),
+            x_raw  => $mtcars->at('wt'),
             y      => $mtcars->at('mpg'),
+            y_raw  => $mtcars->at('mpg'),
             PANEL  => pdl(0),
             group  => pdl(0),
-            x_raw  => $mtcars->at('wt'),
-            y_raw  => $mtcars->at('mpg'),
             alpha  => NA(),
             color  => PDL::SV->new( ['black'] ),
             fill   => NA(),
@@ -116,11 +116,13 @@ subtest geom_point_2 => sub {
                     }
                 )
             ),
-            color_raw => factor($mtcars->at('cyl')),
-            x     => $mtcars->at('wt'),
-            y     => $mtcars->at('mpg'),
-            PANEL => pdl(0),
-            group => pdl(
+            color_raw => factor( $mtcars->at('cyl') ),
+            x         => $mtcars->at('wt'),
+            x_raw     => $mtcars->at('wt'),
+            y         => $mtcars->at('mpg'),
+            y_raw     => $mtcars->at('mpg'),
+            PANEL     => pdl(0),
+            group     => pdl(
                 $mtcars->at('cyl')->unpdl->map(
                     sub {
                         state $mapping = { 4 => 0, 6 => 1, 8 => 2 };
@@ -128,8 +130,6 @@ subtest geom_point_2 => sub {
                     }
                 )
             ),
-            x_raw  => $mtcars->at('wt'),
-            y_raw  => $mtcars->at('mpg'),
             alpha  => NA(),
             fill   => NA(),
             shape  => pdl(19),
@@ -164,9 +164,9 @@ subtest geom_bar_1 => sub {
             count    => $count,
             prop     => pdl(1),
             x        => pdl( 0 .. 6 ),
+            x_raw    => PDL::Factor->new($mpg->at('class')->levels),
             PANEL    => pdl(0),
             group    => pdl( 0 .. 6 ),
-            x_raw    => PDL::Factor->new($mpg->at('class')->levels),
             y        => $count,
             xmax     => pdl( 0.45, 1.45, 2.45, 3.45, 4.45, 5.45, 6.45 ),
             xmin     => pdl( -0.45, 0.55, 1.55, 2.55, 3.55, 4.55, 5.55 ),
@@ -218,11 +218,11 @@ subtest geom_line_1 => sub {
     my $data_expected = Data::Frame::More->new(
         columns => [
             x        => $x,
+            x_raw    => $x_raw,
             y        => $y,
+            y_raw    => $y,
             PANEL    => pdl(0),
             group    => pdl(0),
-            x_raw    => $x_raw,
-            y_raw    => $y,
             alpha    => NA(),
             color    => PDL::SV->new( ['black'] ),
             linetype => PDL::SV->new( ['solid'] ),

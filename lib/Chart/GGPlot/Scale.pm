@@ -149,23 +149,30 @@ method isempty () {
 
 =method transform_df
 
-Returns a hash ref of transformed variables
+Returns an associative arrayref of transformed variables and their values.
 
 =cut
 
 method transform_df ($df) {
     return if $df->isempty;
 
-    my $aesthetics = $self->aesthetics->intersect($df->names);
-    my %transformed =
-      map { $_ => $self->transform( $df->column($_) ) } @$aesthetics;
-    return \%transformed;
+    my $aesthetics = $self->aesthetics->intersect( $df->names );
+    my @transformed =
+      map {
+        my $col_raw = $df->at($_);
+        (
+            $_ => $self->transform($col_raw),
+            ( !$df->exists("${_}_raw") ? ( "${_}_raw" => $col_raw ) : () )
+        );
+      } @$aesthetics;
+    return \@transformed;
 }
 
 =method map_df($df, $i=null)
 
 This calls C<map_to_limits()> on each of the scale's aesthetics. 
-Returns a hashref which maps aesthetics to processed column data.
+Returns an associative arrayref which maps aesthetics to processed column
+data.
 
 =method map_to_limits($p, $limits=$self->get_limits)
 
@@ -180,16 +187,14 @@ method map_df ( $df, $i = undef ) {
     my $aesthetics = $self->aesthetics->intersect($df->names);
     return if ( $aesthetics->isempty );
 
-    my $func = sub {
-        my $data_raw = defined $i ? $df->at($_)->select_rows($i) : $df->at($_);
-
+    my @mapped = map {
+        my $col_raw = defined $i ? $df->at($_)->select_rows($i) : $df->at($_);
         (
-            $_         => $self->map_to_limits($data_raw),
-            "${_}_raw" => $data_raw,
+            $_ => $self->map_to_limits($col_raw),
+            ( !$df->exists("${_}_raw") ? ( "${_}_raw" => $col_raw ) : () ),
         );
-    };
-    my %mapped = map { $func->($_) } ($aesthetics->flatten);
-    return \%mapped;
+    } ( $aesthetics->flatten );
+    return \@mapped;
 }
 
 requires 'map_to_limits';

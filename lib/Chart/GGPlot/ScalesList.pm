@@ -115,12 +115,7 @@ Returns a dataframe whose columns processed to map to the scales' limits.
 method map_df ($df) {
     return $df if ( $df->isempty or $self->isempty );
 
-    my $mapped = $self->scales->map(
-        sub {
-            my $href = $_->map_df($df);
-            map { $_ => $href->{$_} } sort keys %$href;
-        }
-    );
+    my $mapped = $self->scales->map( sub { $_->map_df($df)->flatten } );
     return Data::Frame::More->new(
         columns => [
             @$mapped,
@@ -134,14 +129,17 @@ method map_df ($df) {
 method transform_df ($df) {
     return $df if ( $df->isempty or $self->isempty );
 
-    my $transformed = $self->scales->map( sub { $_->transform_df($df) } );
-    return Data::Frame::More->new(
+    my $transformed =
+      $self->scales->map( sub { $_->transform_df($df)->flatten } );
+    my @transformed_vars = pairkeys @$transformed;
+    my $new = Data::Frame::More->new(
         columns => [
             @$transformed,
-            aref_diff( $df->names, [ pairkeys @$transformed ] )
+            $df->names->setdiff( \@transformed_vars )
               ->map( sub { $_ => $df->at($_) } )->flatten
         ]
     );
+    return $new;
 }
 
 # aesthetics: a list of aesthetic-variable mappings. The name of each

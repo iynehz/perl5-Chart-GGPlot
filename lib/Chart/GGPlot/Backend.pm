@@ -74,9 +74,11 @@ classmethod build($ggplot) {
     $data = &$by_layer( fun( $l, $d ) { $l->compute_aesthetics( $d, $plot ) } );
     $debug_data->($data, 'after compute_aesthetics()');
 
+    $data = $data->map(sub { $scales->transform_df($_); });
+    $debug_data->($data, 'after transform_df()');
+
     my $scale_x = sub { $scales->get_scales('x') };
     my $scale_y = sub { $scales->get_scales('y') };
-
     $layout->train_position( $data, $scale_x->(), $scale_y->() );
 
     # keep raw column on first time of map_position()

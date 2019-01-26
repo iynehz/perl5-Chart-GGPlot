@@ -161,7 +161,7 @@ fun reverse_trans() {
 # Square-root transformation.
 fun sqrt_trans() {
     _trans_new(
-        'reverse',
+        'sqrt',
         fun($p) { $p->sqrt },
         fun($p) { $p ** 2 },
         domain => pdl([ 0, 'inf' ])
