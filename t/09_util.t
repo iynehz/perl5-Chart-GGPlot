@@ -7,7 +7,7 @@ use Data::Frame::More::Examples qw(airquality);
 use PDL::Core qw(long);
 use Chart::GGPlot::Util qw(:all !match);
 
-use Test2::V0;
+use Test2::V0 '!number';
 use Test2::Tools::DataFrame;
 use Test2::Tools::PDL;
 

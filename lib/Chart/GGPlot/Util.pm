@@ -22,7 +22,7 @@ use Types::PDL qw(Piddle1D PiddleFromAny);
 use Types::Standard qw(ArrayRef);
 
 use Chart::GGPlot::Util::_Base qw(:all);
-use Chart::GGPlot::Util::_Scales qw(:all);
+use Chart::GGPlot::Util::Scales qw(:all);
 
 use parent qw(Exporter::Tiny);
 
@@ -49,12 +49,12 @@ my @export_all = (
 
 our @EXPORT_OK = (
     @Chart::GGPlot::Util::_Base::EXPORT_OK,
-    @Chart::GGPlot::Util::_Scales::EXPORT_OK, @export_all,
+    @Chart::GGPlot::Util::Scales::EXPORT_OK, @export_all,
 );
 our %EXPORT_TAGS = (
     all    => \@EXPORT_OK,
     base   => \@Chart::GGPlot::Util::_Base::EXPORT_OK,
-    scales => \@Chart::GGPlot::Util::_Scales::EXPORT_OK,
+    scales => \@Chart::GGPlot::Util::Scales::EXPORT_OK,
     ggplot => \@export_ggplot,
 );
 

@@ -1,4 +1,4 @@
-package Chart::GGPlot::Util::_Scales;
+package Chart::GGPlot::Util::Scales;
 
 # ABSTRACT: R 'scales' package functions used by Chart::GGPlot
 
@@ -14,6 +14,7 @@ use Machine::Epsilon qw(machine_epsilon);
 use Math::Gradient qw(multi_array_gradient);
 use Math::Round qw(nearest round);
 use Math::Interpolate;
+use Number::Format 1.75;
 use Scalar::Util qw(looks_like_number);
 use Time::Moment;
 
@@ -41,6 +42,7 @@ our @EXPORT_OK = qw(
   identity_pal
   extended_breaks regular_minor_breaks
   pretty pretty_breaks
+  number comma percent dollar
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
@@ -289,8 +291,8 @@ fun _color_ramp ($colors) {
       } multi_array_gradient( 10, @hot_spots );
 
     return fun( Piddle $p) {
-        my @mapped = map { $gradient[$_] }
-          ( $p * ( @gradient - 1 ) + 0.5 )->floor->flatten;
+        my @mapped =
+          map { $gradient[$_] } ( $p * ( @gradient - 1 ) )->rint->flatten;
         my $rslt = PDL::SV->new( \@mapped );
         $rslt = $rslt->setbadif( $p->isbad ) if $p->badflag;
         return $rslt;
@@ -397,7 +399,7 @@ fun regular_minor_breaks ( $reverse = false ) {
 
 =func pretty
 
-Compute a sequence of about n+1 equally spaced ‘round’ values which cover
+Compute a sequence of about n+1 equally spaced 'round' values which cover
 the range of the values in x. The values are chosen so that they are
 1, 2 or 5 times a power of 10.
 
@@ -797,6 +799,94 @@ fun pretty_breaks($n=5, %rest) {
         no strict 'refs';
         return $f->($x, n=>$n, %rest);
     };
+}
+
+fun dollar ($p, :$accuracy=undef, :$scale=1, 
+            :$prefix='$', :$suffix='',
+            :$big_mark=',', :$decimal_mark='.',
+            :$largest_with_cents=1e5, :$negative_parens=false) {
+    return PDL::SV->new( [] ) if ( $p->length == 0 );
+
+    $accuracy //= _need_cents( $p * $scale, $largest_with_cents ) ? 0.01 : 1;
+    my $precision = List::AllUtils::max( -floor( log10($accuracy) ), 0 );
+    my $negative  = ( $p->isgood & ( $p < 0 ) );
+
+    my $fmt = Number::Format->new(
+        -thousands_sep   => $big_mark,
+        -decimal_point   => $decimal_mark,
+        -int_curr_symbol => $prefix,
+        ( $negative_parens ? ( -n_sign_posn => 0 ) : () ),
+    );
+
+    no warnings 'numeric';
+    my @amount = map { $fmt->format_price( $_, $precision ); } @{ $p->unpdl };
+
+    my $rslt = PDL::SV->new( \@amount );
+    $rslt = $rslt->setbadif( $p->isbad ) if $p->badflag;
+    return $rslt;
+}
+
+fun _need_cents ($p, $threshold) {
+    return false if ($p->badflag and $p->isbad->all);
+    return false if ($p->abs->max > $threshold);
+    return !(
+        (
+            $p->badflag
+            ? ( ( $p->floor == $p ) | $p->isbad )
+            : ( $p->floor == $p )
+        )->all
+    );
+}
+
+fun percent ($p, :$accuracy=undef, :$scale=100,
+             :$prefix='', :$suffix="%",
+             :$big_mark=',', :$decimal_mark='.'
+        ) {
+    return number(
+        $p,
+        accuracy => $accuracy,
+        scale    => $scale,
+        prefix   => $prefix,
+        suffix   => $suffix
+    );
+}
+
+fun comma ($p, :$big_mark=',', %rest) {
+    return number($p, big_mark => $big_mark, %rest);
+}
+
+fun number ($p, :$accuracy=1, :$scale=1,
+            :$big_mark=' ', :$decimal_mark='.',
+            :$prefix='', :$suffix=''
+        ) {
+    return PDL::SV->new( [] ) if $p->length == 0;
+
+    $accuracy //= _accuracy($p);
+    my $precision =
+      List::AllUtils::max( -floor( log10( $accuracy / $scale ) ), 0 );
+    my $fmt = Number::Format->new(
+        -thousands_sep => $big_mark,
+        -decimal_point => $decimal_mark
+    );
+
+    my @s = ( $p * $scale )->list;
+
+    no warnings 'numeric';
+    @s = map { "${prefix}${_}${suffix}" }
+      map { $fmt->format_number($_, $precision); } @s;
+
+    my $rslt = PDL::SV->new( \@s );
+    $rslt->setbadif( $p->isbad ) if $p->badflag;
+    return $rslt;
+}
+
+fun _accuracy ($p) {
+    return 1 if ((!$p->isfinite)->all);
+
+    my $rng = range_($p, true, true);
+    my $span = zero_range($rng) ? $rng->at(0)->abs : $rng->at(1) - $rng->at(0);
+    return 1 if ($span == 0);
+    return 10 ** (pdl($span)->log10->floor);  
 }
 
 1;

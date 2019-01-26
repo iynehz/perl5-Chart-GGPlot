@@ -7,7 +7,7 @@ use Graphics::Color::RGB;
 use Chart::GGPlot::Util qw(:scales);
 use Chart::GGPlot::Util::_Labeling qw(:all);
 
-use Test2::V0;
+use Test2::V0 '!number';
 use Test2::Tools::PDL;
 
 ok( zero_range( pdl( [ 1, 1 ] ) ), 'zero_range()' );
@@ -213,27 +213,27 @@ subtest 'pretty' => sub {
 
 subtest pretty_dt => sub {
     pdl_is(
-        Chart::GGPlot::Util::_Scales::seq_dt(
+        Chart::GGPlot::Util::Scales::seq_dt(
             beg => PDL::DateTime->new_from_datetime('2018-01-01'),
             end => PDL::DateTime->new_from_datetime('2019-01-01'),
             by  => '1 month'
         ),
         PDL::DateTime->new_sequence( '2018-01-01', 13, 'month' ),
-        'Util::_Scales::seq_dt'
+        'Util::Scales::seq_dt'
     );
 
     pdl_is(
-        Chart::GGPlot::Util::_Scales::seq_dt(
+        Chart::GGPlot::Util::Scales::seq_dt(
             beg => PDL::DateTime->new_from_datetime('2018-01-01'),
             end => PDL::DateTime->new_from_datetime('2019-01-25'),
             by  => '1 month'
         ),
         PDL::DateTime->new_sequence( '2018-01-01', 13, 'month' ),
-        'Util::_Scales::seq_dt'
+        'Util::Scales::seq_dt'
     );
 
     pdl_is(
-        Chart::GGPlot::Util::_Scales::seq_dt(
+        Chart::GGPlot::Util::Scales::seq_dt(
             beg => PDL::DateTime->new_from_datetime('2018-01-01'),
             end => PDL::DateTime->new_from_datetime('2019-01-05'),
             by  => 'halfmonth'
@@ -252,10 +252,10 @@ subtest pretty_dt => sub {
                 '2019-01-15'
             ]
         ),
-        'Util::_Scales::seq_dt'
+        'Util::Scales::seq_dt'
     );
 
-    my $pretty_dt_rslt = Chart::GGPlot::Util::_Scales::pretty_dt(
+    my $pretty_dt_rslt = Chart::GGPlot::Util::Scales::pretty_dt(
         PDL::DateTime->new_from_datetime( [qw(2008-01-01 2009-01-01)] ) );
     DOES_ok($pretty_dt_rslt, [qw(PDL::DateTime PDL::Role::HasNames)]);
     pdl_is(
@@ -296,6 +296,26 @@ subtest pretty_breaks => sub {
         PDL::DateTime->new_sequence( '2000-01-01', 6, 'year', 20 ),
 'pretty_breaks()->(PDL::DateTime->new_from_datetime( [qw(2008-01-01 2090-01-01)] )'
     );
+};
+
+subtest format => sub {
+    no warnings 'qw';
+
+    pdl_is( number( pdl( 1000, 2000 )),
+        PDL::SV->new( ['1 000', '2 000'] ), "number()" );
+
+    pdl_is( comma( pdl( 1000, 2000 )),
+        PDL::SV->new( [qw(1,000 2,000)] ), "comma()" );
+
+    pdl_is( percent( pdl( 0 .. 5 ) / 5 ),
+        PDL::SV->new( [qw(0% 20% 40% 60% 80% 100%)] ), "percent()" );
+
+    pdl_is( dollar( pdl( 0, 1 )),
+        PDL::SV->new( [qw($0 $1)] ), "dollar()" );
+    pdl_is( dollar( pdl( 1000, 2000 )),
+        PDL::SV->new( [qw($1,000 $2,000)] ), "dollar()" );
+    pdl_is( dollar( pdl( 0, 1.01, -2.1), negative_parens => true),
+        PDL::SV->new( [qw($0.00 $1.01 ($2.10))] ), "dollar()" );
 };
 
 # Util::_Labeling

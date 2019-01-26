@@ -5,7 +5,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 # Test2::V0 also has a function called "match".
 use Chart::GGPlot::Util qw(:all !match);
 
-use Test2::V0;
+use Test2::V0 '!number';
 use Test2::Tools::PDL;
 
 diag($INC{'Test2/Tools/PDL.pm'});
