@@ -101,7 +101,8 @@ has na_value => ( is => 'rw', default => "nan" );
 has expand   => ( is => 'rw', default => undef );
 has name     => ( is => 'rw', default => undef );
 has breaks   => ( is => 'rw', default => undef );
-has labels   => ( is => 'rw', isa     => Maybe[ConsumerOf['PDL::SV']], default => undef );
+has labels =>
+  ( is => 'rw', isa => Maybe [ Piddle | CodeRef ], default => undef );
 has guide    => ( is => 'ro', default => "legend" );
 has position => ( is => 'rw', isa     => PositionEnum, default => "left" );
 has trans    => ( is => 'rw', isa     => InstanceOf ["Chart::GGPlot::Trans"] );

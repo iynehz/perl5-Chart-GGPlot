@@ -165,8 +165,8 @@ method get_labels ( $breaks = $self->get_breaks ) {
     if ( not defined $self->labels ) {
         $labels = $self->trans->format->($breaks);
     }
-    elsif ( $self->labels->isempty ) {
-        return null;
+    elsif ( $self->labels->$_call_if_object('isempty') ) {
+        return PDL::SV->new( [] );
     }
     else {
         $labels = call_if_coderef( $self->labels, $breaks );

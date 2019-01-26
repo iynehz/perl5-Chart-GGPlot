@@ -107,8 +107,9 @@ fun scale_type ($x) {
 
 fun _check_breaks_labels ( $breaks, $labels ) {
     state $check = Type::Params::compile(
-        Maybe [ Piddle->plus_coercions(PiddleFromAny) ],
-        Maybe [ Piddle->plus_coercions( Any, sub { PDL::SV->new($_) } ) ]
+        Maybe [ Piddle->plus_coercions(PiddleFromAny) | CodeRef ],
+        Maybe [
+            Piddle->plus_coercions( Any, sub { PDL::SV->new($_) } ) | CodeRef ]
     );
     ( $breaks, $labels ) = $check->( $breaks, $labels );
 
