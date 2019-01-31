@@ -129,8 +129,13 @@ sub as_pdlsv {
 
     if ($self->$_DOES('PDL::Factor')) {
         my $levels = $self->levels;
-        my $x = [ map { $levels->[$_]; } @{$self->unpdl} ];
-        return $new_pdlsv->($x);
+        my $is_bad = $self->badflag ? $self->isbad : undef;
+        my @x = map {
+            ( defined $is_bad and $is_bad->at($_) )
+              ? 'BAD' 
+              : $levels->[ $self->at($_) ];
+        } ( 0 .. $self->length - 1 );
+        return $new_pdlsv->(\@x);
     }
     elsif ($self->$_DOES('PDL::DateTime')) {
         return $new_pdlsv->($self->dt_unpdl);
