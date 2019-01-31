@@ -23,6 +23,7 @@ use PDL::Factor    ();
 use PDL::SV        ();
 
 use List::AllUtils qw(each_arrayref pairgrep pairkeys pairmap);
+use List::MoreUtils 0.423;
 use Ref::Util qw(is_plain_arrayref is_plain_hashref);
 use Scalar::Util qw(looks_like_number);
 use Sereal::Decoder;
@@ -115,27 +116,41 @@ method BUILD ($args) {
     $self->_initialize_sugar();
 }
 
-=method number_of_columns()
+=method number_of_columns
 
-=method ncol()
+    number_of_columns()
+
+=method ncol
+
+    ncol()
 
 This is same as C<number_of_columns>.
 
-=method length()
+=method length
+
+    length()
 
 This is same as C<number_of_columns>.
 
-=method number_of_rows()
+=method number_of_rows
 
-=method nrow()
+    number_of_rows()
+
+=method nrow
+
+    nrow()
 
 This is same as C<number_of_rows>.
 
-=method dims()
+=method dims
+    
+    dims()
 
 Returns a perl list of C<($nrow, $ncol)>.
 
-=method shape()
+=method shape
+
+    shape()
 
 Similar to C<dims> but returns a piddle.
 
@@ -221,11 +236,15 @@ method at (@rest) {
     }
 }
 
-=method exists($col_name)
+=method exists
+
+    exists($col_name)
 
 Returns true of column C<$col_name> exists, false otherwise.
 
-=method delete($col_name)
+=method delete
+
+    delete($col_name)
 
 In-place delete column given by C<$col_name>.
 
@@ -233,7 +252,9 @@ In-place delete column given by C<$col_name>.
 
 In-place rename columns.
 
-=method select_columns($indexer) 
+=method select_columns
+
+    select_columns($indexer) 
 
 Returns a new data frame object which has the columns selected by C<$indexer>.
 
@@ -265,7 +286,9 @@ method rename ($href_or_coderef) {
     return $self;
 }
 
-=method set($col_name, $data)
+=method set
+
+    set($col_name, $data)
 
 Sets data to column. If C<$col_name> does not exist, it would add a new column.
 
@@ -307,17 +330,25 @@ method set ($indexer, $data) {
     return $data;
 }
 
-=method column_names($new_names)
+=method column_names
 
-=method col_names($new_names)
+    column_names($new_names)
+
+=method col_names
+
+    col_names($new_names)
 
 This is same as C<column_names>.
 
-=method names($new_names)
+=method names
+
+    names($new_names)
 
 This is same as C<column_names>.
 
-=method row_names($new_names)
+=method row_names
+
+    row_names($new_names)
 
 =cut
 
@@ -332,17 +363,31 @@ method column_names (@rest) {
 
 *names = \&column_names;
 
-=method select_rows($indexer)
+=method select_rows
+
+    select_rows($indexer)
 
 If a given argument is non-indexer, it would coerce it by C<iloc()>.
 
-=method head($n=6)
+=method head
+
+    head($n=6)
 
 Returns a new data frame object of first C<$n> rows.
 
-=method tail($n=6)
+=method tail
+
+    tail($n=6)
 
 Returns a new data frame object of last C<$n> rows.
+
+=method sample
+
+    sample($n)
+
+Get a random sample of rows from the data frame object.
+
+    my $sample = $df->sample(100);
 
 =cut
 
@@ -370,19 +415,38 @@ method tail ($n=6) {
     return $self->select_rows($indexer);
 }
 
-=method merge($df)
+method sample ($n) {
+    if ($n > $self->nrow) {
+        die "sample size is larger than nrow";
+    }
+    
+    my $indices = [ List::MoreUtils::samples($n, (0 .. $self->nrow-1)) ];
+    return $self->select_rows($indices);
+}
 
-=method cbind($df)
+=method merge
+
+    merge($df)
+
+=method cbind
+
+    cbind($df)
 
 This is same as C<merge()>.
 
-=method append($df)
+=method append
 
-=method rbind($df)
+    append($df)
+
+=method rbind
+    
+    rbind($df)
 
 This is same as C<append()>.
 
-=method transform($func)
+=method transform
+
+    transform($func)
 
 Apply a function to columns of the data frame, and returns a new data
 frame object. 
@@ -528,7 +592,9 @@ method transform ($func) {
     );
 }
 
-=method split($factor, $use_eq=true)
+=method split
+
+    split($factor, $use_eq=true)
 
 Splits the data in into groups defined by f. 
 Returns a hash ref mapping value to data frame.
@@ -618,7 +684,9 @@ method slice (@rest) : lvalue {
     return $new_df;
 }
 
-=method assign((DataFrame|Piddle) $x)
+=method assign
+
+    assign((DataFrame|Piddle) $x)
 
 Assign another data frame or a piddle to this data frame for in-place change.
 
@@ -659,7 +727,9 @@ method assign ((DataFrame | Piddle) $x) {
     return $self;
 }
 
-=method is_numeric_column($column_name_or_idx)
+=method is_numeric_column
+
+    is_numeric_column($column_name_or_idx)
 
 =cut
 
@@ -668,7 +738,9 @@ method is_numeric_column ($column_name_or_idx) {
     return !is_discrete($column);
 }
 
-=method sort($by_columns, $ascending=true)
+=method sort
+
+    sort($by_columns, $ascending=true)
 
 Sort rows for given columns.
 Returns a new data frame.
@@ -781,11 +853,15 @@ method id () {
     return $rslt;
 }
 
-=method copy()
+=method copy
+
+    copy()
 
 Make a deep copy of this data frame object.
 
-=method clone()
+=method clone
+    
+    clone()
 
 This is same as C<copy()>.
 
@@ -955,7 +1031,9 @@ method which (:$bad_to_val=undef, :$ignore_both_bad=true) {
     return pdl($coordinates);
 }
 
-=method isempty()
+=method isempty
+
+    isempty()
 
 Returns true if the data frame has no rows.
 
