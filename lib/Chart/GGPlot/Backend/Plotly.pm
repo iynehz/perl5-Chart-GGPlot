@@ -2,7 +2,7 @@ package Chart::GGPlot::Backend::Plotly;
 
 # ABSTRACT: Plotly backend for Chart::GGPlot
 
-use Chart::GGPlot::Class;
+use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
 # VERSION
@@ -158,12 +158,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
                         map {
                             if ( $d->exists($_) ) {
                                 my $col_data = $d->at($_);
-                                if ( $col_data->$_DOES('PDL::Factor') ) {
-                                    $col_data->levels->at( $col_data->at(0) );
-                                }
-                                else {
-                                    $col_data->at(0);
-                                }
+                                $col_data->slice(pdl(0))->as_pdlsv->at(0);
                             }
                             else {
                                 ();
