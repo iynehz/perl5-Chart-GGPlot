@@ -232,15 +232,13 @@ fun scale_flip_position ($scale) {
 }
 
 fun _scale_hue ($aes) {
-    return fun(
-        : $h         = pdl( [ 0, 360 ] ) + 15,
-        : $c         = 100,
-        : $l         = 65,
-        : $h_start   = 0,
-        : $direction = 1,
-        : $na_value  = 'grey50', %rest
-      )
-    {
+    return fun(:$h = pdl( [ 0, 360 ] ) + 15,
+               :$c = 100, :$l = 65,
+               :$h_start = 0,
+               :$direction = 1,
+               :$na_value = 'grey50',
+               %rest
+      ) {
         return discrete_scale(
             aesthetics => $aes,
             scale_name => 'hue',
@@ -262,12 +260,11 @@ fun _scale_hue ($aes) {
 *scale_fill_hue       = _scale_brewer('hue');
 
 fun _scale_brewer ($aes) {
-    return fun(
-          ColorBrewerTypeEnum : $type = "seq",
-        : $palette   = 0,
-        : $direction = 1, %rest
-      )
-    {
+    return fun(ColorBrewerTypeEnum :$type = "seq",
+               :$palette = 0,
+               :$direction = 1,
+               %rest
+      ) {
         return discrete_scale(
             aesthetics => $aes,
             scale_name => "brewer",
@@ -281,16 +278,12 @@ fun _scale_brewer ($aes) {
 *scale_fill_brewer  = _scale_brewer('fill');
 
 fun _scale_distiller ($aes) {
-    return fun(
-          ColorBrewerTypeEnum : $type = "seq",
-        : $palette   = 1,
-        : $direction = -1,
-        : $values    = [],
-        : $na_value  = "grey50",
-        : $guide     = "colorbar",
-        %rest
-      )
-    {
+    return fun(ColorBrewerTypeEnum :$type = "seq",
+               :$palette = 1,
+               :$direction = -1, :$values = [], :$na_value = "grey50",
+               :$guide = "colorbar",
+               %rest
+      ) {
         if ( $type eq "qual" ) {
             warn(   "Using a discrete color palette in a continuous scale.\n"
                   . "  Consider using type = \"seq\" or type = \"div\" instead"
@@ -313,13 +306,11 @@ fun _scale_distiller ($aes) {
 *scale_fill_distiller  = _scale_distiller('fill');
 
 fun _scale_gradient ($aes) {
-    return fun(
-        : $low      = "#132B43",
-        : $high     = "#56B1F7",
-        : $na_value = "grey50",
-        : $guide    = "colorbar", %rest
-      )
-    {
+    return fun(:$low = "#132B43", :$high = "#56B1F7",
+               :$na_value = "grey50",
+               :$guide = "colorbar",
+               %rest
+      ) {
         return continuous_scale(
             aesthetics => $aes,
             scale_name => "gradient",
@@ -341,15 +332,13 @@ fun _mid_rescaler ($mid) {
 }
 
 fun _scale_gradient2 ($aes) {
-    return fun(
-        : $low      = muted("red"),
-        : $mid      = "white",
-        : $high     = muted("blue"),
-        : $midpoint = 0,
-        : $na_value = "grey50",
-        : $guide    = "colorbar", %rest
-      )
-    {
+    return fun(:$low = muted("red"), :$mid = "white",
+               :$high = muted("blue"),
+               :$midpoint = 0,
+               :$na_value = "grey50",
+               :$guide = "colorbar",
+               %rest
+      ) {
         return continuous_scale(
             aesthetics => $aes,
             scale_name => "gradient2",
@@ -366,12 +355,10 @@ fun _scale_gradient2 ($aes) {
 *scale_fill_gradient2  = _scale_gradient2('fill');
 
 fun _scale_gradientn ($aes) {
-    return fun(
-        : $values   = [],
-        : $na_value = "grey50",
-        : $guide    = "colorbar", %rest
-      )
-    {
+    return fun(:$values = [], :$na_value = "grey50",
+               :$guide = "colorbar",
+               %rest
+      ) {
         my $colors = ( delete $rest{colors} ) // ( delete $rest{colors} );
         continuous_scale(
             aesthetics => $aes,
@@ -416,19 +403,12 @@ fun scale_fill_continuous ( : $type = "gradient", %rest ) {
 }
 
 fun _scale_position_continuous ($aes) {
-    return fun(
-        : $name         = undef,
-        : $breaks       = undef,
-        : $minor_breaks = undef,
-        : $labels       = undef,
-        : $limits       = [],
-        : $expand       = undef,
-        : $oob          = \&censor,
-        : $na_value     = 'nan',
-        : $trans        = 'identity',
-        : $position     = "bottom",
-        : $sec_axis     = undef,
-        %rest,
+    return fun(:$name = undef, :$breaks = undef, :$minor_breaks = undef,
+               :$labels = undef, :$limits = [],
+               :$expand = undef, :$oob = \&censor, :$na_value = 'nan',
+               :$trans = 'identity', :$position = "bottom",
+               :$sec_axis = undef,
+               %rest,
       )
     {
         if ( defined $sec_axis ) {
