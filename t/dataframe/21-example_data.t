@@ -12,18 +12,18 @@ use Test2::Tools::PDL;
 
 use Data::Frame::More::Examples qw(:all);
 
-subtest simple => sub {     # just test if the data is loadable
+subtest simple => sub {    # just test if the data is loadable
     for my $name (qw(airquality mpg mtcars diamonds economics economics_long)) {
+        my $df;
         no strict 'refs';
-        ok( $name->(), $name );
+        ok( no_warnings { $df = $name->(); }, "no warnings from $name()" );
+        ok( defined($df), $name );
+        ok( no_warnings { $df->string; }, "no warnings from $name()->string" );
     }
 };
 
 subtest airquality => sub {
-    my $airquality;
-    ok(no_warnings {
-        $airquality = airquality();
-    }, "read_csv() shall not warn about NA");
+    my $airquality = airquality();
     is($airquality->at('Ozone')->nbad, 37, 'airquality');
 
     my $tempfile = Path::Tiny->tempfile;
