@@ -35,10 +35,18 @@ subtest is_discrete => sub {
 };
 
 subtest factor => sub {
-    my $x = pdl( [qw(6 6 4 6 8 6 8 4 4 6)]); # first 10 from $mtcars->at('cyl')
-    my $f = factor($x);
-    is($f->levels, [qw(4 6 8)], 'levels');
-    is($f->unpdl, [qw(1 1 0 1 2 1 2 0 0 1)], 'unpdl');
+
+    # Here we just very briefly test it, as it should have been tested
+    # in PDL::Factor's distribution.
+
+    my $x1 = pdl( [qw(6 6 4 6 8 6 8 4 4 6)]); # first 10 from $mtcars->{cyl}
+    my $f1 = factor($x1);
+    is($f1->levels, [qw(4 6 8)], 'levels');
+    is($f1->unpdl, [qw(1 1 0 1 2 1 2 0 0 1)], 'unpdl');
+
+    my $f2 = factor($f1, levels => [8, 6, 4]);
+    is($f2->levels, [qw(8 6 4)], 'factor($x, levels => $levels)');
+    is($f2->unpdl, [qw(1 1 2 1 0 1 0 2 2 1)], 'unpdl');
 };
 
 done_testing;

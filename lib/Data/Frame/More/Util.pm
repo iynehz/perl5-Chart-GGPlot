@@ -83,29 +83,8 @@ Convert a thing to a L<PDL::Factor> object.
 
 =cut
 
-fun factor ($x) {
-    return $x if ( $x->$_DOES('PDL::Factor') );
-
-    # TODO get this logic into PDL::Factor::new
-    if ( $x->$_DOES('PDL') ) {
-        if ( $x->$_DOES('PDL::SV') ) {
-            return PDL::Factor->new( $x->unpdl );
-        }
-        else {
-            my $integer = PDL::Core::zeros( $x->length );
-            my $uniq    = $x->uniq->qsort;
-            for my $i ( 0 .. $uniq->length - 1 ) {
-                $integer->slice( which( $x == $uniq->at($i) ) ) .= $i;
-            }
-            return PDL::Factor->new(
-                levels  => $uniq->unpdl,
-                integer => $integer->unpdl
-            );
-        }
-    }
-    else {
-        return PDL::Factor->new($x);
-    }
+fun factor ($x, %rest) {
+    return PDL::Factor->new( $x, %rest );
 }
 
 fun guess_and_convert_to_pdl ( (ArrayRef | Value | Piddle) $x,

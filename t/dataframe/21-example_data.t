@@ -37,6 +37,12 @@ subtest diamonds => sub {
     is( $diamonds->names, [qw(carat cut color clarity depth table price x y z)],
         '$diamonds->names' );
     is( $diamonds->nrow, 53940, '$diamonds->nrow' );
+
+    is(
+        $diamonds->at('clarity')->levels,
+        [qw(I1 SI2 SI1 VS2 VS1 VVS2 VVS1 IF)],
+        'factor for clarity'
+    );
 };
 
 subtest economics => sub {
