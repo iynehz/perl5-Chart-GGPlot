@@ -48,7 +48,7 @@ subtest match => sub {
     pdl_is(
         Chart::GGPlot::Util::match( pdl( [ 1, 2, 3 ] ), pdl( [ 3, 1, 2 ] ) ),
         pdl([ 1, 2, 0 ]),
-        'match()'
+        'match($pdl, $pdl)'
     );
     pdl_is(
         Chart::GGPlot::Util::match(
@@ -56,7 +56,17 @@ subtest match => sub {
             PDL::SV->new( [qw(baz foo bar)] )
         ),
         pdl([ 1, 2, 0 ]),
-        'match()'
+        'match($pdlsv, $pdlsv)'
+    );
+    pdl_is(
+        Chart::GGPlot::Util::match(
+            PDL::Factor->new(
+                [qw(6 6 4 6 8 6 8 4 4 6)], levels => [qw(8 6 4)]
+            ),
+            PDL::Factor->new( [qw(8 6 4)] ),
+        ),
+        pdl( [qw(1 1 2 1 0 1 0 2 2 1)] ),
+        'match($factor, $factor)'
     );
 };
 

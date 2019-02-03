@@ -120,6 +120,7 @@ classmethod build($ggplot) {
     if ( $npscales->length > 0 ) {
         $data->map(sub { $npscales->train_df($_) });
         $data = $data->map(sub { $npscales->map_df($_) });
+        $debug_data->($data, 'after mapping non-position scales');
     }
 
     $data = &$by_layer( fun( $l, $d ) { $l->compute_geom_2($d) } );

@@ -72,41 +72,33 @@ use PDL::Ufunc qw(qsorti);
 use PDL::Primitive qw(which vsearch_match);
 
 fun match (Piddle $a, Piddle $b) {
-    my $is_discrete =
+    my $is_string =
       List::AllUtils::any { $_->$_DOES('PDL::SV') or $_->type eq 'byte' }
     ( $a, $b );
 
-    if ($is_discrete) {
-        # TODO: refactor this to somewhere else
-        state $factor2sv = sub {
-            my ($x) = @_;
-            return $x unless ($x->$_DOES('PDL::Factor'));
-
-            my $levels = $x->levels;
-            my $p = PDL::SV->new($x->unpdl->map(sub { $levels->[$_] }));
-            if ($x->badflag) {
-                $p = $p->setbadif($x->isbad);
-            }
-            return $p;
-        };
-
-        $a = $factor2sv->($a);
-        $b = $factor2sv->($b);
+    if ($is_string) {
+        $a = $a->as_pdlsv;
+        $b = $b->as_pdlsv;
         my %b_hash = map { $b->at($_) => $_ } reverse( 0 .. $b->length - 1 );
-        my $rslt = [ $a->flatten ]->map( sub { $b_hash{$_} // -1; } );
+        my $rslt   = [ $a->flatten ]->map( sub { $b_hash{$_} // -1; } );
         return pdl($rslt)->setvaltobad(-1);
     }
     else {
-        my $sorted_idx = $b->qsorti;
-        my $sorted     = $b->slice($sorted_idx);
-        my $match      = $a->vsearch_match($sorted);
-        my $rslt       = [ 0 .. $a->length - 1 ]->map(
-            sub {
-                my $idx = $match->at($_);
-                $idx < 0 ? -1 : $sorted_idx->at($idx);
-            }
-        );
-        return pdl($rslt)->setvaltobad(-1);
+        if ( $b->$_DOES('PDL::Factor') ) {
+            return $a->{PDL};
+        }
+        else {
+            my $sorted_idx = $b->qsorti;
+            my $sorted     = $b->slice($sorted_idx);
+            my $match      = $a->vsearch_match($sorted);
+            my $rslt       = [ 0 .. $a->length - 1 ]->map(
+                sub {
+                    my $idx = $match->at($_);
+                    $idx < 0 ? -1 : $sorted_idx->at($idx);
+                }
+            );
+            return pdl($rslt)->setvaltobad(-1);
+        }
     }
 }
 

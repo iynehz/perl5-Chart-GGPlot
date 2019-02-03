@@ -70,13 +70,8 @@ method map_to_limits ( $p, $limits = $self->get_limits ) {
         $self->_n_breaks_cache($n);
     }
 
-    my $pal_match;
-    if ( $pal->$_can('names') ) {
-        $pal_match = $pal->slice( match( $p, $pal->names ) );
-    }
-    else {
-        $pal_match = $pal->slice( match( $p, $limits ) );
-    }
+    my $pal_match =
+      $pal->slice( match( $p, ( $pal->$_call_if_can('names') // $limits ) ) );
 
     return (
         $self->na_translate
