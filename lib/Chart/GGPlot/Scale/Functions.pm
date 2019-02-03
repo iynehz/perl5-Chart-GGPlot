@@ -37,12 +37,16 @@ my @export_ggplot = (
           scale_x_discrete scale_y_discrete
           scale_x_datetime scale_y_datetime
           scale_color_hue scale_color_discrete
+          scale_fill_hue scale_fill_discrete
           scale_color_continuous scale_fill_continuous
           scale_color_brewer scale_fill_brewer
           scale_color_distiller scale_fill_distiller
           scale_color_gradient scale_fill_gradient
           scale_color_gradient2 scale_fill_gradient2
           scale_color_gradientn scale_fill_gradientn
+          scale_color_viridis_d scale_fill_viridis_d
+          scale_fill_ordinal scale_fill_ordinal
+          scale_color_viridis_c scale_fill_viridis_c
           scale_size_continuous
           scale_alpha_continuous scale_alpha
           scale_color_identity scale_shape_identity scale_linetype_identity
@@ -86,7 +90,7 @@ fun find_scale ($aes, $x) {
 # TODO support various kind of types
 fun scale_type ($x) {
     if ( $x->$_DOES('PDL::Factor') ) {
-        return 'discrete';
+        return $x->DOES('PDL::Factor::Ordered') ? 'ordinal' : 'discrete';
     }
     elsif ( $x->$_DOES('PDL::SV') ) {
         return 'discrete';
@@ -258,6 +262,7 @@ fun _scale_hue ($aes) {
 *scale_color_hue      = _scale_hue('color');
 *scale_color_discrete = \&scale_color_hue;
 *scale_fill_hue       = _scale_brewer('hue');
+*scale_fill_discrete  = \&scale_fill_hue;
 
 fun _scale_brewer ($aes) {
     return fun(ColorBrewerTypeEnum :$type = "seq",
@@ -324,6 +329,50 @@ fun _scale_gradient ($aes) {
 
 *scale_color_gradient = _scale_gradient('color');
 *scale_fill_gradient  = _scale_gradient('fill');
+
+fun _scale_viridis_d ($aes) {
+    return fun (:$begin = 0, :$end = 1,
+                :$direction = 1, :$option = 'viridis',
+                %rest
+            ) {
+        return discrete_scale(
+            aesthetics => $aes,
+            scale_name => "viridis_d",
+            palette    => viridis_pal( $begin, $end, $direction, $option ),
+            %rest,
+        );
+    };
+}
+
+*scale_color_viridis_d = _scale_viridis_d('color');
+*scale_color_ordinal   = \&scale_color_viridis_d;
+*scale_fill_viridis_d  = _scale_viridis_d('fill');
+*scale_fill_ordinal    = \&scale_fill_viridis_d;
+
+fun _scale_viridis_c ($aes) {
+    return fun (:$begin = 0, :$end = 1,
+                :$direction = 1, :$option = 'viridis', :$values = null(),
+                :$na_value = 'grey50',
+                :$guide = 'colorbar',
+                %rest
+            ) {
+        
+        my $pal =
+          gradient_n_pal( viridis_pal( $begin, $end, $direction, $option )->(6),
+            $values );
+        return continuous_scale(
+            aesthetics => $aes,
+            scale_name => "viridis_c",
+            palette    => $pal,
+            na_value   => $na_value,
+            guide      => $guide,
+            %rest,
+        );
+    };
+}
+
+*scale_color_viridis_c = _scale_viridis_c('color');
+*scale_fill_viridis_c  = _scale_viridis_c('fill');
 
 fun _mid_rescaler ($mid) {
     return fun( $v, $to = [ 0, 1 ], $from = range( $v, true ) ) {

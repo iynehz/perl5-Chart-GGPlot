@@ -2,6 +2,9 @@ package Chart::GGPlot::Util::Scales;
 
 # ABSTRACT: R 'scales' package functions used by Chart::GGPlot
 
+# TODO: make a separate library, e.g. Color::Scales for the color palettes.
+#  Some of the color palette function's signature may change.
+
 use Chart::GGPlot::Setup qw(:base :pdl);
 
 # VERSION
@@ -36,7 +39,7 @@ use parent qw(Exporter::Tiny);
 our @EXPORT_OK = qw(
   censor discard expand_range zero_range
   rescale squish
-  hue_pal brewer_pal gradient_n_pal rescale_pal
+  hue_pal brewer_pal gradient_n_pal rescale_pal viridis_pal
   seq_gradient_pal div_gradient_pal
   area_pal
   identity_pal
@@ -335,6 +338,22 @@ fun div_gradient_pal ($low, $mid, $high) {
 fun rescale_pal ( $range = PDL->new( [ 0.1, 1 ] ) ) {
     return fun($p) {
         rescale( $p, $range, PDL->new( [ 0, 1 ] ) );
+    };
+}
+
+fun viridis_pal ($begin=0, $end=1, $direction=1, $option='viridis') {
+    use Chart::GGPlot::Util::Scales::_Viridis;
+
+    return fun($n) {
+        my $colors =
+          Chart::GGPlot::Util::Scales::_Viridis::viridis( $n, $begin, $end,
+            $direction, $option );
+        my @palette = map {
+            my ( $r, $g, $b ) = @$_;
+            my $c = Graphics::Color::RGB->new( r => $r, g => $g, b => $b );
+            $c->as_css_hex;
+        } @$colors;
+        return PDL::SV->new( \@palette );
     };
 }
 

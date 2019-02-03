@@ -24,7 +24,9 @@ my %data_setup = (
             $df->set(
                 'clarity',
                 factor(
-                    $clarity, levels => [qw(I1 SI2 SI1 VS2 VS1 VVS2 VVS1 IF)]
+                    $clarity,
+                    levels  => [qw(I1 SI2 SI1 VS2 VS1 VVS2 VVS1 IF)],
+                    ordered => true
                 )
             );
             return $df;
