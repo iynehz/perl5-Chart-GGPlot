@@ -31,7 +31,7 @@ use Data::Frame::More::Util qw(guess_and_convert_to_pdl);
     from_csv($file, :$header=true, :$sep=',', :$quote='"',
              :$na=[qw(NA BAD)], :$col_names=undef, :$row_names=undef, 
              HashRef :$col_types={},
-             :$strings_as_factors=true)
+             :$strings_as_factors=false)
 
 Create a data frame object from a CSV file. For example, 
 
@@ -53,7 +53,7 @@ decided.
 classmethod from_csv ($file, :$header=true, :$sep=",", :$quote='"',
                       :$na=[qw(NA BAD)], :$col_names=undef, :$row_names=undef,
                       HashRef :$col_types={},
-                      :$strings_as_factors=true
+                      :$strings_as_factors=false
   ) {
     state $check = Type::Params::compile(
         ( ArrayRef [Str] )->plus_coercions( Any, sub { [$_] } ) );

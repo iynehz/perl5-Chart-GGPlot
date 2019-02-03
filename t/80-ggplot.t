@@ -159,12 +159,13 @@ subtest geom_bar_1 => sub {
     diag($data->[0]->string);
 
     my $count = pdl(5, 47, 41, 11, 33, 35, 62);
+    my $class_sorted = PDL::SV->new( [ sort $mpg->at('class')->uniq->list ] );
     my $data_expected = Data::Frame::More->new(
         columns => [
             count    => $count,
             prop     => pdl(1),
             x        => pdl( 0 .. 6 ),
-            x_raw    => PDL::Factor->new($mpg->at('class')->levels),
+            x_raw    => $class_sorted,
             PANEL    => pdl(0),
             group    => pdl( 0 .. 6 ),
             y        => $count,

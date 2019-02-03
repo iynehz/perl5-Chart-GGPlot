@@ -24,9 +24,16 @@ method train($p, $drop = false, $na_rm = false ) {
         die "Continuous value supplied to discrete scale";
     }
     
-    my @range = @{$self->range->unpdl};
-    push @range, $p->$_can('levels') ? @{$p->levels} : $p->flatten;
-    $self->range(ref($p)->new([uniq(@range)]));
+    my @range = @{ $self->range->unpdl };
+    if ( $p->$_DOES('PDL::Factor') ) {
+        # TODO: This may be incorrect.
+        push @range, $p->levels->flatten;
+        $self->range( ref($p)->new( [ uniq(@range) ] ) );
+    }
+    else {
+        push @range, $p->flatten;
+        $self->range( ref($p)->new( [ sort(uniq(@range)) ] ) );
+    }
 
     return $self->range;
 }
