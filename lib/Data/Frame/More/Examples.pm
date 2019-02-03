@@ -32,16 +32,20 @@ my %data_setup = (
             return $df;
         }
     },
-    mpg       => {},
-    mtcars    => {},
     economics => { params => { col_types => { date => 'PDL::DateTime' } } },
     economics_long =>
       { params => { col_types => { date => 'PDL::DateTime' } } },
+    mpg       => {},
+    mtcars    => {},
+    txhousing => {},
 );
-my @data_names = keys %data_setup;
+my @data_names = sort keys %data_setup;
 
-our @EXPORT_OK = (@data_names);
-our %EXPORT_TAGS = ( all => \@EXPORT_OK, );
+our @EXPORT_OK = (@data_names, 'dataset_names');
+our %EXPORT_TAGS = (
+    datasets => \@data_names,
+    all      => \@EXPORT_OK,
+);
 
 my $data_raw_dir;
 
@@ -73,11 +77,31 @@ fun _make_data ( $name, $setup ) {
     };
 }
 
-for my $name ( keys %data_setup ) {
+for my $name ( @data_names ) {
     no strict 'refs';
     *{$name} = _make_data( $name, $data_setup{$name} );
 }
 
+=func dataset_names
+
+Returns an array of names of the datasets in this module. 
+
+=cut
+
+sub dataset_names { @data_names; }
+
 1;
 
 __END__
+
+=head1 SYNOPSIS
+
+    use Data::Frame::More::Examples qw(:datasets dataset_names);
+
+    say dataset_names();    # names of all example datasets
+
+    my $mtcars = mtcars();
+
+=head1 SEE ALSO
+
+L<Data::Frame::More>

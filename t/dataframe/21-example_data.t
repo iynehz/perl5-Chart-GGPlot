@@ -10,10 +10,10 @@ use Test2::Tools::Warnings qw(no_warnings);
 use Test2::Tools::DataFrame;
 use Test2::Tools::PDL;
 
-use Data::Frame::More::Examples qw(:all);
+use Data::Frame::More::Examples qw(:datasets dataset_names);
 
 subtest simple => sub {    # just test if the data is loadable
-    for my $name (qw(airquality mpg mtcars diamonds economics economics_long)) {
+    for my $name (dataset_names()) {
         my $df;
         no strict 'refs';
         ok( no_warnings { $df = $name->(); }, "no warnings from $name()" );
