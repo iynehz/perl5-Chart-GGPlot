@@ -15,7 +15,8 @@ my $dsamp = diamonds()->sample(1000);
 my $p = ggplot(
     data    => $dsamp,
     mapping => aes( x => 'carat', y => 'price' )
-)->geom_point( mapping => aes( color => 'clarity' ) );
+)->geom_point( mapping => aes( color => 'clarity' ) )
+ ->scale_color_hue();
 
 if (defined $save_as) {
     $p->save($save_as);
