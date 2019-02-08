@@ -7,6 +7,7 @@ use namespace::autoclean;
 
 # VERSION
 
+use Data::Munge qw(elem);
 use List::AllUtils qw(pairmap pairkeys);
 use Types::Standard qw(Any ArrayRef Object);
 use Type::Params;
@@ -115,7 +116,12 @@ Returns a dataframe whose columns processed to map to the scales' limits.
 method map_df ($df) {
     return $df if ( $df->isempty or $self->isempty );
 
-    my $mapped = $self->scales->map( sub { $_->map_df($df)->flatten } );
+    my $mapped = $self->scales->map(
+        sub {
+            my $x = $_->map_df($df);
+            return defined $x ? $x->flatten : ();
+        }
+    );
     return Data::Frame::More->new(
         columns => [
             @$mapped,
@@ -161,13 +167,20 @@ method add_defaults ($data, $aesthetics) {
     for my $aes ( sort grep { not $skip_aes->{$_} } keys %datacols ) {
         my ( $scale_f, $func_name ) = find_scale( $aes, $datacols{$aes} );
         unless ( defined $scale_f ) {
-            die sprintf(
-                "Cannot find scale for aes %s. Missing a function of name %s",
-                $aes, $func_name );
+            # some aesthetics do not have scale functions
+            if ( elem( $aes, [qw(weight)] ) ) {
+                next;
+            }
+            else {
+                die sprintf(
+"Cannot find scale for aes %s. Missing a function of name %s",
+                    $aes, $func_name );
+            }
         }
         $log->debugf(
             "ScalesList::add_defaults : Got scale function %s for aes %s",
-            $func_name, $aes ) if $log->is_debug;
+            $func_name, $aes )
+          if $log->is_debug;
         $self->add( $scale_f->() );
     }
 }
