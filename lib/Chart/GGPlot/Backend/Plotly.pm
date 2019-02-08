@@ -22,7 +22,7 @@ use Types::Standard qw(HashRef Int);
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Util qw(:all);
 use Chart::GGPlot::Backend::Plotly::Geom;
-use Chart::GGPlot::Backend::Plotly::Util qw(br);
+use Chart::GGPlot::Backend::Plotly::Util qw(br to_rgb);
 
 #TODO: To test and see which value is proper.
 our $WEBGL_THRESHOLD = 2000;
@@ -201,12 +201,51 @@ method to_plotly ($plot_built) {
     my $scales       = $layout->get_scales(0);
     my $panel_params = $layout->panel_params->at(0);
 
-    my %plotly_layout = ();
-    my $labels        = $plot->labels;
-    if ( exists $labels->{title} ) {
-        $plotly_layout{title} = $labels->{title};
+    # prepare theme and calc elements
+    my $theme  = $plot->theme;
+    my $elements = $theme->keys;
+    for my $elname (@$elements) {
+        my $el = $theme->at($elname);
+        if ($el->$_DOES('Chart::GGPlot::Theme::Element')) {
+            $theme->set($elname, $theme->calc_element($elname));
+        }
     }
+
+    my $el_panel_bg = $theme->at('panel_background');
+    my $el_plot_bg  = $theme->at('plot_background');
+
+    my %plotly_layout = (
+        (
+              ( not defined $el_panel_bg or $el_panel_bg->is_blank ) ? ()
+            : ( plot_bgcolor => to_rgb( $el_panel_bg->at('fill') ) )
+        ),
+        (
+              ( not defined $el_plot_bg or $el_plot_bg->is_blank ) ? ()
+            : ( paper_bgcolor => to_rgb( $el_plot_bg->at('fill') ) )
+        ),
+    );
+
+    my $labels        = $plot->labels;
+    my $title = $labels->{title};
+    if ( defined $labels->{title} and length($title) ) {
+
+        # NOTE: plotly does not directly support subtitle
+        #  See https://github.com/plotly/plotly.js/issues/233
+
+        my $subtitle = $labels->{subtitle};
+        if ( defined $subtitle and length($subtitle) ) {
+            $title .= br() . sprintf( "%s", $subtitle );
+        }
+        $plotly_layout{title} = $title;
+    }
+
     for my $xy (qw(x y)) {
+
+        my $theme_el = sub {
+            my ($elname) = @_;
+            return ($theme->at("${elname}.${xy}") // $theme->at($elname));
+        };
+
         my $sc =
             $plot->coordinates->DOES('Chart::GGPlot::Coord::Flip')
           ? $scales->{ $xy eq 'x' ? 'y' : 'x' }
@@ -219,18 +258,73 @@ method to_plotly ($plot_built) {
         my $major_source = $panel_params->{"$xy.major_source"}->unpdl;
         my %ticks = pairwise { $a => $b } @$major_source, @$labels;
 
+        # TODO:
+        # Plotly does not well support minor ticks. Although we could
+        # specify empty string at ticktext for minor ticks (like via below
+        # lines I comment out), because of plotly's limitation minor
+        # and major ticks has to be of same tick length on axises, which
+        # looks ugly. In contrast ggplot2 would defaultly have a zero 
+        # length for minor ticks. R's plotly module simply discards minor
+        # ticks. For now we just follow that.
+
         # There is not necessarily minor ticks for an axis.
-        my $minor_source = $panel_params->{"$xy.minor_source"};
-        my $tickvals =
-          defined $minor_source ? $minor_source->unpdl : $major_source;
+        #my $minor_source = $panel_params->{"$xy.minor_source"};
+        #my $tickvals =
+        #  defined $minor_source ? $minor_source->unpdl : $major_source;
+
+        my $tickvals = $major_source;
         my $ticktext = [ map { $ticks{$_} // '' } @$tickvals ];
 
+        my ( $el_axis_line, $el_axis_text, $el_axis_ticks, $el_axis_title ) =
+          map { $theme_el->($_) } qw(axis_line axis_text axis_ticks axis_title);
+        my $el_panel_grid = $theme_el->('panel_grid_major')
+          // $theme->at('panel_grid');
+
         $plotly_layout{"${xy}axis"} = {
-            title    => $axis_title,
             range    => $range,
-            ticktext => $ticktext,
-            tickvals => $tickvals,
             zeroline => JSON::false,
+
+            (
+                  ( not defined $el_axis_title or $el_axis_title->is_blank )
+                ? ()
+                : ( title => $axis_title, )
+            ),
+            (
+                  ( not defined $el_axis_ticks or $el_axis_ticks->is_blank )
+                ? ()
+                : (
+                    ticks     => 'outside',
+                    ticktext  => $ticktext,
+                    tickvals  => $tickvals,
+                    tickcolor => to_rgb( $el_axis_ticks->at('color') ),
+                    tickangle => -( $el_axis_ticks->at('angle') // 0 ),
+                )
+            ),
+
+            #ticklen => $theme->axis_ticks_length;
+            #tickwidth => $el_axis_ticks,
+            (
+                  ( not defined $el_axis_text or $el_axis_text->is_blank )
+                ? ( showticklabels => JSON::false, )
+                : ( showticklabels => JSON::true, )
+            ),
+            (
+                ( not defined $el_axis_line or $el_axis_line->is_blank ) ? ()
+                : (
+                    linecolor => to_rgb( $el_axis_line->at('color') ),
+                    linewidth => 1,
+                )
+            ),
+            (
+                (
+                    not defined $el_panel_grid
+                      or $el_panel_grid->is_blank
+                ) ? ( showgrid => JSON::false, )
+                : (
+                    gridcolor => to_rgb( $el_panel_grid->at('color') ),
+                    gridwidth => to_rgb( $el_panel_grid->at('size') ),
+                )
+            ),
         };
     }
 
@@ -282,6 +376,28 @@ method to_plotly ($plot_built) {
 
     # hovermode
     $plotly_layout{hovermode} = 'closest';
+    
+    # border
+    my $el_panel_border = $theme->at('panel_border');
+    unless ( not defined $el_panel_border or $el_panel_border->is_blank ) {
+        $plotly_layout{shapes} = [
+            {
+                type      => 'rect',
+                fillcolor => 'transparent',
+                line      => {
+                    color    => to_rgb( $el_panel_border->at('color') ),
+                    width    => 1,
+                    linetype => 'solid',
+                },
+                xref => 'paper',
+                x0   => 0,
+                x1   => 1,
+                yref => 'paper',
+                y0   => 0,
+                y1   => 1,
+            }
+        ];
+    }
 
     $log->debug( "plotly layout : " . Dumper( \%plotly_layout ) )
       if $log->is_debug;

@@ -6,11 +6,8 @@ use Chart::GGPlot::Setup;
 
 # VERSION
 
-use Chart::GGPlot::Theme::Element::Blank;
-use Chart::GGPlot::Theme::Element::Rect;
-use Chart::GGPlot::Theme::Element::Line;
-use Chart::GGPlot::Theme::Element::Text;
-use Chart::GGPlot::Theme::Element::Rel;
+use Chart::GGPlot::Theme::Element;
+use Chart::GGPlot::Theme::Rel;
 
 use parent qw(Exporter::Tiny);
 
@@ -53,7 +50,7 @@ Used to specify sizes relative to the parent.
 =cut
 
 fun rel($x) {
-    return Chart::GGPlot::Theme::Element::Rel->new($x);
+    return Chart::GGPlot::Theme::Rel->new($x);
 }
 
 

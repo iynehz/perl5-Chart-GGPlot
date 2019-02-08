@@ -68,7 +68,7 @@ has stat_params => (
 );
 has aes_params => (
     is     => 'rw',
-    isa    => Aes,
+    isa    => AesMapping,
     coerce => 1,
 );
 has position    => ( is => 'ro', required => 1 );
@@ -86,7 +86,7 @@ Should this layer be included in the legends?
 
 =cut
 
-my $ShowLegend = ( ( Enum [qw(auto never always)] ) | Aes );
+my $ShowLegend = ( ( Enum [qw(auto never always)] ) | AesMapping );
 has show_legend => ( is => 'ro', isa => $ShowLegend, default => 'auto' );
 
 around BUILDARGS( $orig, $class : @rest ) {

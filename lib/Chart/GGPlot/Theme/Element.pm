@@ -1,56 +1,118 @@
 package Chart::GGPlot::Theme::Element;
 
-# ABSTRACT: The role for theme elements
+# ABSTRACT: Basic types for theme elements
 
-use Chart::GGPlot::Role;
-use namespace::autoclean;
+use strict;
+use warnings;
 
 # VERSION
 
-use Types::Standard qw(Bool);
+package Chart::GGPlot::Theme::Element {
+    use Chart::GGPlot::Setup;
+    use Function::Parameters qw(classmethod);
+    use namespace::autoclean;
 
-has debug => ( is => 'rw', default => sub { false } );
+    use parent qw(Chart::GGPlot::Params);
 
-with qw(MooseX::Clone);
+    sub transform_key {
+        my ( $class, $key ) = @_;
+        return 'color' if $key eq 'colour';
+        return $key;
+    }
 
-=classmethod parameters()
+    sub parameters { [] } 
 
-=method grob()
+    sub is_blank { false }
 
-Generate grid grob from theme element.
+    method string () {
+        return Dumper($self);
+    }
 
-=method as_hashref()
-
-=method string()
-
-=cut
-
-classmethod parameters () {
-    return [qw(debug)];
 }
 
-method grob () { ... }
+package Chart::GGPlot::Theme::Element::Blank {
+    use Chart::GGPlot::Setup;
+    use Function::Parameters qw(classmethod);
+    use namespace::autoclean;
 
-method as_hashref () {
-    return {
-        (
-            map {
-                my $value = $self->$_;
-                my $attr = $self->meta->get_attribute($_);
-                if ( $attr->type_constraint->$_call_if_can('equals', Bool) ) {
-                    $value = $value ? true : false;
-                } elsif (my $href = $value->$_call_if_can('as_hashref')) {
-                    $value = $href;
-                }
-                $_ => $value;
-            } @{$self->parameters}
-        )
+    use parent qw(Chart::GGPlot::Theme::Element);
+
+    classmethod parameters () { [] }
+
+    sub is_blank { true }
+}
+
+package Chart::GGPlot::Theme::Element::Line {
+    use Chart::GGPlot::Setup;
+    use Function::Parameters qw(classmethod);
+    use Class::Method::Modifiers;
+    use namespace::autoclean;
+
+    use parent qw(Chart::GGPlot::Theme::Element);
+
+    use Types::Standard;
+
+    around parameters => sub {
+        my $orig  = shift;
+        my $class = shift;
+        return [
+            qw(color size linetype lineend inherit_blank),
+            @{ $class->$orig() }
+        ];
     };
 }
 
-method string () {
-    return Dumper($self);
+package Chart::GGPlot::Theme::Element::Rect {
+    use Chart::GGPlot::Setup;
+    use Function::Parameters qw(classmethod);
+    use Class::Method::Modifiers;
+    use namespace::autoclean;
+
+    use parent qw(Chart::GGPlot::Theme::Element);
+
+    use Types::Standard;
+
+    use Chart::GGPlot::Util qw(pt);
+
+    around parameters => sub {
+        my $orig  = shift;
+        my $class = shift;
+        return [ qw(fill color size linetype inherit_blank),
+            @{ $class->$orig() } ];
+    }
 }
+
+package Chart::GGPlot::Theme::Element::Text {
+
+    use Chart::GGPlot::Setup;
+    use Function::Parameters qw(classmethod);
+    use Class::Method::Modifiers;
+    use namespace::autoclean;
+
+    # VERSION
+
+    use parent qw(Chart::GGPlot::Theme::Element);
+
+    around parameters => sub {
+        my $orig  = shift;
+        my $class = shift;
+        return [
+            qw(
+              family face color size hjust vjust
+              angle lineheight inherit_blank
+              ),
+            @{ $class->$orig() }
+        ];
+    };
+}
+
+1;
+
+__END__
+
+=head1 SEE ALSO
+
+L<Chart::GGPlot::Theme::Element>
 
 1;
 

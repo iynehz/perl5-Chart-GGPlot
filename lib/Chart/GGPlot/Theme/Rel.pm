@@ -1,4 +1,4 @@
-package Chart::GGPlot::Theme::Element::Rel;
+package Chart::GGPlot::Theme::Rel;
 
 # ABSTRACT: To specify sizes relative to the parent
 

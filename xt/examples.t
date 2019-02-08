@@ -2,6 +2,7 @@
 
 use FindBin;
 use Path::Tiny;
+use Capture::Tiny qw(:all);
 use Chart::Plotly::Image::Orca;
 
 use Test2::V0;
@@ -13,9 +14,10 @@ my $script = "$FindBin::RealBin/../utils/run_all_examples.pl";
 
 my $tempdir = Path::Tiny->tempdir;
 
-my @cmd = ($^X, $script, "--save-to-dir=$tempdir");
-my $rc = system(@cmd);
+my @cmd = ( $^X, $script, "--save-to-dir=$tempdir" );
+my ( $out, $err, $exit ) = tee { system(@cmd) };
 
-ok($rc == 0, "run_all_examples.pl has no errors");
+ok( $exit == 0, "run_all_examples.pl has no errors" );
+#ok( length($err) == 0, 'no warnings emitted' );
 
 done_testing;

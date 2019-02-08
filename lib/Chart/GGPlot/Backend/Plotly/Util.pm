@@ -11,6 +11,7 @@ use Graphics::Color::RGB;
 use List::AllUtils qw(pairmap reduce);
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle);
+use Types::Standard qw(Str);
 
 use parent qw(Exporter::Tiny);
 
@@ -35,7 +36,10 @@ fun cex_to_px ($x) { pt_to_px( 12 * $x * 0.75 * 0.3 ) }
 sub br { '<br />' }
 
 # plotly does not understands some non-rgb colors like "grey35"
-fun to_rgb (Piddle $x) {
+fun to_rgb ($x) {
+    state $check = Type::Params::compile((Piddle | Str));
+    ($x) = $check->($x);
+
     my $rgb = sub {
         my ($color) = @_;
 
@@ -53,11 +57,14 @@ fun to_rgb (Piddle $x) {
         }
     };
 
-    my $p = PDL::SV->new( $x->unpdl->map($rgb) );
-    if ( $x->badflag ) {
-        $p = $p->setbadif( $x->isbad );
+    if ( !ref($x) ) {
+        return $rgb->($x);
     }
-    return $p;
+    else {
+        my $p = PDL::SV->new( $x->unpdl->map($rgb) );
+        $p = $p->setbadif( $x->isbad ) if $x->badflag;
+        return $p;
+    }
 }
 
 =func group_to_NA

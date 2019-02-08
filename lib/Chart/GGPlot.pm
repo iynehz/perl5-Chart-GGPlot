@@ -11,10 +11,11 @@ use Autoload::AUTOCAN;
 use List::AllUtils qw(pairgrep pairmap firstres);
 use Module::Load;
 use Package::Stash;
+use Scalar::Util qw(looks_like_number);
 use String::Util qw(trim);
 use Types::Standard qw(ArrayRef ConsumerOf HashRef InstanceOf);
 
-use Chart::GGPlot::Built;
+use Chart::GGPlot::Aes;
 use Chart::GGPlot::Coord::Functions ();
 use Chart::GGPlot::Guides;
 use Chart::GGPlot::Layout;
@@ -23,7 +24,7 @@ use Chart::GGPlot::ScalesList;
 use Chart::GGPlot::Types qw(:all);
 
 method AUTOCAN ($method) {
-    state $known_methods;
+    state $known_methods;   # mapping method name to coderef
     unless ($known_methods) {
         my @namespaces = qw(
           Chart::GGPlot::Coord::Functions
@@ -33,6 +34,7 @@ method AUTOCAN ($method) {
           Chart::GGPlot::Labels::Functions
           Chart::GGPlot::Scale::Functions
           Chart::GGPlot::Limits
+          Chart::GGPlot::Theme::Defaults
         );
 
         for (@namespaces) {
@@ -66,6 +68,7 @@ method AUTOCAN ($method) {
         [ ( ConsumerOf ['Chart::GGPlot::Labels'] ), 'add_labels' ],
         [ ( ConsumerOf ['Chart::GGPlot::Guide'] ),  'add_guide' ],
         [ ( ConsumerOf ['Chart::GGPlot::Scale'] ),  'add_scale' ],
+        [ ( ConsumerOf ['Chart::GGPlot::Theme'] ),  '_set__theme' ],
     ];
 
     return method(@rest) {
@@ -105,12 +108,11 @@ has scales => (
     is      => 'ro',
     default => sub { Chart::GGPlot::ScalesList->new() }
 );
-has mapping => ( is => 'ro' );
-has theme   => (
+has mapping => (
     is      => 'ro',
-    isa     => HashRef,
-    default => sub { {} }
+    default => sub { Chart::GGPlot::Aes->new() }
 );
+has _theme   => ( is => 'rwp', isa => InstanceOf['Chart::GGPlot::Theme'] );
 has coordinates => (
     is      => 'rw',
     isa     => Coord,
@@ -213,8 +215,6 @@ method add_scale ($scale) {
     return $self;
 }
 
-use Scalar::Util qw(looks_like_number);
-
 classmethod make_labels($mapping) {
     state $strip = sub {    # strip_dots() in R ggplot2
         my ($aesthetic, $expr) = @_; 
@@ -236,6 +236,22 @@ classmethod make_labels($mapping) {
 
     my %labels = pairmap { $a => $strip->($a, $b) } $mapping->flatten;
     return \%labels;
+}
+
+method theme() {
+    use Chart::GGPlot::Global;
+
+    my $default = Chart::GGPlot::Global->theme_current();
+    if (my $theme = $self->_theme) {
+        if ($theme->is_complete) {
+            return $theme;
+        }
+        else {
+            return $theme->defaults($default);
+        }
+    } else {
+        return $default;
+    }
 }
 
 __PACKAGE__->meta->make_immutable;

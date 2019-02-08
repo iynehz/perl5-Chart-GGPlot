@@ -159,10 +159,12 @@ method merge ($other, $skip_undef=false) {
 =method defaults($other)
 
 Using data from C<$other> as defaults.
+If C<$other> is C<undef>, returns a clone of C<$self>.
 
 =cut
 
 method defaults ($other) {
+    return $self->clone unless defined $other;
     return $other->merge( $self, true );
 }
 

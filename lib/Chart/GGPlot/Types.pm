@@ -8,7 +8,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 use Ref::Util qw(is_plain_arrayref);
 use Type::Library -base, -declare => qw(
-  GGParams Aes
+  GGParams AesMapping
   ColorBrewerTypeEnum PositionEnum
   Theme Margin Labeller
   Coord Facet Scale
@@ -23,8 +23,8 @@ declare GGParams, as ConsumerOf ["Chart::GGPlot::Params"];
 coerce GGParams, from HashRef,
     via { 'Chart::GGPlot::Params'->new($_->flatten); };
 
-declare Aes, as InstanceOf ["Chart::GGPlot::Aes"];
-coerce Aes, from HashRef,
+declare AesMapping, as InstanceOf ["Chart::GGPlot::Aes"];
+coerce AesMapping, from HashRef,
     via { 'Chart::GGPlot::Aes'->new($_->flatten); };
 
 declare ColorBrewerTypeEnum, as Enum [qw(seq dev qual)];

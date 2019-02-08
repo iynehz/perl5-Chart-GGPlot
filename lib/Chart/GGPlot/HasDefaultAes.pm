@@ -10,10 +10,11 @@ use namespace::autoclean;
 use Types::Standard qw(InstanceOf);
 
 use Chart::GGPlot::Aes;
+use Chart::GGPlot::Types qw(AesMapping);
 
 has default_aes => (
     is      => 'ro',
-    isa     => InstanceOf["Chart::GGPlot::Aes"],
+    isa     => AesMapping,
     default => sub { Chart::GGPlot::Aes->new() },
 );
 

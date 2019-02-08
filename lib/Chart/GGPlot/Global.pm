@@ -9,43 +9,43 @@ use MooseX::Singleton;
 # VERSION
 
 use Module::Load;
-use Types::Standard qw(InstanceOf);
+use Types::Standard qw(ConsumerOf InstanceOf);
 
-#=attr theme_current
-#
-#The current theme.
-#
-#=cut
-#
-#has theme_current => (
-#    is      => 'rw',
-#    isa     => InstanceOf ['Chart::GGPlot::Theme'],
-#    lazy    => 1,
-#    builder => '_build_theme_current'
-#);
-#
-#method _build_theme_current () {
-#    load Chart::GGPlot::Theme::Defaults, qw(theme_grey);
-#    return theme_grey();
-#}
+=attr theme_current
 
-#=attr element_tree
-#
-#Element tree for the theme elements.
-#
-#=cut
-#
-#has element_tree => (
-#    is      => 'rw',
-#    isa     => InstanceOf ['Chart::GGPlot::Theme::ElementTree'],
-#    lazy    => 1,
-#    builder => '_build_element_tree',
-#);
-#
-#method _build_element_tree () {
-#    load Chart::GGPlot::Theme::ElementTree;
-#    return Chart::GGPlot::Theme::ElementTree->default_element_tree();
-#}
+The current theme.
+
+=cut
+
+has theme_current => (
+    is      => 'rw',
+    isa     => ConsumerOf ['Chart::GGPlot::Theme'],
+    lazy    => 1,
+    builder => '_build_theme_current'
+);
+
+method _build_theme_current () {
+    load Chart::GGPlot::Theme::Defaults, qw(theme_grey);
+    return theme_grey();
+}
+
+=attr element_tree
+
+Element tree for the theme elements.
+
+=cut
+
+has element_tree => (
+    is      => 'rw',
+    isa     => ConsumerOf ['Chart::GGPlot::Theme::ElementTree'],
+    lazy    => 1,
+    builder => '_build_element_tree',
+);
+
+method _build_element_tree () {
+    load Chart::GGPlot::Theme::ElementTree;
+    return Chart::GGPlot::Theme::ElementTree->default_element_tree();
+}
 
 1;
 
@@ -61,5 +61,5 @@ __END__
 =head1 DESCRIPTION
 
 This is a singleton class that holds various global variables and settings
-for ggplot.
+for Chart::GGPlot.
 

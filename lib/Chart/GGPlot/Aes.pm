@@ -4,13 +4,11 @@ package Chart::GGPlot::Aes;
 
 use Chart::GGPlot::Setup;
 use Function::Parameters qw(classmethod);
+use namespace::autoclean;
 
 # VERSION
 
 use parent qw(Chart::GGPlot::Params);
-
-use List::AllUtils qw(pairmap);
-use namespace::autoclean;
 
 my @all_aesthetics = (
     "adj",    "alpha",    "angle",      "bg",

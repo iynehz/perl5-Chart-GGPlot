@@ -28,8 +28,8 @@ The signature ggplot2 theme with a grey background and white gridlines.
 =cut
 
 fun theme_grey (:$base_size=11, :$base_family="",
-               :$base_line_size=$base_size/22,
-               :$base_rect_size=$base_size/22) {
+                :$base_line_size=$base_size/22,
+                :$base_rect_size=$base_size/22) {
 
     # The half-line (base-fontsize / 2) sets up the basic vertical
     # rhythm of the theme.
@@ -57,61 +57,61 @@ fun theme_grey (:$base_size=11, :$base_family="",
             hjust      => 0.5,
             vjust      => 0.5,
             angle      => 0,
-            margin     => margin(),
+#            margin     => margin(),
         ),
         axis_line   => element_blank(),
         axis_line_x => undef,
         axis_line_y => undef,
         axis_text   => element_text( size => rel(0.8), color => "grey30" ),
         axis_text_x => element_text(
-            margin => margin( t => 0.8 * $half_line / 2 ),
+#            margin => margin( t => 0.8 * $half_line / 2 ),
             vjust  => 1
         ),
         axis_text_x_top => element_text(
-            margin => margin( b => 0.8 * $half_line / 2 ),
+#            margin => margin( b => 0.8 * $half_line / 2 ),
             vjust  => 0
         ),
         axis_text_y => element_text(
-            margin => margin( r => 0.8 * $half_line / 2 ),
+#            margin => margin( r => 0.8 * $half_line / 2 ),
             hjust  => 1
         ),
         axis_text_y_right => element_text(
-            margin => margin( l => 0.8 * $half_line / 2 ),
+#            margin => margin( l => 0.8 * $half_line / 2 ),
             hjust  => 0
         ),
         axis_ticks        => element_line( color => "grey20" ),
-        axis_ticks_length => unit( $half_line / 2, "pt" ),
+#        axis_ticks_length => unit( $half_line / 2, "pt" ),
         axis_title_x      => element_text(
-            margin => margin( t => $half_line / 2 ),
+#            margin => margin( t => $half_line / 2 ),
             vjust  => 1
         ),
         axis_title_x_top => element_text(
-            margin => margin( b => $half_line / 2 ),
+#            margin => margin( b => $half_line / 2 ),
             vjust  => 0
         ),
         axis_title_y => element_text(
             angle  => 90,
-            margin => margin( r => $half_line / 2 ),
+#            margin => margin( r => $half_line / 2 ),
             vjust  => 1
         ),
         axis_title_y_right => element_text(
             angle  => -90,
-            margin => margin( l => $half_line / 2 ),
+#            margin => margin( l => $half_line / 2 ),
             vjust  => 0
         ),
 
         # TODO: What would this NA behave?
         #legend_background =>  element_rect(color = NA),
         legend_background => element_rect(),
-        legend_spacing    => unit( 2 * $half_line, "pt" ),
-        legend_spacing_x  => undef,
-        legend_spacing_y  => undef,
-        legend_margin =>
-          margin( t => $half_line, r => $half_line, b => $half_line, l => $half_line ),
+#        legend_spacing    => unit( 2 * $half_line, "pt" ),
+#        legend_spacing_x  => undef,
+#        legend_spacing_y  => undef,
+#        legend_margin =>
+#          margin( t => $half_line, r => $half_line, b => $half_line, l => $half_line ),
         legend_key        => element_rect( fill => "grey95", color => "white" ),
-        legend_key_size   => unit( 1.2, "lines" ),
-        legend_key_height => undef,
-        legend_key_width  => undef,
+#        legend_key_size   => unit( 1.2, "lines" ),
+#        legend_key_height => undef,
+#        legend_key_width  => undef,
         legend_text       => element_text( size => rel(0.8) ),
         legend_text_align => undef,
         legend_title      => element_text( hjust => 0 ),
@@ -120,9 +120,9 @@ fun theme_grey (:$base_size=11, :$base_family="",
         legend_direction      => undef,
         legend_justification  => "center",
         legend_box            => undef,
-        legend_box_margin     => margin(),
+#        legend_box_margin     => margin(),
         legend_box_background => element_blank(),
-        legend_box_spacing    => unit( 2 * $half_line, "pt" ),
+#        legend_box_spacing    => unit( 2 * $half_line, "pt" ),
 
         # TODO: What would this NA behave?
         #panel_background =>  element_rect(fill => "grey92", color => NA),
@@ -130,9 +130,9 @@ fun theme_grey (:$base_size=11, :$base_family="",
         panel_border     => element_blank(),
         panel_grid       => element_line( color => "white" ),
         panel_grid_minor => element_line( size => rel(0.5) ),
-        panel_spacing    => unit( $half_line, "pt" ),
-        panel_spacing_x  => undef,
-        panel_spacing_y  => undef,
+#        panel_spacing    => unit( $half_line, "pt" ),
+#        panel_spacing_x  => undef,
+#        panel_spacing_y  => undef,
         panel_ontop      => false,
 
         #strip_background =   element_rect(fill => "grey85", color => NA),
@@ -140,38 +140,38 @@ fun theme_grey (:$base_size=11, :$base_family="",
         strip_text => element_text(
             color  => "grey10",
             size   => rel(0.8),
-            margin => margin(
-                t => 0.8 * $half_line,
-                r => 0.8 * $half_line,
-                b => 0.8 * $half_line,
-                l => 0.8 * $half_line
-            )
+#            margin => margin(
+#                t => 0.8 * $half_line,
+#                r => 0.8 * $half_line,
+#                b => 0.8 * $half_line,
+#                l => 0.8 * $half_line
+#            )
         ),
         strip_text_x          => undef,
         strip_text_y          => element_text( angle => -90 ),
         strip_placement       => "inside",
         strip_placement_x     => undef,
         strip_placement_y     => undef,
-        strip_switch_pad_grid => unit( $half_line / 2, "pt" ),
-        strip_switch_pad_wrap => unit( $half_line / 2, "pt" ),
+#        strip_switch_pad_grid => unit( $half_line / 2, "pt" ),
+#        strip_switch_pad_wrap => unit( $half_line / 2, "pt" ),
 
         plot_background => element_rect( color => "white" ),
         plot_title      => element_text(                     # font size "large"
             size   => rel(1.2),
             hjust  => 0,
             vjust  => 1,
-            margin => margin( b => $half_line )
+#            margin => margin( b => $half_line )
         ),
         plot_subtitle => element_text(    # font size "regular"
             hjust  => 0,
             vjust  => 1,
-            margin => margin( b => $half_line )
+#            margin => margin( b => $half_line )
         ),
         plot_caption => element_text(     # font size "small"
             size   => rel(0.8),
             hjust  => 1,
             vjust  => 1,
-            margin => margin( t => $half_line )
+#            margin => margin( t => $half_line )
         ),
         plot_tag => element_text(
             size  => rel(1.2),
@@ -179,7 +179,7 @@ fun theme_grey (:$base_size=11, :$base_family="",
             vjust => 0.5
         ),
         plot_tag_position => 'topleft',
-        plot_margin => margin( t => $half_line, r => $half_line, b => $half_line, l => $half_line ),
+#        plot_margin => margin( t => $half_line, r => $half_line, b => $half_line, l => $half_line ),
 
         complete => true,
     );
@@ -252,12 +252,12 @@ fun theme_linedraw ( :$base_size = 11, %rest ) {
             strip_text       => element_text(
                 color  => "white",
                 size   => rel(0.8),
-                margin => margin(
-                    t => 0.8 * $half_line,
-                    r => 0.8 * $half_line,
-                    b => 0.8 * $half_line,
-                    l => 0.8 * $half_line
-                ),
+#                margin => margin(
+#                    t => 0.8 * $half_line,
+#                    r => 0.8 * $half_line,
+#                    b => 0.8 * $half_line,
+#                    l => 0.8 * $half_line
+#                ),
 
             ),
             complete => true,
@@ -300,12 +300,12 @@ fun theme_light (:$base_size = 11, %rest) {
             strip_text       => element_text(
                 color  => "white",
                 size   => rel(0.8),
-                margin => margin(
-                    t => 0.8 * $half_line,
-                    r => 0.8 * $half_line,
-                    b => 0.8 * $half_line,
-                    l => 0.8 * $half_line
-                )
+#                margin => margin(
+#                    t => 0.8 * $half_line,
+#                    r => 0.8 * $half_line,
+#                    b => 0.8 * $half_line,
+#                    l => 0.8 * $half_line
+#                )
             ),
 
             complete => true,
@@ -332,12 +332,12 @@ fun theme_dark (:$base_size = 11, %rest) {
 
   # inverse grid lines contrast compared to theme_grey
   # make them thinner and try to keep the same visual contrast as in theme_light
-            panel_grid       => element_line( colour => "grey42" ),
+            panel_grid       => element_line( color => "grey42" ),
             panel_grid_major => element_line( size   => rel(0.5) ),
             panel_grid_minor => element_line( size   => rel(0.25) ),
 
             # match axes ticks thickness to gridlines
-            axis_ticks => element_line( colour => "grey20", size => rel(0.5) ),
+            axis_ticks => element_line( color => "grey20", size => rel(0.5) ),
 
             # match legend key to panel.background
             legend_key => element_rect( fill => "grey50" ),
@@ -345,14 +345,14 @@ fun theme_dark (:$base_size = 11, %rest) {
          # dark strips with light text (inverse contrast compared to theme_grey)
             strip_background => element_rect( fill => "grey15" ),
             strip_text       => element_text(
-                colour => "grey90",
+                color => "grey90",
                 size   => rel(0.8),
-                margin => margin(
-                    t => 0.8 * $half_line,
-                    r => 0.8 * $half_line,
-                    b => 0.8 * $half_line,
-                    l => 0.8 * $half_line
-                )
+#                margin => margin(
+#                    t => 0.8 * $half_line,
+#                    r => 0.8 * $half_line,
+#                    b => 0.8 * $half_line,
+#                    l => 0.8 * $half_line
+#                )
             ),
 
             complete => true,
@@ -444,44 +444,44 @@ fun theme_void (:$base_size=11, :$base_family="",
         text => element_text(
             family     => $base_family,
             face       => "plain",
-            colour     => "black",
+            color      => "black",
             size       => $base_size,
             lineheight => 0.9,
             hjust      => 0.5,
             vjust      => 0.5,
             angle      => 0,
-            margin     => margin()
+#            margin     => margin()
         ),
         axis_text             => element_blank(),
         axis_title            => element_blank(),
-        axis_ticks_length     => unit( 0, "pt" ),
+#        axis_ticks_length     => unit( 0, "pt" ),
         legend_box            => undef,
-        legend_key_size       => unit( 1.2, "lines" ),
+#        legend_key_size       => unit( 1.2, "lines" ),
         legend_position       => "right",
         legend_text           => element_text( size => rel(0.8) ),
         legend_title          => element_text( hjust => 0 ),
         strip_text            => element_text( size => rel(0.8) ),
-        strip_switch_pad_grid => unit( $half_line / 2, "pt" ),
-        strip_switch_pad_wrap => unit( $half_line / 2, "pt" ),
+#        strip_switch_pad_grid => unit( $half_line / 2, "pt" ),
+#        strip_switch_pad_wrap => unit( $half_line / 2, "pt" ),
         panel_ontop           => false,
-        panel_spacing         => unit( $half_line, "pt" ),
-        plot_margin           => margin(unit => "lines"),
+#        panel_spacing         => unit( $half_line, "pt" ),
+#        plot_margin           => margin(unit => "lines"),
         plot_title            => element_text(
             size   => rel(1.2),
             hjust  => 0,
             vjust  => 1,
-            margin => margin( t => $half_line )
+#            margin => margin( t => $half_line )
         ),
         plot_subtitle => element_text(
             hjust  => 0,
             vjust  => 1,
-            margin => margin( t => $half_line )
+#            margin => margin( t => $half_line )
         ),
         plot_caption => element_text(
             size   => rel(0.8),
             hjust  => 1,
             vjust  => 1,
-            margin => margin( t => $half_line )
+#            margin => margin( t => $half_line )
         ),
         plot_tag => element_text(
             size  => rel(1.2),
@@ -506,7 +506,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Some some predefined themes.
+Some predefined themes.
 
 =head1 SEE ALSO
 

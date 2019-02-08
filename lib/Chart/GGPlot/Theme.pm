@@ -9,24 +9,12 @@ use Function::Parameters qw(classmethod);
 
 use parent qw(Chart::GGPlot::Params);
 
-use Autoload::AUTOCAN;
 use List::AllUtils qw(reduce pairmap);
 use Types::Standard qw(ArrayRef Bool HashRef InstanceOf Num Str);
 
 use Chart::GGPlot::Global;
 use Chart::GGPlot::Theme::ElementTree;
 use Chart::GGPlot::Types qw(:all);
-
-# AUTOLOAD for theme properties.
-method AUTOCAN ($method) {
-    if ( $self->exists($method) ) {
-        return sub {
-            my ($self) = @_;
-            $self->at($method);
-        };
-    }
-    return undef;
-}
 
 classmethod new ( @rest ) {
     my %params = @rest == 1 ? %{ $rest[0] } : @rest;
@@ -47,7 +35,7 @@ classmethod _theme (:$complete = false, %elements ) {
             if ( $el->$_DOES('Chart::GGPlot::Theme::Element')
                 and !$el->$_DOES('Chart::GGPlot::Theme::Element::Blank') )
             {
-                $el->inherit_blank(true);
+                $el->set( 'inherit_blank', true );
             }
             $a => $el;
         }
@@ -63,16 +51,7 @@ classmethod _theme (:$complete = false, %elements ) {
     );
 }
 
-fun _make_attr ($name) {
-    return method(@rest) {
-        if ( @rest > 0 ) {
-            $self->{$name} = $rest[0];
-        }
-        return $self->{$name};
-    };
-}
-
-*complete = _make_attr('complete');
+method is_complete() { $self->{complete} }
 
 # override Chart::GGPlot::Aes's transform_key().
 method transform_key ($key) {
@@ -110,7 +89,7 @@ method calc_element ($elname) {
 
     # If no parents, this is a "root" node. Just return this element.
     if ( !@$pnames ) {
-        my $nullprops = $el->parameters->grep( sub { !defined $el->$_ } );
+        my $nullprops = $el->parameters->grep( sub { !defined $el->at($_) } );
         if (@$nullprops) {
             die( sprintf "Theme element '%s' has undef property: %s",
                 $elname, join( ", ", @$nullprops ) );
@@ -124,22 +103,6 @@ method calc_element ($elname) {
     my $parents = $pnames->map( sub { $self->calc_element($_) } );
 
     return reduce { $self->_combine_elements( $a, $b ) } $el, @$parents;
-}
-
-=method render_element(:$elname='', :$name=undef, %rest)
-
-Return a grob for the element.
-
-=cut
-
-method render_element ($elname=undef, :$name=undef, %rest) {
-    my $el = $self->calc_element($elname);
-    unless ( defined $el ) {
-        warn("Theme element $self missing");
-        return zero_grob();
-    }
-    my $name = join( '.', $elname, ( $name // () ) );
-    return $el->grob( %rest, name => $name );
 }
 
 # Check that an element object has the proper class
@@ -170,20 +133,21 @@ classmethod _combine_elements ($e1, $e2) {
         or $e1->$_DOES("Chart::GGPlot::Theme::Element::Blank") );
     return $e2 unless defined $e1;
     if ( $e2->$_DOES("Chart::GGPlot::Theme::Element::Blank") ) {
-        return ( $e1->inherit_blank ? $e2 : $e1 );
+        return ( $e1->at('inherit_blank') ? $e2 : $e1 );
     }
 
     my $rslt = $e1->clone;
     for ( $e2->parameters->flatten ) {
-        unless ( defined $e1->$_ ) {
-            $rslt->$_( $e2->$_ );
+        unless ( defined $e1->at($_) ) {
+            $rslt->set( $_, $e2->at($_) );
         }
     }
 
     # Calculate relative sizes
-    if ( $e1->size and $e1->size->$_DOES('Chart::GGPlot::Theme::Element::Rel') )
+    my $e1_size = $e1->at('size');
+    if ( $e1_size->$_DOES('Chart::GGPlot::Theme::Rel') )
     {
-        $rslt->size( $e2->size * $e1->size );
+        $rslt->set('size', $e2->at('size') * $e1->at('size') );
     }
 
     return $rslt;
@@ -221,7 +185,7 @@ method add_theme (Theme $other) {
     }
 
     # If either theme is complete, then the combined theme is complete
-    $self->complete( $self->complete or $other->complete );
+    $self->{complete} = ( $self->{complete} or $other->{complete} );
     return $self;
 }
 
@@ -230,7 +194,7 @@ method replace (Theme $other) {
     for my $elname ( $other->names->flatten ) {
         $new->set( $elname, $other->at($elname) );
     }
-    $new->complete( $other->complete );
+    $new->{complete} = $other->{complete};
     return $new;
 }
 
