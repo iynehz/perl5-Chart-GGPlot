@@ -261,7 +261,7 @@ fun _scale_hue ($aes) {
 
 *scale_color_hue      = _scale_hue('color');
 *scale_color_discrete = \&scale_color_hue;
-*scale_fill_hue       = _scale_brewer('hue');
+*scale_fill_hue       = _scale_hue('fill');
 *scale_fill_discrete  = \&scale_fill_hue;
 
 fun _scale_brewer ($aes) {
