@@ -889,10 +889,9 @@ fun number ($p, :$accuracy=1, :$scale=1,
     );
 
     my @s = ( $p * $scale )->list;
-
     no warnings 'numeric';
     @s = map { "${prefix}${_}${suffix}" }
-      map { $fmt->format_number($_, $precision); } @s;
+      map { $_ eq 'BAD' ? $_ : $fmt->format_number( $_, $precision ); } @s;
 
     my $rslt = PDL::SV->new( \@s );
     $rslt->setbadif( $p->isbad ) if $p->badflag;
