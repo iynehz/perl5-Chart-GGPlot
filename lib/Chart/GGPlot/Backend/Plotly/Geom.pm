@@ -190,12 +190,15 @@ package Chart::GGPlot::Backend::Plotly::Geom::Bar {
             opacity => $opacity->unpdl,
         );
 
-        my ($x, $y) = map { $df->at($_)->unpdl } qw(x y);
+        my $x = $df->at('x')->unpdl;
+        my $y = ($df->at('ymax') - $df->at('ymin'))->unpdl;
+        my $base = $df->at('ymin')->unpdl;
         my $width = ($df->at('xmax') - $df->at('xmin'))->unpdl;
 
         return Chart::Plotly::Trace::Bar->new(
             x         => $x,
             y         => $y,
+            base      => $base,
             width     => $width,
             marker    => $marker,
             hovertext => $df->at('hovertext')->unpdl,

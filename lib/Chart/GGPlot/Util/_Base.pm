@@ -15,6 +15,7 @@ our @EXPORT_OK = (
       is_finite is_infinite is_na is_null sign
       range_ seq_n seq_by
       match
+      pmax pmin
       ), @Data::Frame::More::Util::EXPORT_OK
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
@@ -101,6 +102,9 @@ fun match (Piddle $a, Piddle $b) {
         }
     }
 }
+
+fun pmax ($a, $b) { ifelse($a > $b, $a, $b); }
+fun pmin ($a, $b) { ifelse($a < $b, $a, $b); }
 
 1;
 

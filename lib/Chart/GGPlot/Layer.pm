@@ -103,17 +103,12 @@ classmethod _find_subclass ($super, $name) {
     );
 }
 
-classmethod _layer (
-    Defined : $geom,
-    Defined : $stat,
-    : $data = undef,
-    : $mapping = undef,
-    Defined : $position,
-    : $params = { na_rm => false },
-    : $inherit_aes = true,
-    : $check_aes   = true,
-    : $check_param = true,
-    : $show_legend = NA
+classmethod _layer (Defined :$geom, Defined :$stat,
+                    :$data = undef, :$mapping = undef,
+                    Defined :$position,
+                    :$params = { na_rm => false },
+                    :$inherit_aes = true, :$check_aes = true,
+                    :$check_param = true, :$show_legend = NA
   ) {
     $mapping //= Chart::GGPlot::Aes->new();
     unless ( defined $params->at("na_rm") ) {
@@ -130,7 +125,7 @@ classmethod _layer (
     };
     $geom     = $find_subclass->( 'Geom',     $geom );
     $stat     = $find_subclass->( 'Stat',     $stat );
-    $position = $find_subclass->( 'Position', $position );
+    $position = $find_subclass->( 'Position', $position )->new();
 
     # Split up params between aesthetics, geom, and stat
     $params = Chart::GGPlot::Aes->new( $params->flatten );

@@ -49,7 +49,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
 
     my %discrete_scales = map {
         my $scale = $_;
-        if ( $scale->$_DOES('Chart::GGPlot::Scale::Discrete') ) {
+        if ( $scale->isa('Chart::GGPlot::Scale::Discrete') ) {
             map { $_ => $scale } @{ $scale->aesthetics };
         }
         else {
@@ -281,8 +281,9 @@ method to_plotly ($plot_built) {
           // $theme->at('panel_grid');
 
         $plotly_layout{"${xy}axis"} = {
-            range    => $range,
-            zeroline => JSON::false,
+            range     => $range,
+            zeroline  => JSON::false,
+            autorange => JSON::false,
 
             (
                   ( not defined $el_axis_title or $el_axis_title->is_blank )
@@ -326,7 +327,14 @@ method to_plotly ($plot_built) {
                 )
             ),
         };
-    }
+
+        if ( $sc->isa('Chart::GGPlot::Scale::DiscretePosition') ) {
+            my $has_dodge = List::AllUtils::any {
+                $_->isa('Chart::GGPlot::Position::Dodge')
+            } $layers->map( sub { $_->position } )->flatten;
+            $plotly_layout{barmode} = $has_dodge ? 'dodge' : 'relative';
+        }
+    } # for (qw(x y))
 
     for my $i ( 0 .. $#$layers ) {
         my $layer = $layers->[$i];

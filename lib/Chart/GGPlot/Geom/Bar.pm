@@ -19,17 +19,14 @@ classmethod required_aes() { [qw(x y)] }
 classmethod extra_params() { [qw(na_rm width)] }
 
 method setup_data ($data, $params) {
-    state $pmin = fun($a, $b) { ifelse($a > $b, $b, $a); };
-    state $pmax = fun($a, $b) { ifelse($a > $b, $a, $b); };
-
     unless ( $data->exists('width') ) {
         $data->set( 'width',
             $params->at('width')
               // pdl( resolution( $data->at('x'), false ) * 0.9 ) );
     }
     return $data->transform( {
-            ymin => fun($col, $df) { &$pmin($df->at('y'), 0) }, 
-            ymax => fun($col, $df) { &$pmax($df->at('y'), 0) },
+            ymin => fun($col, $df) { pmin($df->at('y'), 0) }, 
+            ymax => fun($col, $df) { pmax($df->at('y'), 0) },
             xmin => fun($col, $df) { $df->at('x') - $df->at('width') / 2 },
             xmax => fun($col, $df) { $df->at('x') + $df->at('width') / 2 },
             width => undef,
