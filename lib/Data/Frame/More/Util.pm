@@ -13,7 +13,7 @@ use parent qw(Exporter::Tiny);
 our @EXPORT_OK = qw(
   BAD NA
   ifelse is_discrete
-  factor
+  factor logical
   guess_and_convert_to_pdl
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
@@ -85,6 +85,17 @@ Convert a thing to a L<PDL::Factor> object.
 
 fun factor ($x, %rest) {
     return PDL::Factor->new( $x, %rest );
+}
+
+# TODO: to implement PDL::Logical
+fun logical ($x, %rest) {
+    return pdl(!!$x) unless ref($x);
+
+    # TODO see how R converts other types of vectors to logical
+    return $x if $x->$_DOES('PDL');
+
+    # $x is an arrayref
+    return pdl( [ map { !!$_ ? 1 : 0 } @$x ] );
 }
 
 fun guess_and_convert_to_pdl ( (ArrayRef | Value | Piddle) $x,

@@ -760,7 +760,7 @@ method sort ($by_columns, $ascending=true) {
 
 method sorti ($by_columns, $ascending=true) {
     if (Ref::Util::is_plain_arrayref($ascending)) {
-        $ascending = pdl($ascending);
+        $ascending = logical($ascending);
     }
 
     return pdl( [ 0 .. $self->nrow - 1 ] ) if $by_columns->length == 0;
