@@ -65,12 +65,13 @@ Calculate the element properties, by inheriting properties from its parents.
 =cut
 
 method calc_element ($elname) {
-    my $message = "$elname -->";
+    my $message = "calc_element: $elname -->";
 
     # If this is element_blank, don't inherit anything from parents
     my $el = $self->at($elname);
     if ( $el->$_DOES('Chart::GGPlot::Theme::Element::Blank') ) {
-        $log->debug( $message . 'element_blank (no inheritance)' );
+        $log->debug( $message . ' element_blank (no inheritance)' )
+          if $log->is_debug;
         return $el;
     }
 
@@ -94,12 +95,12 @@ method calc_element ($elname) {
             die( sprintf "Theme element '%s' has undef property: %s",
                 $elname, join( ", ", @$nullprops ) );
         }
-        $log->debug( $message . 'nothing (top level)' );
+        $log->debug( $message . ' nothing (top level)' ) if $log->is_debug;
         return $el;
     }
 
     # Calculate the parent objects' inheritance
-    $log->debug( $message . join( ', ', @$pnames ) );
+    $log->debug( $message . ' ' . join( ', ', @$pnames ) ) if $log->is_debug;
     my $parents = $pnames->map( sub { $self->calc_element($_) } );
 
     return reduce { $self->_combine_elements( $a, $b ) } $el, @$parents;
