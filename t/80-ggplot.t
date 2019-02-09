@@ -198,6 +198,8 @@ subtest geom_bar_1 => sub {
         'x.labels',
     );
     pdl_is( $panel_params->{'x.major_source'}, pdl(0 .. 6), 'x.major_source');
+    pdl_is( $panel_params->{'x.range'}, pdl( [ -0.6, 6.6 ] ), 'x.range' );
+    pdl_is( $panel_params->{'y.range'}, pdl( [ -3.1, 65.1 ] ), 'y.range' );
 };
 
 subtest geom_line_1 => sub {

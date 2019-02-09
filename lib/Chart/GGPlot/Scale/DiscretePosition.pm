@@ -71,12 +71,12 @@ method dimension ( $expand = pdl([0, 0, 0, 0]) ) {
         return expand_range4( $c_range, $expand );
     }
     elsif ( $c_range->isempty ) {               # only discrete
-        return expand_range4( [ 1, $d_range->length ], $expand );
+        return expand_range4( [ 0, $d_range->length - 1 ], $expand );
     }
     else {                                      # both
         return range_(
             $c_range->glue(
-                0, expand_range4( [ 1, $d_range->length ], $expand )
+                0, expand_range4( [ 0, $d_range->length - 1 ], $expand )
             )
         );
     }
