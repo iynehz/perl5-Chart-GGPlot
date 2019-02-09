@@ -9,6 +9,8 @@ use PDL::Primitive qw(grandom random);
 use Chart::GGPlot::Functions qw(:all);
 use Data::Frame::More::Examples qw(mtcars);
 
+srand(0);
+
 my $save_as;
 GetOptions( 'o=s' => \$save_as );
 

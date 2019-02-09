@@ -10,6 +10,8 @@ use PDL::Core qw(pdl);
 use PDL::Primitive qw(random);
 use Data::Frame::More;
 
+srand(0);
+
 my $save_as;
 GetOptions( 'o=s' => \$save_as );
 

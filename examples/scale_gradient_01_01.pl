@@ -8,6 +8,8 @@ use Chart::GGPlot::Functions qw(:all);
 use Data::Frame::More;
 use PDL::Primitive qw(random grandom);
 
+srand(0);
+
 my $save_as;
 GetOptions( 'o=s' => \$save_as );
 

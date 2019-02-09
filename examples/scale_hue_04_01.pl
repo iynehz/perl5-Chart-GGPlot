@@ -9,6 +9,8 @@ use PDL::Primitive qw(random which);
 use PDL::Ufunc ();
 use Data::Frame::More::Examples qw(mtcars);
 
+srand(0);
+
 my $save_as;
 GetOptions( 'o=s' => \$save_as );
 
