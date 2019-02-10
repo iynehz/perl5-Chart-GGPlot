@@ -48,6 +48,12 @@ fun collide ($data, $width, $name, $strategy,
     $data  = $dlist->{data};
     $width = $dlist->{width};
 
+    # Reorder by x position, then on group. The default stacking order
+    # reverses the group in order to match the legend order.
+    $data = $reverse
+      ? $data->sort( [qw(xmin group)] )
+      : $data->sort( [qw(xmin group)], [ true, false ] );
+
     # TODO: ddply to preserve the order.
     #  So firstly DF::split() shall preserve the order.
     state $ddply = sub {
@@ -72,15 +78,15 @@ fun collide ($data, $width, $name, $strategy,
         die "Neither y nor ymax defined";
     }
 
-    # Reorder by x position, then on group. The default stacking order
-    # reverses the group in order to match the legend order.
+    # TODO: This is only to maintain some order to get some tests pass.
+    # This should be not needed once we fix ddply.
     return $reverse
       ? $data->sort( [qw(xmin group)] )
       : $data->sort( [qw(xmin group)], [ true, false ] );
 }
 
 fun pos_dodge ($df, $width, :$n=undef) {
-    my $n //= $df->at('group')->uniq->length;
+    $n //= $df->at('group')->uniq->length;
     if ( $n == 1 ) {
         return $df;
     }
@@ -103,11 +109,11 @@ fun pos_stack ($df, $width, :$vjust=1, :$fill=false) {
     my $heights = pdl( [0] )->glue( 0, $y->cumusumover() );
 
     if ($fill) {
-        $heights = $heights / $heights->at(-1)->abs;
+        $heights = $heights / abs($heights->at(-1));
     }
 
-    my $heights1 = $heights->slice( [ 0 .. $heights->length - 2 ] );
-    my $heights2 = $heights->slice( [ 1 .. $heights->length - 1 ] );
+    my $heights1 = $heights->slice( pdl( [ 0 .. $heights->length - 2 ] ) );
+    my $heights2 = $heights->slice( pdl( [ 1 .. $heights->length - 1 ] ) );
     $df->set( 'ymin', pmin( $heights1, $heights2 ) );
     $df->set( 'ymax', pmax( $heights1, $heights2 ) );
     $df->set( 'y',
