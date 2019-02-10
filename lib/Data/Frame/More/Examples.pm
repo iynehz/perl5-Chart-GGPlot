@@ -20,17 +20,27 @@ my %data_setup = (
     diamonds   => {
         postprocess => sub {
             my ($df) = @_;
-            my $clarity = $df->at('clarity');
-            $df->set(
-                'clarity',
-                factor(
-                    $clarity,
-                    levels  => [qw(I1 SI2 SI1 VS2 VS1 VVS2 VVS1 IF)],
-                    ordered => true
-                )
+
+            my $factorize = sub {
+                my ( $var, $levels ) = @_;
+
+                $df->set(
+                    $var,
+                    factor(
+                        $df->at($var),
+                        levels  => $levels,
+                        ordered => true
+                    )
+                );
+            };
+
+            $factorize->(
+                'cut', [ 'Fair', 'Good', 'Very Good', 'Premium', 'Ideal' ]
             );
+            $factorize->( 'color',   [ 'D' .. 'J' ] );
+            $factorize->( 'clarity', [qw(I1 SI2 SI1 VS2 VS1 VVS2 VVS1 IF)] );
             return $df;
-        }
+          }
     },
     economics => { params => { col_types => { date => 'PDL::DateTime' } } },
     economics_long =>
