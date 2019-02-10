@@ -6,11 +6,13 @@ use Chart::GGPlot::Setup qw(:pdl);
 
 # VERSION
 
+use Module::Load;
+
 use Chart::GGPlot::Aes::Functions qw(:all);
 
 use parent qw(Exporter::Tiny);
 
-my @position_types = qw(identity dodge stack);
+my @position_types = qw(identity dodge stack fill);
 
 our @EXPORT_OK = (map { "position_${_}" } @position_types);
 
@@ -19,6 +21,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK, ggplot => @export_ggplot );
 
 for my $type (@position_types) {
     my $class = 'Chart::GGPlot::Position::' . ucfirst($type);
+    load $class;
 
     no strict 'refs';
     *{"position_${type}"} = sub { $class->new(@_); };
