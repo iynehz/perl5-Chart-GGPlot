@@ -239,6 +239,7 @@ method to_plotly ($plot_built) {
         $plotly_layout{title} = $title;
     }
 
+    my $barmode;
     for my $xy (qw(x y)) {
 
         my $theme_el = sub {
@@ -332,7 +333,9 @@ method to_plotly ($plot_built) {
             my $has_dodge = List::AllUtils::any {
                 $_->isa('Chart::GGPlot::Position::Dodge')
             } $layers->map( sub { $_->position } )->flatten;
-            $plotly_layout{barmode} = $has_dodge ? 'dodge' : 'relative';
+            if ($has_dodge) {
+                $barmode = 'dodge';
+            }
         }
     } # for (qw(x y))
 
@@ -382,8 +385,8 @@ method to_plotly ($plot_built) {
         }
     }
 
-    # hovermode
     $plotly_layout{hovermode} = 'closest';
+    $plotly_layout{barmode} = $barmode // 'relative';
     
     # border
     my $el_panel_border = $theme->at('panel_border');
