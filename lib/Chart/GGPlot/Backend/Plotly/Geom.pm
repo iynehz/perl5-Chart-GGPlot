@@ -202,7 +202,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Bar {
             width     => $width,
             marker    => $marker,
             hovertext => $df->at('hovertext')->unpdl,
-            hoverinfo => [ ('text') x $df->nrow ],
+            hoverinfo => 'text',
         );
     }
 
