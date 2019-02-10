@@ -48,13 +48,8 @@ fun collide ($data, $width, $name, $strategy,
     $data  = $dlist->{data};
     $width = $dlist->{width};
 
-    # Reorder by x position, then on group. The default stacking order
-    # reverses the group in order to match the legend order.
-    $data =
-        $reverse
-      ? $data->sort( [qw(xmin group)] )
-      : $data->sort( [qw(xmin group)], [ true, false ] );
-
+    # TODO: ddply to preserve the order.
+    #  So firstly DF::split() shall preserve the order.
     state $ddply = sub {
         my ( $df, $vars, $func ) = @_;
 
@@ -66,17 +61,22 @@ fun collide ($data, $width, $name, $strategy,
 
     my $strategy_wrapped = sub { $strategy->( $_[0], $width, %rest ) };
     if ( $data->exists('ymax') ) {
-        return $ddply->( $data, ['xmin'], $strategy_wrapped );
+        $data = $ddply->( $data, ['xmin'], $strategy_wrapped );
     }
     elsif ( $data->exists('y') ) {
         $data->set( 'ymax', $data->at('y') );
         $data = $ddply->( $data, ['xmin'], $strategy_wrapped );
         $data->set( 'y', $data->at('ymax') );
-        return $data;
     }
     else {
         die "Neither y nor ymax defined";
     }
+
+    # Reorder by x position, then on group. The default stacking order
+    # reverses the group in order to match the legend order.
+    return $reverse
+      ? $data->sort( [qw(xmin group)] )
+      : $data->sort( [qw(xmin group)], [ true, false ] );
 }
 
 fun pos_dodge ($df, $width, :$n=undef) {

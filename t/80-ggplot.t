@@ -181,6 +181,8 @@ subtest geom_bar_1 => sub {
         ]
     );
 
+    #diag($data_expected->string);
+
     dataframe_is( $data->[0], $data_expected, '$built->data' );
 
     is( $built->plot->labels,
