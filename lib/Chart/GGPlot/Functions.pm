@@ -20,12 +20,18 @@ use parent qw(Exporter::Tiny);
 
 our @EXPORT_OK = qw(ggplot qplot);
 
-for my $package (qw(Chart::GGPlot::Aes::Functions)) {
+for my $package (
+    qw(
+    Chart::GGPlot::Aes::Functions
+    Chart::GGPlot::Position::Functions
+    )
+  )
+{
     load $package, ':ggplot';
     no strict 'refs';
     push @EXPORT_OK, @{ ${"${package}::EXPORT_TAGS"}{ggplot} };
-    push @EXPORT_OK, qw(factor);
 }
+push @EXPORT_OK, qw(factor);
 
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
