@@ -116,16 +116,16 @@ classmethod _layer (Defined :$geom, Defined :$stat,
     }
 
     my $find_subclass = fun( $super, $x ) {
-        unless ( Ref::Util::is_ref($x) ) {
+        unless ( Ref::Util::is_ref($x) ) {  # $x is a class name
             my $subclass = $class->_find_subclass( $super, $x );
             load $subclass;
-            return $subclass;
+            return $subclass->new();
         }
         return $x;
     };
     $geom     = $find_subclass->( 'Geom',     $geom );
     $stat     = $find_subclass->( 'Stat',     $stat );
-    $position = $find_subclass->( 'Position', $position )->new();
+    $position = $find_subclass->( 'Position', $position );
 
     # Split up params between aesthetics, geom, and stat
     $params = Chart::GGPlot::Aes->new( $params->flatten );

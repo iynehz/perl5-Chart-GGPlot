@@ -10,7 +10,7 @@ use Chart::GGPlot::Aes::Functions qw(:all);
 
 subtest geom_histogram => sub {
     my $g = geom_histogram();
-    is( $g->geom, 'Chart::GGPlot::Geom::Bar', 'geom' );
+    isa_ok( $g->geom, ['Chart::GGPlot::Geom::Bar'], 'geom' );
 };
 
 done_testing;
