@@ -9,7 +9,6 @@ use MooseX::Singleton;
 # VERSION
 
 use Data::Frame::More;
-use PDL::Primitive qw(which);
 
 use Chart::GGPlot::Aes::Functions qw(aes);
 use Chart::GGPlot::Util qw(resolution stat);
@@ -52,9 +51,7 @@ method compute_group ($data, $scales, $params) {
 
     my $uniq = $x->uniq->qsort;
     my $count = pdl(
-        $uniq->unpdl->map(
-            sub { $weight->slice(which($x == $_))->sum; }
-        )
+        $uniq->unpdl->map( sub { $weight->where($x == $_)->sum; } )
     );
     $count->setbadtoval(0);
 

@@ -21,7 +21,6 @@ use Number::Format 1.75;
 use Scalar::Util qw(looks_like_number);
 use Time::Moment;
 
-use PDL::Primitive qw(which);
 use POSIX qw(ceil floor log10);
 
 use Role::Tiny ();
@@ -107,7 +106,7 @@ Discard any values outside of range.
 
 fun discard ( $p, $range = pdl([ 0, 1 ]) ) {
     my ( $min, $max ) = $range->minmax;
-    return $p->index( which( ( $p >= $min ) & ( $p <= $max ) ) );
+    return $p->where( ( ( $p >= $min ) & ( $p <= $max ) ) );
 }
 
 # Expand a range with a multiplicative or additive constant
@@ -156,8 +155,8 @@ fun squish ( $p, $range = pdl([ 0, 1 ]), $only_finite = true ) {
     my $finite = $only_finite ? $p->isfinite : PDL->ones( $p->length );
     my $r = $p->copy;
 
-    ( $r->slice( which( $finite & ( $r < $min ) ) ) ) .= $min;
-    ( $r->slice( which( $finite & ( $r > $max ) ) ) ) .= $max;
+    $r->where( ( $finite & ( $r < $min ) ) ) .= $min;
+    $r->where( ( $finite & ( $r > $max ) ) ) .= $max;
     return $r;
 }
 
@@ -373,10 +372,10 @@ fun identity_pal() {
 
 fun extended_breaks ( $n = 5, @rest ) {
     return fun($p) {
-        my $p1 = $p->slice( which( $p->isfinite ) );
-        return null if ( $p1->isempty );
+        $p = $p->where( $p->isfinite );
+        return null if ( $p->isempty );
 
-        my $range = range_($p1);
+        my $range = range_($p);
         return labeling_extended( $range->at(0), $range->at(1), $n, @rest );
     };
 }
@@ -386,7 +385,7 @@ fun regular_minor_breaks ( $reverse = false ) {
 
     # $n : To create $n - 1 minor breaks between two major breaks
     return fun( $b, $limits, $n ) {
-        my $b1 = $b->index( which( !is_na($b) ) );
+        my $b1 = $b->where( !is_na($b) );
 
         return PDL->null if ( $b1->length < 2 );
 

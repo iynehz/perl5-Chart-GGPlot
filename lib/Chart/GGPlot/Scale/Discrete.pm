@@ -7,6 +7,7 @@ use namespace::autoclean;
 
 # VERSION
 
+use PDL::Primitive qw(which);
 use Types::Standard qw(Any ArrayRef Bool CodeRef ConsumerOf InstanceOf);
 use Types::PDL -types;
 

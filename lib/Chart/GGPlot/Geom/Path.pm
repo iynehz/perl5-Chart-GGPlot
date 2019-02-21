@@ -53,7 +53,7 @@ method handle_na ($data, $params) {
         my ( $x, $grouping, $fun ) = @_;
         my $new = $x->copy;
         for my $g ( $grouping->uniq->flatten ) {
-            my $sliced   = $new->slice( which( $x == $g ) );
+            my $sliced   = $new->where( $x == $g );
             my $averaged = $fun->($sliced);
             $sliced .= $averaged;
         }

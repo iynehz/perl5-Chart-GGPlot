@@ -16,7 +16,7 @@ use Data::Frame::More;
 use Math::Trig ();
 use constant PI => Math::Trig::pi;
 
-use PDL::Primitive;
+use PDL::Primitive qw(which);
 use Package::Stash;
 use Types::PDL qw(Piddle1D PiddleFromAny);
 use Types::Standard qw(ArrayRef);
@@ -115,7 +115,7 @@ fun remove_missing ($df,
         if ($finite and !is_discrete($col)) {
             $bad = ( $bad | !( $col->isfinite ) );
         }
-        $missing->slice( which($bad) ) .= 1;
+        $missing->where( $bad ) .= 1;
     }
 
     if ( $missing->any ) {

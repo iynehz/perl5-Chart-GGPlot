@@ -4,8 +4,10 @@ package Chart::GGPlot::Util::_Base;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-use Types::PDL qw(Piddle);
 use Data::Frame::More::Util qw(:all);
+use PDL::Ufunc qw(qsorti);
+use PDL::Primitive qw(vsearch_match);
+use Types::PDL qw(Piddle);
 
 use parent qw(Exporter::Tiny);
 
@@ -27,7 +29,7 @@ fun range_ (Piddle $p, $na_rm = false, $finite = false) {
             return pdl( [ 'nan', 'nan' ] )->setnantobad;
         }
     }
-    my $p = $finite ? $p->index( which( $p->isfinite ) ) : $p;
+    my $p = $finite ? $p->where( $p->isfinite ) : $p;
     my $class = ref($p);
     return $class->new( [ $p->min, $p->max ] );
 }
@@ -66,11 +68,6 @@ fun is_null ($p) {
 }
 
 fun sign ($p) { $p <=> 0; }
-
-# Set operations on two arrayrefs.
-
-use PDL::Ufunc qw(qsorti);
-use PDL::Primitive qw(which vsearch_match);
 
 fun match (Piddle $a, Piddle $b) {
     my $is_string =

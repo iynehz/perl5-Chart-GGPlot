@@ -33,8 +33,7 @@ fun collide_setup ($data, $width, $name, $strategy,
         }
 
         my $widths = ( $data->at('xmax') - $data->at('xmin') )->uniq;
-        $widths = $widths->slice( which( $widths->isgood ) )
-          if $widths->badflag;
+        $widths = $widths->where( $widths->isgood ) if $widths->badflag;
 
         $width = $widths->at(0);
     }

@@ -191,15 +191,15 @@ method break_info ($range=$self->dimension) {
 
     # drop oob breaks/labels by testing major == NA
     if ( not $labels->isempty and $major->badflag ) {
-        $labels = $labels->slice( which( $major->isgood ) );
+        $labels = $labels->where( $major->isgood );
     }
     if ( not $major->isempty and $major->badflag ) {
-        $major = $major->slice( which( $major->isgood ) );
+        $major = $major->where( $major->isgood );
     }
 
     my $minor = $self->get_breaks_minor( 2, $major, $range );
-    unless ( $minor->isempty ) {
-        $minor = $minor->slice( which( $minor->isgood ) );
+    unless ( $minor->isempty and $minor->badflag ) {
+        $minor = $minor->where( $minor->isgood );
     }
 
     # rescale to [0, 1]
