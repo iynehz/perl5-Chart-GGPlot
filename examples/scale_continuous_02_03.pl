@@ -4,7 +4,7 @@ use 5.016;
 use warnings;
 
 use Getopt::Long;
-use Chart::GGPlot::Functions qw(:all);
+use Chart::GGPlot qw(:all);
 use Chart::GGPlot::Util::Scales qw(comma);
 use PDL::Core qw(pdl);
 use PDL::Primitive qw(random);

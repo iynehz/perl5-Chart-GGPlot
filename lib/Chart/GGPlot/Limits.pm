@@ -142,7 +142,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Chart::GGPlot::Functions qw(:all);
+    use Chart::GGPlot qw(:all);
 
     my $plot1 = ggplot(data => $mtcars, 
                        mapping => aes(x => 'mpg', y => 'wt')) + 

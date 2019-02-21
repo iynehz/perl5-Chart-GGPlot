@@ -79,7 +79,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
         if ( $layer->inherit_aes ) {
             $map = $map->merge( $plot->mapping );
         }
-        $hover_text_aes = Chart::GGPlot->make_labels($map);
+        $hover_text_aes = Chart::GGPlot::Plot->make_labels($map);
     }
 
     # put x and y at first in plotly hover text

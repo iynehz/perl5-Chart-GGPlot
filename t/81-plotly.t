@@ -9,7 +9,7 @@ use Test2::Tools::DataFrame;
 use Test2::Tools::PDL;
 
 use Chart::GGPlot::Backend::Plotly::Util qw(:all);
-use Chart::GGPlot::Functions qw(:all);
+use Chart::GGPlot qw(:all);
 
 subtest group_to_NA => sub {
     my $df1 = Data::Frame::More->new(

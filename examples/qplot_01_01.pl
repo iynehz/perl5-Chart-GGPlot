@@ -6,7 +6,7 @@ use warnings;
 use Getopt::Long;
 use PDL::Primitive qw(grandom random);
 
-use Chart::GGPlot::Functions qw(:all);
+use Chart::GGPlot qw(:all);
 use Data::Frame::More::Examples qw(mtcars);
 
 srand(0);

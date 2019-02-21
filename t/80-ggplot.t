@@ -9,7 +9,7 @@ use Test2::V0;
 use Test2::Tools::DataFrame;
 use Test2::Tools::PDL;
 
-use Chart::GGPlot::Functions qw(:all);
+use Chart::GGPlot qw(:all);
 use Chart::GGPlot::Built;
 #use Chart::GGPlot::Aes::Functions qw(:ggplot);
 use Chart::GGPlot::Util qw(NA);
@@ -22,7 +22,7 @@ subtest geom_point_1 => sub {
         mapping => aes( x => 'wt', y => 'mpg' )
     )->geom_point();
 
-    isa_ok( $p, ['Chart::GGPlot'], 'Chart::GGPlot->new' );
+    isa_ok( $p, ['Chart::GGPlot::Plot'], 'ggplot()' );
 
     my $built = $p->backend->build($p);
     isa_ok( $built, [qw(Chart::GGPlot::Built)], '$plot->build' );

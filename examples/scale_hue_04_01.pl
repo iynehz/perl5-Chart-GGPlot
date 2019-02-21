@@ -4,7 +4,7 @@ use 5.016;
 use warnings;
 
 use Getopt::Long;
-use Chart::GGPlot::Functions qw(:all);
+use Chart::GGPlot qw(:all);
 use PDL::Primitive qw(random which);
 use PDL::Ufunc ();
 use Data::Frame::More::Examples qw(mtcars);

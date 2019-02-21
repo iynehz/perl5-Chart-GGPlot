@@ -2,7 +2,7 @@
 
 # NAME
 
-Chart::GGPlot - ggplot port for Perl
+Chart::GGPlot - ggplot2 port in Perl
 
 # VERSION
 
@@ -18,7 +18,8 @@ without notice.
 Before this library be released to CPAN, if you would like to try it out
 you can get the source from [https://github.com/stphnlyd/perl5-Chart-GGPlot/](https://github.com/stphnlyd/perl5-Chart-GGPlot/).
 Also note that at this moment you will also need my forked version of the
-"Data-Frame" package at [https://github.com/stphnlyd/p5-Data-Frame/tree/alt-pdlsv](https://github.com/stphnlyd/p5-Data-Frame/tree/alt-pdlsv). In my fork I improved PDL::SV and will still work on PDL::Factor.
+"Data-Frame" package at [https://github.com/stphnlyd/p5-Data-Frame/tree/alt-pdlsv](https://github.com/stphnlyd/p5-Data-Frame/tree/alt-pdlsv).
+In my fork I improved PDL::SV and will still work on PDL::Factor.
 
 # DESCRIPTION
 
@@ -27,40 +28,24 @@ This Chart-GGPlot library is an implementation of
 be possible to support multiple plotting backends. And it ships a default
 backend which uses [Chart::Plotly](https://metacpan.org/pod/Chart::Plotly).
 
-This Chart::GGPlot module itself just represents the ggplot class.
-Instead of this module you would usually want to look at
-[Chart::GGPlot::Functions](https://metacpan.org/pod/Chart::GGPlot::Functions), which is a function interface of this library
-and is closer to R ggplot2's API.
+This Chart::GGPlot module is the function interface of the Perl Chart-GGPlot
+library.
 
-# METHODS
+# FUNCTIONS
 
-## show
+## ggplot
 
-```
-$ggplot->show(HashRef $opts={})
+```perl
+my $ggplot = ggplot(:$data, :$mapping, %rest);
 ```
 
-Show the plot.
-Implementation depends on the plotting backend.
+This is same as [Chart::GGPlot::Plot->new(...)](https://metacpan.org/pod/Chart::GGPlot::Plot->new\(...\)).
 
-## save
-
-```
-$ggplot->save($filename, HashRef $opts={})
-```
-
-Save the plot to file.
-Implementation depends on the plotting backend.
-
-## summary()
-
-Get a useful description of a ggplot object.
+## qplot
 
 # SEE ALSO
 
 [ggplot](https://en.wikipedia.org/wiki/Ggplot)
-
-[Chart::GGPlot::Functions](https://metacpan.org/pod/Chart::GGPlot::Functions)
 
 # AUTHOR
 
