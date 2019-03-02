@@ -39,7 +39,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
     my $ggplot = ggplot(:$data, :$mapping, %rest);
 
-This is same as L<Chart::GGPlot::Plot-E<gt>new(...)>.
+This is same as C<Chart::GGPlot::Plot-E<gt>new(...)>.
 
 =cut
 
