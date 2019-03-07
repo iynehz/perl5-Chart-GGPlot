@@ -127,10 +127,8 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
                 my $fac_levels = $lvls->id;
                 my $i          = 0;
                 my %fac_levels = map { $_ => $i++ } $fac_levels->flatten;
-                my $fac_integers =
-                  [ map { $fac_levels{$_} } $d_tmp->id->flatten ];
                 PDL::Factor->new(
-                    integer => $fac_integers,
+                    [ map { $fac_levels{$_} } $d_tmp->id->flatten ],
                     levels  => [ 0 .. $fac_levels->length - 1 ],
                 );
             };
