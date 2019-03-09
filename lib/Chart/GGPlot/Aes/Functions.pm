@@ -1,5 +1,7 @@
 package Chart::GGPlot::Aes::Functions;
 
+# ABSTRACT: Function interface for aesthetics mappings
+
 use Chart::GGPlot::Setup qw(:base :pdl);
 
 # VERSION

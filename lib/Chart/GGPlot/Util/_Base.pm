@@ -4,6 +4,8 @@ package Chart::GGPlot::Util::_Base;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
+# VERSION
+
 use Data::Frame::Util qw(:all);
 use PDL::Ufunc qw(qsorti);
 use PDL::Primitive qw(vsearch_match);

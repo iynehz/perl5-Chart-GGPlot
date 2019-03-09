@@ -1,6 +1,6 @@
 package Chart::GGPlot::Scale::Positional;
 
-# Role for positional scale
+# ABSTRACT: Role for positional scale
 
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;

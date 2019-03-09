@@ -1,6 +1,10 @@
 package Chart::GGPlot::Stat::Functions;
 
+# ABSTRACT: Function interface for stats
+
 use Chart::GGPlot::Setup qw(:base :pdl);
+
+# VERSION
 
 use Chart::GGPlot::Layer::Functions qw(layer);
 use Chart::GGPlot::Types;
@@ -17,6 +21,10 @@ our %EXPORT_TAGS = (
     ggplot => \@export_ggplot,
 );
 
+=func stat_identity
+
+=cut
+
 fun stat_identity (:$mapping = undef, :$data = undef,
                    :$geom = "point", :$position = "identity",
                    :$show_legend = undef, :$inherit_aes = true, %rest) {
@@ -31,6 +39,10 @@ fun stat_identity (:$mapping = undef, :$data = undef,
         params      => { na_rm => false, %rest },
     );
 }
+
+=func stat_count
+
+=cut
 
 fun stat_count (:$mapping = undef, :$data = undef,
                 :$geom = 'bar', :$position = 'stack', 
@@ -58,27 +70,6 @@ fun stat_count (:$mapping = undef, :$data = undef,
     );
 }
 
-fun geom_histogram (:$mapping = undef, :$data = undef,
-                    :$stat = "bin", :$position = "stack",
-                    :$binwidth = undef, :$bins = undef,
-                    :$na_rm = false, :$show_legend = undef,
-                    :$inherit_aes = true, %rest) {
-    return layer(
-        data        => $data,
-        mapping     => $mapping,
-        stat        => stat,
-        geom        => 'bar',
-        position    => $position,
-        show_legend => $show_legend,
-        inherit_aes => $inherit_aes,
-        params      => {
-            binwidth => $binwidth,
-            bins     => $bins,
-            na_rm    => $na_rm,
-            pad      => false,
-            %rest
-        },
-    );
-}
-
 1;
+
+__END__
