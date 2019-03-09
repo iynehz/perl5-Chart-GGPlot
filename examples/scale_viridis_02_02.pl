@@ -8,7 +8,7 @@ use warnings;
 use Getopt::Long;
 use Chart::GGPlot qw(:all);
 use Data::Munge qw(elem);
-use Data::Frame::More::Examples qw(txhousing);
+use Data::Frame::Examples qw(txhousing);
 use List::AllUtils qw(indexes);
 
 my $save_as;

@@ -17,7 +17,7 @@ use Type::Library -base, -declare => qw(
 use Type::Utils -all;
 use Types::Standard -types;
 use Types::PDL -types;
-use Data::Frame::More::Types qw(:all);
+use Data::Frame::Types qw(:all);
 
 declare GGParams, as ConsumerOf ["Chart::GGPlot::Params"];
 coerce GGParams, from HashRef,

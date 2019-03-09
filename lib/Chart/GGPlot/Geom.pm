@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 # VERSION
 
-use Data::Frame::More::Util qw(guess_and_convert_to_pdl);
+use Data::Frame::Util qw(guess_and_convert_to_pdl);
 use Types::Standard qw(ArrayRef CodeRef);
 
 use Chart::GGPlot::Aes;

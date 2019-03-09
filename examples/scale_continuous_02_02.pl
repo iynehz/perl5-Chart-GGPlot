@@ -8,14 +8,14 @@ use Chart::GGPlot qw(:all);
 use Chart::GGPlot::Util::Scales qw(dollar);
 use PDL::Core qw(pdl);
 use PDL::Primitive qw(random);
-use Data::Frame::More;
+use Data::Frame;
 
 srand(0);
 
 my $save_as;
 GetOptions( 'o=s' => \$save_as );
 
-my $df = Data::Frame::More->new(
+my $df = Data::Frame->new(
     columns => [
         x => random(10) * 100000,
         y => pdl( [ 0 .. 9 ] ) / 9

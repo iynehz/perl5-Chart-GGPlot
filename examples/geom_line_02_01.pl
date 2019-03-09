@@ -5,7 +5,7 @@ use warnings;
 
 use Getopt::Long;
 use Chart::GGPlot qw(:all);
-use Data::Frame::More::Examples qw(economics_long);
+use Data::Frame::Examples qw(economics_long);
 
 my $save_as;
 GetOptions( 'o=s' => \$save_as );

@@ -2,8 +2,8 @@
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-use Data::Frame::More;
-use Data::Frame::More::Examples qw(mtcars mpg economics);
+use Data::Frame;
+use Data::Frame::Examples qw(mtcars mpg economics);
 
 use Test2::V0;
 use Test2::Tools::DataFrame;
@@ -31,7 +31,7 @@ subtest geom_point_1 => sub {
     is( $data->length, 1 );
     diag($data->[0]->string);
 
-    my $data_expected = Data::Frame::More->new(
+    my $data_expected = Data::Frame->new(
         columns => [
             x      => $mtcars->at('wt'),
             x_raw  => $mtcars->at('wt'),
@@ -53,7 +53,7 @@ subtest geom_point_1 => sub {
     my $layout = $built->layout;
     dataframe_is(
         $layout->layout,
-        Data::Frame::More->new(
+        Data::Frame->new(
             columns => [
                 PANEL   => pdl( [0] ),
                 ROW     => pdl( [0] ),
@@ -105,7 +105,7 @@ subtest geom_point_2 => sub {
     my $data  = $built->data;
     diag($data->[0]->string);
 
-    my $data_expected = Data::Frame::More->new(
+    my $data_expected = Data::Frame->new(
         columns => [
             color => PDL::SV->new(
                 $mtcars->at('cyl')->unpdl->map(
@@ -160,7 +160,7 @@ subtest geom_bar_1 => sub {
 
     my $count = pdl(5, 47, 41, 11, 33, 35, 62);
     my $class_sorted = PDL::SV->new( [ sort $mpg->at('class')->uniq->list ] );
-    my $data_expected = Data::Frame::More->new(
+    my $data_expected = Data::Frame->new(
         columns => [
             count    => $count,
             prop     => pdl(1),
@@ -220,7 +220,7 @@ subtest geom_line_1 => sub {
     my $x = pdl($x_raw->unpdl);
     my $y = $economics->at('unemploy')->slice(pdl(0 .. 9));
 
-    my $data_expected = Data::Frame::More->new(
+    my $data_expected = Data::Frame->new(
         columns => [
             x        => $x,
             x_raw    => $x_raw,

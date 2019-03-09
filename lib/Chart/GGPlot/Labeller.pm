@@ -12,7 +12,7 @@ use Types::Standard qw(CodeRef HashRef InstanceOf Str);
 use namespace::autoclean;
 
 use List::AllUtils qw(each_arrayref pairmap pairwise);
-use Data::Frame::More::Types qw(DataFrame);
+use Data::Frame::Types qw(DataFrame);
 use Chart::GGPlot::Util qw(:all);
 
 use overload

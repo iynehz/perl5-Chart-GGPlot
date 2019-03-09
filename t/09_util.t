@@ -2,8 +2,8 @@
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-use Data::Frame::More;
-use Data::Frame::More::Examples qw(airquality);
+use Data::Frame;
+use Data::Frame::Examples qw(airquality);
 use PDL::Core qw(long);
 use Chart::GGPlot::Util qw(:all !match);
 
@@ -50,7 +50,7 @@ my $df =
     my $lf = find_line_formula( pdl( [ 4, 7, 9 ] ), pdl( [ 1, 5, 3 ] ) );
     dataframe_is(
         $lf,
-        Data::Frame::More->new(
+        Data::Frame->new(
             columns => [
                 x1         => pdl( 4,              7 ),
                 y1         => pdl( 1,              5 ),

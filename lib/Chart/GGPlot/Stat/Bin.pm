@@ -8,7 +8,6 @@ use MooseX::Singleton;
 
 # VERSION
 
-use Data::Frame::More;
 use PDL::Primitive qw(which);
 use POSIX qw(floor);
 

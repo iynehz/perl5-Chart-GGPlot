@@ -15,12 +15,6 @@ after-work time) and is highly incomplete. Basically only what's in the
 `examples` directory is able to work now. And its API can change
 without notice.
 
-Before this library be released to CPAN, if you would like to try it out
-you can get the source from [https://github.com/stphnlyd/perl5-Chart-GGPlot/](https://github.com/stphnlyd/perl5-Chart-GGPlot/).
-Also note that at this moment you will also need my forked version of the
-"Data-Frame" package at [https://github.com/stphnlyd/p5-Data-Frame/tree/alt-pdlsv](https://github.com/stphnlyd/p5-Data-Frame/tree/alt-pdlsv).
-In my fork I improved PDL::SV and will still work on PDL::Factor.
-
 # DESCRIPTION
 
 This Chart-GGPlot library is an implementation of
@@ -39,7 +33,7 @@ library.
 my $ggplot = ggplot(:$data, :$mapping, %rest);
 ```
 
-This is same as [Chart::GGPlot::Plot->new(...)](https://metacpan.org/pod/Chart::GGPlot::Plot->new\(...\)).
+This is same as `Chart::GGPlot::Plot->new(...)`.
 
 ## qplot
 

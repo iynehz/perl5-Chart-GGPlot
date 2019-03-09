@@ -7,6 +7,7 @@ use namespace::autoclean;
 
 # VERSION
 
+use Data::Frame;
 use List::AllUtils qw(reduce pairmap);
 use Math::SimpleHisto::XS;
 use POSIX qw(floor);
@@ -141,7 +142,7 @@ classmethod bin_out (Piddle $count, Piddle $x, Piddle $width,
                     :$xmin=$x-$width/2, :$xmax=$x+$width/2) {
     my $density = $count / $width / $count->abs->sum;
 
-    return Data::Frame::More->new(
+    return Data::Frame->new(
         columns => [
             count    => $count,
             x        => $x,

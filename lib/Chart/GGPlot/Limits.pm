@@ -6,6 +6,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 # VERSION
 
+use Data::Frame;
 use List::AllUtils qw(pairmap); 
 use Type::Params;
 use Types::Standard;
@@ -128,7 +129,7 @@ Expand the plot limits, using data.
 =cut
 
 fun expand_limits (%params) {
-    my $data = Data::Frame::More->new( columns => \%params );
+    my $data = Data::Frame->new( columns => \%params );
     return Chart::GGPlot::Geom::Blank->new(
         mapping     => aes_all( $data->names ),
         data        => $data,

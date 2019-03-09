@@ -7,6 +7,7 @@ use namespace::autoclean;
 
 # VERSION
 
+use Data::Frame;
 use PDL::Primitive qw(which);
 use Type::Params;
 use Types::Standard qw(ArrayRef Bool CodeRef Enum Maybe Str);
@@ -34,7 +35,7 @@ method compute_layout ($data, $params) {
 
 method map_data ($data, $layout, $params) {
     if ( not defined $data ) {
-        return Data::Frame::More->new( columns => [ PANEL => null ] );
+        return Data::Frame->new( columns => [ PANEL => null ] );
     }
     if ( $data->isempty ) {
         return $data->merge( PANEL => null );

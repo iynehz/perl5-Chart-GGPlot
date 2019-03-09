@@ -7,7 +7,7 @@ use Getopt::Long;
 use PDL::Primitive qw(grandom random);
 
 use Chart::GGPlot qw(:all);
-use Data::Frame::More::Examples qw(mtcars);
+use Data::Frame::Examples qw(mtcars);
 
 srand(0);
 

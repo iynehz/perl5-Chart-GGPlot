@@ -122,7 +122,7 @@ method map_df ($df) {
             return defined $x ? $x->flatten : ();
         }
     );
-    return Data::Frame::More->new(
+    return Data::Frame->new(
         columns => [
             @$mapped,
             $df->names->setdiff( [ pairkeys @$mapped ] )
@@ -138,7 +138,7 @@ method transform_df ($df) {
     my $transformed =
       $self->scales->map( sub { $_->transform_df($df)->flatten } );
     my @transformed_vars = pairkeys @$transformed;
-    my $new = Data::Frame::More->new(
+    my $new = Data::Frame->new(
         columns => [
             @$transformed,
             $df->names->setdiff( \@transformed_vars )

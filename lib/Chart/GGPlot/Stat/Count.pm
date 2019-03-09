@@ -8,7 +8,7 @@ use MooseX::Singleton;
 
 # VERSION
 
-use Data::Frame::More;
+use Data::Frame;
 
 use Chart::GGPlot::Aes::Functions qw(aes);
 use Chart::GGPlot::Util qw(resolution stat);
@@ -55,7 +55,7 @@ method compute_group ($data, $scales, $params) {
     );
     $count->setbadtoval(0);
 
-    return Data::Frame::More->new(
+    return Data::Frame->new(
         columns => [
             count => $count,
             prop  => $count / $count->abs->sum,

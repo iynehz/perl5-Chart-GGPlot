@@ -7,8 +7,8 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 # VERSION
 
 use Data::Munge qw(elem);
-use Data::Frame::More::Types qw(DataFrame);
-use Data::Frame::More::Util qw(guess_and_convert_to_pdl);
+use Data::Frame::Types qw(DataFrame);
+use Data::Frame::Util qw(guess_and_convert_to_pdl);
 use Module::Load;
 use Types::Standard qw(Maybe Str);
 
@@ -78,7 +78,7 @@ fun qplot (
 
     $log->debug('qplot() $mapping = ' . Dumper($mapping));
 
-    my $data = Data::Frame::More->new(
+    my $data = Data::Frame->new(
         columns => [
             x => guess_and_convert_to_pdl($x),
             y => guess_and_convert_to_pdl($y),
@@ -142,12 +142,6 @@ At this moment this library is still under active development (at my
 after-work time) and is highly incomplete. Basically only what's in the
 C<examples> directory is able to work now. And its API can change
 without notice.
-
-Before this library be released to CPAN, if you would like to try it out
-you can get the source from L<https://github.com/stphnlyd/perl5-Chart-GGPlot/>.
-Also note that at this moment you will also need my forked version of the
-"Data-Frame" package at L<https://github.com/stphnlyd/p5-Data-Frame/tree/alt-pdlsv>.
-In my fork I improved PDL::SV and will still work on PDL::Factor.
 
 =head1 DESCRIPTION
 

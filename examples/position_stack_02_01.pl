@@ -5,7 +5,7 @@ use warnings;
 
 use Getopt::Long;
 use Chart::GGPlot qw(:all);
-use Data::Frame::More::Examples qw(diamonds);
+use Data::Frame::Examples qw(diamonds);
 
 my $save_as;
 GetOptions( 'o=s' => \$save_as );

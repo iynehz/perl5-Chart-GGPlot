@@ -12,14 +12,17 @@ use feature ':5.16';
 
 use Import::Into;
 
+use Alt::Data::Frame::ButMore;
+use Data::Frame;
+
 use Carp;
-use Data::Dumper      ();
-use Data::Frame::More ();
+use Data::Dumper ();
 use Function::Parameters 2.0;
 use Log::Any qw($log);
 use Log::Any::Adapter;
-use Safe::Isa 1.000010   ();
-use PerlX::Maybe         ();
+use Safe::Isa 1.000010 ();
+use PerlX::Maybe ();
+
 #use PerlX::Assert        ();
 use Syntax::Keyword::Try ();
 use Module::Load;
@@ -41,7 +44,7 @@ use List::AllUtils qw(uniq);
 # * hashref and aes, dataframe, etc
 for my $type (qw(Hash Array)) {
     Moose::Autobox->mixin_additional_role(
-        uc($type) => "Data::Frame::More::Autobox::$type" );
+        uc($type) => "Data::Frame::Autobox::$type" );
 }
 
 # for debug
@@ -110,7 +113,7 @@ sub _import_tag {
 
         Moose::Autobox->import::into($target);
 
-        Data::Frame::More->import::into($target);
+        Data::Frame->import::into($target);
     }
     elsif ( $tag eq ':class' ) {
         $class->_import_tag( $target, ':base' );
@@ -150,7 +153,7 @@ sub _import_tag {
         PDL::Core->import::into( $target, qw(pdl null) );
         #PDL::IO::Dumper->import::into($target);
 
-        Role::Tiny->apply_roles_to_package( 'PDL', 'Data::Frame::More::PDL' );
+        Role::Tiny->apply_roles_to_package( 'PDL', 'Data::Frame::PDL' );
 
         # "use PDL::SV;" (or PDL::Factor) would import names like float,
         # thus would pollute caller namespace and cause a warning with

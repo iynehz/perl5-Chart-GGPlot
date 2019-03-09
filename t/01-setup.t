@@ -28,14 +28,4 @@ like(
     "dies on a wrong import parameter"
 );
 
-#{
-#    DOES_ok(
-#        []->autobox_class,
-#        [qw(Data::Frame::More::Autobox::Array)],
-#        'ARRAY autobox'
-#    );
-#    DOES_ok( {}->autobox_class, [qw(Data::Frame::More::Autobox::Hash)],
-#        'HASH autobox' );
-#}
-
 done_testing;

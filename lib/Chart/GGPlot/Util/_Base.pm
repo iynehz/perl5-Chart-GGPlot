@@ -4,7 +4,7 @@ package Chart::GGPlot::Util::_Base;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-use Data::Frame::More::Util qw(:all);
+use Data::Frame::Util qw(:all);
 use PDL::Ufunc qw(qsorti);
 use PDL::Primitive qw(vsearch_match);
 use Types::PDL qw(Piddle);
@@ -18,7 +18,7 @@ our @EXPORT_OK = (
       range_ seq_n seq_by
       match
       pmax pmin
-      ), @Data::Frame::More::Util::EXPORT_OK
+      ), @Data::Frame::Util::EXPORT_OK
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 

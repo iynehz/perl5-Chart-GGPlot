@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 # VERSION
 
-use Data::Frame::More::Types qw(DataFrame);
+use Data::Frame::Types qw(DataFrame);
 use Data::Munge qw(elem);
 use List::AllUtils qw(pairwise);
 use PDL::Primitive qw(which);
@@ -43,7 +43,7 @@ has layout => ( is => 'rw', isa => DataFrame, init_arg => undef );
 has [qw(panel_scales_x panel_scales_y)] => ( is => 'rw' );
 has panel_params => ( is => 'rwp', isa => ArrayRef [HashRef] );
 
-method setup (ArrayRef $data, $plot_data=Data::Frame::More->new()) {
+method setup (ArrayRef $data, $plot_data=Data::Frame->new()) {
     $data = [ $plot_data, @$data ];
 
     $self->facet_params(

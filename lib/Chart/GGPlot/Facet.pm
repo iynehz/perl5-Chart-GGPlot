@@ -7,6 +7,7 @@ use namespace::autoclean;
 
 # VERSION
 
+use Data::Frame;
 use Data::Munge qw(elem);
 use Eval::Closure;
 use List::AllUtils qw(firstidx);
@@ -220,7 +221,7 @@ classmethod check_layout ($layout) {
 }
 
 classmethod layout_null () {
-    return Data::Frame::More->new(
+    return Data::Frame->new(
         columns => [
             PANEL   => pdl([0]),
             ROW     => pdl([0]),

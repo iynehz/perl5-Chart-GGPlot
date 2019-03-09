@@ -2,8 +2,8 @@
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-use Data::Frame::More::Examples qw(mtcars);
-use Data::Frame::More::Types qw(DataFrame);
+use Data::Frame::Examples qw(mtcars);
+use Data::Frame::Types qw(DataFrame);
 use Types::Standard qw(ArrayRef); 
 
 use Chart::GGPlot::Facet;

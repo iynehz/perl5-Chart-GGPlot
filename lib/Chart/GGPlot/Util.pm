@@ -8,7 +8,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 use Data::Dumper::Concise ();
 
-use Data::Frame::More;
+use Data::Frame;
 
 #TODO: Watch https://github.com/kmx/pdl-datetime/issues/1
 # PDL::Constants uses PDL::Complex which has conflict with PDL::DateTime
@@ -262,7 +262,7 @@ fun find_line_formula ($x, $y) {
     my $slope      = $y->diff / $x->diff;
     my $yintercept = $y->slice("1:") - $slope * $x->slice("1:");
     my $xintercept = $x->slice("1:") - $y->slice("1:") / $slope;
-    return Data::Frame::More->new(
+    return Data::Frame->new(
         columns => [
             x1 => $x->slice( "0:" . ( $x->length - 2 ) ),
             y1 => $y->slice( "0:" . ( $y->length - 2 ) ),

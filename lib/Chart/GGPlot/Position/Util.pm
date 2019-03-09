@@ -6,6 +6,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 # VERSION
 
+use Data::Frame;
 use List::AllUtils qw(reduce);
 use PDL::Core;
 use PDL::Primitive qw(which);
@@ -157,7 +158,7 @@ fun pos_dodge2 ($df, $width, :$n=undef, :$padding=0.1) {
     }
 
     # Find the total width of each group of elements
-    my $group_sizes = Data::Frame::More->new(
+    my $group_sizes = Data::Frame->new(
         columns => [
             size => $tapply->( $new_width, $xid, sub { $_[0]->sum } ),
             newx => $newx

@@ -21,7 +21,6 @@ install:
   # install my forked Data::Frame from github
   - git clone https://github.com/stphnlyd/p5-Data-Frame.git ~/p5-Data-Frame
   - cd ~/p5-Data-Frame
-  - git checkout alt-pdlsv
   - dzil authordeps | cpanm --no-interactive --no-man-pages --notest --skip-satisfied
   - dzil listdeps | cpanm --no-interactive --no-man-pages --notest --skip-satisfied
   - dzil install

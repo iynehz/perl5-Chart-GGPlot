@@ -6,7 +6,7 @@ use warnings;
 use Getopt::Long;
 use Chart::GGPlot qw(:all);
 use Chart::GGPlot::Util qw(seq_n);
-use Data::Frame::More;
+use Data::Frame;
 use PDL::Core qw(pdl);
 
 my $save_as;
@@ -18,7 +18,7 @@ sub qlogis {
 }
 
 my $x  = seq_n( 0.01, 0.99, 100 );
-my $df = Data::Frame::More->new(
+my $df = Data::Frame->new(
     columns => [
         x     => $x->glue( 0, $x ),
         y     => qlogis($x)->glue( 0, qlogis($x) * 2 ),

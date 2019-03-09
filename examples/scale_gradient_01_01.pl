@@ -5,7 +5,7 @@ use warnings;
 
 use Getopt::Long;
 use Chart::GGPlot qw(:all);
-use Data::Frame::More;
+use Data::Frame;
 use PDL::Primitive qw(random grandom);
 
 srand(0);
@@ -13,7 +13,7 @@ srand(0);
 my $save_as;
 GetOptions( 'o=s' => \$save_as );
 
-my $df = Data::Frame::More->new(
+my $df = Data::Frame->new(
     columns => [
         x => random(100),
         y => random(100),

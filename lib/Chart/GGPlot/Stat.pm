@@ -11,7 +11,7 @@ use List::AllUtils qw(reduce pairmap);
 use Types::Standard qw(ArrayRef CodeRef Str InstanceOf Bool);
 use Types::PDL -types;
 
-use Data::Frame::More;
+use Data::Frame;
 use Chart::GGPlot::Trans;
 use Chart::GGPlot::Types qw(:all);
 use Chart::GGPlot::Util qw(remove_missing stat);
@@ -68,7 +68,7 @@ method compute_layer ( $data, $params, $layout ) {
 }
 
 method compute_panel ( $data, $scales, $params ) {
-    return Data::Frame::More->new() if ( $data->isempty );
+    return Data::Frame->new() if ( $data->isempty );
 
     my $groups = $data->split( $data->at('group') );
     my $stats = {

@@ -24,7 +24,7 @@ method compute_layer ($data, $params, $layout) {
     my $panel_data = $data->at('PANEL'); 
     my $splitted = $data->split($panel_data);
 
-    my $new_df = Data::Frame::More->new();
+    my $new_df = Data::Frame->new();
     for my $panel_id (sort { $a <=> $b } keys %$splitted) {
         my $f = fun($df) {
             return $df if ($df->isempty);

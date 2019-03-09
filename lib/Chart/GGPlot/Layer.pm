@@ -9,8 +9,8 @@ use namespace::autoclean;
 
 use List::AllUtils qw(pairgrep pairkeys pairmap);
 use Module::Load;
-use Data::Frame::More::Types qw(DataFrame);
-use Data::Frame::More::Util qw(is_discrete);
+use Data::Frame::Types qw(DataFrame);
+use Data::Frame::Util qw(is_discrete);
 use Types::Standard qw(Bool Defined Enum HashRef InstanceOf Maybe);
 
 use Chart::GGPlot::Types qw(:all);
@@ -197,7 +197,7 @@ method layer_data ($plot_data) {
     return $plot_data unless ( defined $self->data );
 
     my $data = call_if_coderef( $self->data, $plot_data );
-    unless ( $data->$_DOES('Data::Frame::More') ) {
+    unless ( $data->$_DOES('Data::Frame') ) {
         die("Data function must return a dataframe object");
     }
     return $data;
@@ -225,7 +225,7 @@ method compute_aesthetics ( $data, $plot ) {
     $plot->scales->add_defaults( $data, $aesthetics );
 
     # Evaluate and check aesthetics
-    my $evaled = Data::Frame::More->new( columns =>
+    my $evaled = Data::Frame->new( columns =>
           [ pairmap { $a => $data->eval_tidy($b) } ( $aesthetics->flatten ) ] );
 
     # If there is no data, look at longest evaluated aesthetic.
@@ -246,7 +246,7 @@ method compute_aesthetics ( $data, $plot ) {
 }
 
 method compute_statistic ( $data, $layout ) {
-    return Data::Frame::More->new() if ( $data->isempty );
+    return Data::Frame->new() if ( $data->isempty );
 
     my $params = $self->stat->setup_params( $data, $self->stat_params );
     my $data   = $self->stat->setup_data( $data, $params );
@@ -254,7 +254,7 @@ method compute_statistic ( $data, $layout ) {
 }
 
 method map_statistic ( $data, $plot ) {
-    return Data::Frame::More->new() if ( $data->isempty );
+    return Data::Frame->new() if ( $data->isempty );
 
     # Assemble aesthetics from layer, plot and stat mappings
     my $aesthetics = $self->mapping;
@@ -270,7 +270,7 @@ method map_statistic ( $data, $plot ) {
     return $data if ( $new->isempty );
 
     my $stat_data =
-      Data::Frame::More->new(
+      Data::Frame->new(
         columns => [ pairmap { $a => $data->eval_tidy($b) } $new->flatten ] );
     #say $stat_data->string;
 
@@ -285,7 +285,7 @@ method map_statistic ( $data, $plot ) {
 }
 
 method compute_geom_1 ($data) {
-    return Data::Frame::More->new() if ( $data->isempty );
+    return Data::Frame->new() if ( $data->isempty );
 
     $self->geom->check_required_aes(
         [ @{ $data->names }, @{ $self->aes_params->names } ] );
@@ -295,7 +295,7 @@ method compute_geom_1 ($data) {
 }
 
 method compute_position ( $data, $layout ) {
-    return Data::Frame::More->new() if ( $data->isempty );
+    return Data::Frame->new() if ( $data->isempty );
 
     my $params = $self->position->setup_params($data);
     $data = $self->position->setup_data( $data, $params );
@@ -304,7 +304,7 @@ method compute_position ( $data, $layout ) {
 
 # Combine aesthetics, defaults, and params
 method compute_geom_2 ($data) {
-    return Data::Frame::More->new() if ( $data->isempty );
+    return Data::Frame->new() if ( $data->isempty );
     return $self->geom->use_defaults( $data, $self->aes_params );
 }
 

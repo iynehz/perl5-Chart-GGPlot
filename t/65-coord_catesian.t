@@ -2,8 +2,8 @@
 
 use Chart::GGPlot::Setup;
 
-use Data::Frame::More;
-use Data::Frame::More::Examples qw(mtcars);
+use Data::Frame;
+use Data::Frame::Examples qw(mtcars);
 
 use Test2::V0;
 

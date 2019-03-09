@@ -8,8 +8,6 @@ use Chart::GGPlot::Util qw(:all !match);
 use Test2::V0 '!number';
 use Test2::Tools::PDL;
 
-diag($INC{'Test2/Tools/PDL.pm'});
-
 pdl_is( sign( pdl( -5, 0, 2, "inf", "-inf", "nan" )->setbadat(5) ),
     pdl([ -1, 0, 1, 1, -1, 'nan' ])->setnantobad, 'sign()' );
 ok( !is_null( pdl( [] ) ), 'is_null(pdl([]))' );
