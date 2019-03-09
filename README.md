@@ -25,17 +25,42 @@ backend which uses [Chart::Plotly](https://metacpan.org/pod/Chart::Plotly).
 This Chart::GGPlot module is the function interface of the Perl Chart-GGPlot
 library.
 
+Example exported image files:
+
+<div>
+    <p float="left">
+    <img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/position_stack_02_02.png" alt="proportional stacked bar" width="45%">
+    <img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/geom_line_02_01.png" alt="line chart" width="45%">
+    <img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/scale_viridis_02_01.png" alt="viridis color scale" width="45%">
+    <img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/theme_01_06.png" alt="theme 'minimal'" width="45%">
+    </p>
+</div>
+
 # FUNCTIONS
 
 ## ggplot
 
-```perl
-my $ggplot = ggplot(:$data, :$mapping, %rest);
+```
+ggplot(:$data, :$mapping, %rest)
 ```
 
 This is same as `Chart::GGPlot::Plot->new(...)`.
 
 ## qplot
+
+```
+qplot(:$x, :$y,
+      Str :$geom='auto',
+      :$xlim=undef, :$ylim=undef,
+      :$title=undef, :$xlab='x', :$ylab='y',
+      %rest)
+```
+
+# ENVIRONMENT VARIABLES
+
+## CHART\_GGPLOT\_TRACE
+
+A positive integer would enable debug messages.
 
 # SEE ALSO
 

@@ -20,6 +20,41 @@ use parent qw(Exporter::Tiny);
 
 our @EXPORT_OK = qw(ggplot qplot);
 
+# PodWeaver would move the HTML/markdown block to after FUNCTION.
+# So we have to move our DESCRIPTION part to the top and explicitly have
+# a "=head1 FUNCTIONS" header, and not use =func directive.
+=pod
+=encoding utf8
+
+=head1 DESCRIPTION
+
+This Chart-GGPlot library is an implementation of
+L<ggplot|https://en.wikipedia.org/wiki/Ggplot> in Perl. It's designed to
+be possible to support multiple plotting backends. And it ships a default
+backend which uses L<Chart::Plotly>.
+
+This Chart::GGPlot module is the function interface of the Perl Chart-GGPlot
+library.
+
+Example exported image files:
+
+=begin html
+
+<p float="left">
+<img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/position_stack_02_02.png" alt="proportional stacked bar" width="45%">
+<img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/geom_line_02_01.png" alt="line chart" width="45%">
+<img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/scale_viridis_02_01.png" alt="viridis color scale" width="45%">
+<img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/theme_01_06.png" alt="theme 'minimal'" width="45%">
+</p>
+
+=end html
+
+=cut
+
+=head1 FUNCTIONS
+
+=cut
+
 for my $package (
     qw(
     Chart::GGPlot::Aes::Functions
@@ -35,9 +70,9 @@ push @EXPORT_OK, qw(factor);
 
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-=func ggplot
+=head2 ggplot
 
-    my $ggplot = ggplot(:$data, :$mapping, %rest);
+    ggplot(:$data, :$mapping, %rest)
 
 This is same as C<Chart::GGPlot::Plot-E<gt>new(...)>.
 
@@ -47,7 +82,13 @@ sub ggplot {
     return Chart::GGPlot::Plot->new(@_);
 }
 
-=func qplot
+=head2 qplot
+
+    qplot(:$x, :$y,
+          Str :$geom='auto',
+          :$xlim=undef, :$ylim=undef,
+          :$title=undef, :$xlab='x', :$ylab='y',
+          %rest)
 
 =cut
 
@@ -133,9 +174,6 @@ fun qplot (
 
 __END__
 
-=pod
-=encoding utf8
-
 =head1 STATUS
 
 At this moment this library is still under active development (at my
@@ -143,21 +181,11 @@ after-work time) and is highly incomplete. Basically only what's in the
 C<examples> directory is able to work now. And its API can change
 without notice.
 
-=head1 DESCRIPTION
-
-This Chart-GGPlot library is an implementation of
-L<ggplot|https://en.wikipedia.org/wiki/Ggplot> in Perl. It's designed to
-be possible to support multiple plotting backends. And it ships a default
-backend which uses L<Chart::Plotly>.
-
-This Chart::GGPlot module is the function interface of the Perl Chart-GGPlot
-library.
-
 =head1 ENVIRONMENT VARIABLES
 
 =head2 CHART_GGPLOT_TRACE
 
-A positive value would enable debug messages.
+A positive integer would enable debug messages.
 
 =head1 SEE ALSO
 

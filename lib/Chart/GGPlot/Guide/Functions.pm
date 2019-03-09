@@ -1,5 +1,7 @@
 package Chart::GGPlot::Guide::Functions;
 
+# ABSTRACT: Function interface for guides
+
 use Chart::GGPlot::Setup;
 
 # VERSION
