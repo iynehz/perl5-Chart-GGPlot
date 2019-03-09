@@ -153,6 +153,12 @@ backend which uses L<Chart::Plotly>.
 This Chart::GGPlot module is the function interface of the Perl Chart-GGPlot
 library.
 
+=head1 ENVIRONMENT VARIABLES
+
+=head2 CHART_GGPLOT_TRACE
+
+A positive value would enable debug messages.
+
 =head1 SEE ALSO
 
 L<ggplot|https://en.wikipedia.org/wiki/Ggplot>
