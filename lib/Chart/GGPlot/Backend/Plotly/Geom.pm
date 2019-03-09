@@ -10,6 +10,10 @@ use warnings;
 package Chart::GGPlot::Backend::Plotly::Geom {
     use Chart::GGPlot::Role;
 
+    use List::AllUtils qw(pairmap);
+
+    use Chart::GGPlot::Backend::Plotly::Util qw(br);
+
     # whether or not to use webgl
     method use_webgl ($df) {
         my $threshold = $Chart::GGPlot::Backend::Plotly::WEBGL_THRESHOLD;
@@ -18,6 +22,38 @@ package Chart::GGPlot::Backend::Plotly::Geom {
     }
 
     requires 'to_trace';
+
+    classmethod make_hovertext ($df, $hover_labels) {
+        my %seen_hover_aes;
+        my @hover_assoc = pairmap {
+            my ( $aes, $var ) = ( $a, $b );
+            if ( !ref($var) and $seen_hover_aes{$var}++ ) {
+                ();
+            }
+            else {
+                if ( $var->$_DOES('Eval::Quosure') ) {
+                    $var = $var->expr;
+                }
+                my $data = $class->_hovertext_data_for_aes( $df, $aes );
+                return ( defined $data ? ( $var => $data->as_pdlsv ) : () );
+            }
+        }
+        @$hover_labels;
+
+        return [ 0 .. $df->nrow - 1 ]->map(
+            sub {
+                join( br(), pairmap { "$a: " . $b->at($_) } @hover_assoc );
+            }
+        );
+    }
+
+    classmethod _hovertext_data_for_aes ($df, $aes) {
+        return (
+              $df->exists("${aes}_raw") ? $df->at("${aes}_raw")
+            : $df->exists($aes)         ? $df->at($aes)
+            :                             undef
+        );
+    }
 }
 
 package Chart::GGPlot::Backend::Plotly::Geom::Blank {
@@ -206,6 +242,12 @@ package Chart::GGPlot::Backend::Plotly::Geom::Bar {
         );
     }
 
+    around _hovertext_data_for_aes ( $orig, $class : $df, $aes ) {
+        return ( $aes eq 'y'
+            ? $df->at('ymax') - $df->at('ymin')
+            : $class->$orig( $df, $aes ) );
+    }
+
     __PACKAGE__->meta->make_immutable;
 }
 
@@ -214,3 +256,12 @@ package Chart::GGPlot::Backend::Plotly::Geom::Bar {
 
 __END__
 
+=method to_trace
+
+    to_trace($df, %rest)
+
+=method make_hovertext
+
+    make_hovertext($df, $aes_names)
+   
+=cut

@@ -102,7 +102,11 @@ method bin_vector ($x, :$weight=undef, :$pad=false) {
         return $self->bin_out( $x->length );
     }
 
-    # PDL's histgram functions does not support arbitrary breaks.
+    # PDL's histgram functions does not support variable length bins.
+    # 
+    # NOTE: Math::SimpleHisto::XS's bin range is left-closed and right-open,
+    # while R ggplot2's bin range is defautly right-closed and left-open.
+    # This can cause some differences.
     my $hist = Math::SimpleHisto::XS->new( bins => $self->fuzzy->unpdl );
     if ( defined $weight ) {
         $weight->inplace->setbadtoval(0);
@@ -152,6 +156,9 @@ classmethod bin_out (Piddle $count, Piddle $x, Piddle $width,
             density  => $density,
             ncount   => $count / $count->abs->max,
             ndensity => $density / $density->abs->max,
+
+            # set x to x_raw as there is no longer one-to-one mapping from original data
+            x_raw => $x,
         ],
     );
 }
