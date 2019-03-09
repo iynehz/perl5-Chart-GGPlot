@@ -27,7 +27,7 @@ use Chart::GGPlot::Backend::Plotly::Util qw(br to_rgb);
 #TODO: To test and see which value is proper.
 our $WEBGL_THRESHOLD = 2000;
 
-# Does not do any yet.
+# TODO
 classmethod _split_on($data) {
     return [];
 }
@@ -39,6 +39,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
     my $class_geom      = ( ref($geom) || $geom );
     my $short           = $class_geom =~ s/^Chart::GGPlot::Geom:://r;
     my $class_geom_impl = "Chart::GGPlot::Backend::Plotly::Geom::$short";
+    load($class_geom_impl);
 
     my $geom_params = $layer->geom_params;
     my $stat_params = $layer->stat_params;
