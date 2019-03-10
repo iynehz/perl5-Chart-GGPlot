@@ -1,31 +1,11 @@
 language: perl
-
 perl:
-  - "5.16"
-  - "5.20"
+  - "5.28"
   - "5.26"
-
+  - "5.20"
+  - "5.16"
 sudo: false
-
+env:
+  - PERL_USE_UNSAFE_INC=1
 before_install:
-  - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
-  - source ~/travis-perl-helpers/init
-  - build-perl
-  - perl -V
-  - build-dist
-  - cd $BUILD_DIR             # $BUILD_DIR is set by the build-dist command
-
-install:
-  - cpan-install --deps       # installs prereqs, including recommends
- 
-  # install my forked Data::Frame from github
-  - git clone https://github.com/stphnlyd/p5-Data-Frame.git ~/p5-Data-Frame
-  - cd ~/p5-Data-Frame
-  - dzil authordeps | cpanm --no-interactive --no-man-pages --notest --skip-satisfied
-  - dzil listdeps | cpanm --no-interactive --no-man-pages --notest --skip-satisfied
-  - dzil install
-
-  - cd $BUILD_DIR
-
-script:
-  - prove -l -j$(test-jobs) $(test-files)   # parallel testing
+  - eval $(curl https://travis-perl.github.io/init) --auto
