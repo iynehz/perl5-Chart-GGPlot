@@ -15,6 +15,9 @@ after-work time) and is highly incomplete. Basically only what's in the
 `examples` directory is able to work now. And its API can change
 without notice.
 
+Besides, it heavily depends on my [Alt::Data::Frame::ButMore](https://metacpan.org/pod/Alt::Data::Frame::ButMore) library,
+which is also experimental.
+
 # DESCRIPTION
 
 This Chart-GGPlot library is an implementation of
@@ -65,6 +68,8 @@ A positive integer would enable debug messages.
 # SEE ALSO
 
 [ggplot](https://en.wikipedia.org/wiki/Ggplot)
+
+[Alt::Data::Frame::ButMore](https://metacpan.org/pod/Alt::Data::Frame::ButMore)
 
 # AUTHOR
 

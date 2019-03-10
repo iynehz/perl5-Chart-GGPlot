@@ -181,6 +181,9 @@ after-work time) and is highly incomplete. Basically only what's in the
 C<examples> directory is able to work now. And its API can change
 without notice.
 
+Besides, it heavily depends on my L<Alt::Data::Frame::ButMore> library,
+which is also experimental.
+
 =head1 ENVIRONMENT VARIABLES
 
 =head2 CHART_GGPLOT_TRACE
@@ -191,3 +194,4 @@ A positive integer would enable debug messages.
 
 L<ggplot|https://en.wikipedia.org/wiki/Ggplot>
 
+L<Alt::Data::Frame::ButMore>
