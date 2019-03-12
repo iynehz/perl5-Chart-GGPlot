@@ -834,6 +834,11 @@ fun dollar ($p, :$accuracy=undef, :$scale=1,
         -decimal_point   => $decimal_mark,
         -int_curr_symbol => $prefix,
         ( $negative_parens ? ( -n_sign_posn => 0 ) : () ),
+
+        # Number::Format defaulty uses locale's P/N_SEP_BY_SPACE.
+        # Here we force these values to 0 to be align with R's scale::dollar.
+        -p_sep_by_space  => 0,
+        -n_sep_by_space  => 0,
     );
 
     no warnings 'numeric';
