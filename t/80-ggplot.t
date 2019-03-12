@@ -91,6 +91,8 @@ subtest geom_point_1 => sub {
         '$scale->{y}->range'
     );
     ok( $scales_y->limits->isempty, '$scale->{y}->limits' );
+
+    diag($p->summary);
 };
 
 subtest geom_point_2 => sub {

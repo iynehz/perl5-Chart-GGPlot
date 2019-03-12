@@ -10,6 +10,9 @@ use namespace::autoclean;
 
 use parent qw(Chart::GGPlot::Params);
 
+use Data::Dump;
+use List::AllUtils qw(pairmap);
+
 my @all_aesthetics = (
     "adj",    "alpha",    "angle",      "bg",
     "cex",    "col",      "color",      "colour",
@@ -78,6 +81,19 @@ classmethod check_aesthetics ($aes, $n=undef) {
             $n, join( ', ', map { qq{"$_"} } @bad_keys )
         )
     );
+}
+
+=method string
+
+    string()
+
+=cut
+
+method string () {
+    my @assoc = pairmap {
+        $a => $b->$_DOES('Eval::Quosure') ? $b->expr : $b;
+    } $self->flatten;
+    return join(", ", pairmap { qq{$a => $b} } @assoc);
 }
 
 1;

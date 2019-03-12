@@ -26,7 +26,9 @@ classmethod new (@rest) {
 
 sub _hash { $_[0]->{_hash} }
 
-=classmethod transform_key($key)
+=classmethod transform_key
+
+    transform_key($key)
 
 Derived classes can override this classmethod to have their own way
 of renaming the keys.
@@ -35,7 +37,19 @@ of renaming the keys.
 
 classmethod transform_key ($key) { $key }
 
-=method exists($key)
+=method length
+
+    length()
+
+Returns the count of keys.
+
+=cut
+
+method length () { scalar(@{$self->keys}); }
+
+=method exists
+
+    exists($key)
 
 Tests if a key exists.
 
@@ -43,11 +57,15 @@ Tests if a key exists.
 
 method exists ($key) { exists $self->_hash->{ $self->transform_key($key) }; }
 
-=method keys()
+=method keys
+
+    keys()
 
 Return an array ref of keys. 
 
-=method names()
+=method names
+
+    names()
 
 This is an alias of the C<keys()> method.
 
@@ -56,7 +74,9 @@ This is an alias of the C<keys()> method.
 method keys () { [ CORE::keys %{ $self->_hash } ]; }
 sub names { $_[0]->keys }
 
-=method values()
+=method values
+
+    values()
 
 Return an array ref of values. 
 
@@ -66,13 +86,19 @@ method values () {
     [ map { $self->at($_) } @{ $self->keys } ];
 }
 
-=method isempty()
+=method isempty
+
+    isempty()
+
+Return a boolean value if length is 0.
 
 =cut
 
-method isempty () { @{ $self->keys } == 0; }
+method isempty () { $self->length == 0; }
 
-=method delete($key)
+=method delete
+
+    delete($key)
 
 =cut
 
@@ -80,7 +106,9 @@ method delete ($key) {
     delete $self->_hash->{ $self->transform_key($key) };
 }
 
-=method set($key, $value)
+=method set
+
+    set($key, $value)
 
 Associate a value with a key and return the value.
 
@@ -90,7 +118,9 @@ method set ( $key, $value ) {
     $self->_hash->{ $self->transform_key($key) } = $value;
 }
 
-=method at($key)
+=method at
+
+    at($key)
 
 Get associated value of the given key.
 
@@ -100,7 +130,11 @@ method _at ($key) { $self->_hash->{$key}; }
 
 method at ($key) { $self->_hash->{ $self->transform_key($key) }; }
 
-=method flatten()
+=method flatten
+
+    flatten()
+
+Returns an array.
 
 =cut
 
@@ -108,9 +142,13 @@ method flatten () {
     map { $_ => $self->_at($_) } @{ $self->keys };
 }
 
-=method hslice($keys)
+=method hslice
 
-=method slice($keys)
+    hslice($keys)
+
+=method slice
+
+    slice($keys)
 
 This is an alias of C<hslice>.
 
@@ -122,7 +160,9 @@ method hslice ($keys) {
 }
 *slice = \&hslice;
 
-=method kv()
+=method kv
+
+    kv()
 
 Return a list of a value with a key and return the value.
 
@@ -156,7 +196,9 @@ method merge ($other, $skip_undef=false) {
     return bless( { _hash => { $self->flatten, @other_data } }, $class );
 }
 
-=method defaults($other)
+=method defaults
+
+    defaults($other)
 
 Using data from C<$other> as defaults.
 If C<$other> is C<undef>, returns a clone of C<$self>.
@@ -168,11 +210,13 @@ method defaults ($other) {
     return $other->merge( $self, true );
 }
 
-=method rename($href_or_coderef)
+=method rename
 
-    my $p2 = $p1->rename( { $from_key => $to_key, ... } );
+    rename($href_or_coderef)
 
 Returns a new object.
+
+    my $p2 = $p1->rename( { $from_key => $to_key, ... } );
     
 =cut
 
@@ -194,19 +238,33 @@ method rename ($href_or_coderef) {
     return bless( { _hash => $new_hash }, $class );
 }
 
-=method as_hashref()
+=method as_hashref
+
+    as_hashref()
+
+Returns a hashref.
 
 =cut
 
 method as_hashref () { $self->_hash; }
 
-=method clone()
+=method copy
+
+    copy()
+
+=method clone
+
+    clone()
+
+This is same as the C<copy()> method.
 
 =cut
 
-method clone () {
+method copy () {
     return dclone($self);
 }
+
+*clone = \&copy;
 
 1;
 
