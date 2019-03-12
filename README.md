@@ -6,7 +6,7 @@ Chart::GGPlot - ggplot2 port in Perl
 
 # VERSION
 
-version 0.0000\_01
+version 0.0000\_02
 
 # STATUS
 
@@ -48,6 +48,7 @@ ggplot(:$data, :$mapping, %rest)
 ```
 
 This is same as `Chart::GGPlot::Plot->new(...)`.
+See [Chart::GGPlot::Plot](https://metacpan.org/pod/Chart::GGPlot::Plot) for details.
 
 ## qplot
 
@@ -69,6 +70,8 @@ A positive integer would enable debug messages.
 
 [ggplot](https://en.wikipedia.org/wiki/Ggplot)
 
+[Chart::GGPlot::Plot](https://metacpan.org/pod/Chart::GGPlot::Plot)
+
 [Alt::Data::Frame::ButMore](https://metacpan.org/pod/Alt::Data::Frame::ButMore)
 
 # AUTHOR
@@ -77,7 +80,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Stephan Loyd.
+This software is copyright (c) 2019 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
