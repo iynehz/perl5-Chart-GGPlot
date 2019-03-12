@@ -45,6 +45,19 @@ fun geom_blank (:$mapping = undef, :$data = undef,
     );
 }
 
+=method geom_path
+
+    geom_path (:$mapping = undef, :$data = undef, 
+               :$stat = 'identity', :$position = 'identity', 
+               :$na_rm = false,
+               :$show_legend = 'auto', :$inherit_aes = true, 
+               %rest)
+
+C<geom_path()> connects the observations in the order in which they appear in
+the data. 
+
+=cut
+
 fun geom_path (:$mapping = undef, :$data = undef, 
                :$stat = 'identity', :$position = 'identity', 
                :$na_rm = false,
@@ -62,6 +75,19 @@ fun geom_path (:$mapping = undef, :$data = undef,
     );
 }
 
+=method geom_line
+
+    geom_line (:$mapping = undef, :$data = undef, 
+               :$stat = 'identity', :$position = 'identity', 
+               :$na_rm = false,
+               :$show_legend = 'auto', :$inherit_aes = true, 
+               %rest)
+
+C<geom_line()> connects the observations in the order of the variable on the
+x axis. 
+
+=cut
+
 fun geom_line (:$mapping = undef, :$data = undef, 
                :$stat = 'identity', :$position = 'identity', 
                :$na_rm = false,
@@ -78,6 +104,10 @@ fun geom_line (:$mapping = undef, :$data = undef,
         params      => { na_rm => $na_rm, %rest },
     );
 }
+
+=method geom_point
+
+=cut
 
 fun geom_point (:$mapping = undef, :$data = undef,
                 :$stat = 'identity', :$position = 'identity',
@@ -144,3 +174,8 @@ fun geom_histogram (:$data = undef, :$mapping = undef,
 1;
 
 __END__
+
+=head1 SEE ALSO
+
+L<Chart::GGPlot::Geom>
+

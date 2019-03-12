@@ -75,6 +75,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
     ggplot(:$data, :$mapping, %rest)
 
 This is same as C<Chart::GGPlot::Plot-E<gt>new(...)>.
+See L<Chart::GGPlot::Plot> for details.
 
 =cut
 
@@ -193,5 +194,7 @@ A positive integer would enable debug messages.
 =head1 SEE ALSO
 
 L<ggplot|https://en.wikipedia.org/wiki/Ggplot>
+
+L<Chart::GGPlot::Plot>
 
 L<Alt::Data::Frame::ButMore>
