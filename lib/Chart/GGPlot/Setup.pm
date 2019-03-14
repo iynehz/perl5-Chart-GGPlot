@@ -17,7 +17,7 @@ use Data::Frame;
 
 use Carp;
 use Data::Dumper ();
-use Function::Parameters 2.0;
+use Function::Parameters 2.001003;
 use Log::Any qw($log);
 use Log::Any::Adapter;
 use Safe::Isa 1.000010 ();
@@ -33,7 +33,6 @@ use MooseX::Aliases           ();
 use MooseX::MungeHas          ();
 use MooseX::LazyRequire       ();
 use MooseX::StrictConstructor ();
-use MooseX::Traits            ();
 use boolean                   ();
 
 use List::AllUtils qw(uniq);
@@ -126,8 +125,6 @@ sub _import_tag {
         MooseX::LazyRequire->import::into($target);
         MooseX::MungeHas->import::into($target);
         MooseX::StrictConstructor->import::into($target);
-
-        MooseX::Traits->import::into($target);
     }
     elsif ( $tag eq ':role' ) {
         $class->_import_tag( $target, ':base' );

@@ -11,7 +11,7 @@ use Chart::GGPlot::Util qw(:all);
 use Chart::GGPlot::Layer;
 use Chart::GGPlot::Aes::Functions qw(aes);
 
-use Exporter qw(import);
+use parent qw(Exporter::Tiny);
 
 my @export_ggplot = qw(layer);
 

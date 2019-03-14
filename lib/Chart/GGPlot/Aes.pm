@@ -10,7 +10,6 @@ use namespace::autoclean;
 
 use parent qw(Chart::GGPlot::Params);
 
-use Data::Dump;
 use List::AllUtils qw(pairmap);
 
 my @all_aesthetics = (
