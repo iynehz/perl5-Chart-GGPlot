@@ -101,12 +101,26 @@ __END__
 
 =head1 DESCRIPTION
 
-This class is used for holding aesthetics data. 
-It inherits L<Chart::GGPlot::Params> to accept various names of same
-concept, like color/colour/fg, fill/bg, etc.
-
+This class inherits L<Chart::GGPlot::Params> to accept various names of
+same concept, like color/colour/fg, fill/bg, etc.
 Unlike L<Chart::GGPlot::Params>, this class has its object keys
 alphabetically sorted.
+
+It is designed for holding aesthetics-specific data. It can usually
+be used in either of below two ways:
+
+=over 4
+
+=item * Created by the C<aes()> function.
+
+For specifying how the aesthetics, like x/y variables (column names),
+colors, etc., are mapped to data in your data frame input to C<ggplot()>.
+
+=item * Used only for its key alias feature.
+
+See L<Chart::GGPlot::Labels>.
+
+=back
 
 =head1 SEE ALSO
 

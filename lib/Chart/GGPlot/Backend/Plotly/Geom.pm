@@ -7,6 +7,7 @@ use Chart::GGPlot::Role;
 # VERSION
 
 use List::AllUtils qw(pairmap);
+use Types::Standard qw(ArrayRef);
 
 use Chart::GGPlot::Backend::Plotly::Util qw(br);
 
@@ -14,9 +15,11 @@ use Chart::GGPlot::Backend::Plotly::Util qw(br);
 
     use_webgl($df)
 
-Returns a boolean value for whether or not to use webgl, like for scatter plots.
-Now it decides by comparing the data count in C<$df> against module variable
-C<$WEBGL_THRESHOLD>. The variable can be adjusted by like,
+Returns a boolean value for whether or not to use webgl, like for scatter
+plots where Plotly is very slow to generate SVG when the data count is large.
+Now it decides by comparing the data count in C<$df> against variable
+C<$Chart::GGPlot::Backend::Plotly::WEBGL_THRESHOLD>.
+The variable can be adjusted by like,
 
     $Chart::GGPlot::Backend::Plotly::WEBGL_THRESHOLD = 2000;
 
@@ -33,6 +36,7 @@ method use_webgl ($df) {
     to_trace($df, %rest)
 
 This shall be implemented by consumers of this role.
+It should return an arrayref of Chart::Plotly::Trace::X objects.  
 
 =cut
 
@@ -40,11 +44,16 @@ requires 'to_trace';
 
 =method make_hovertext
 
-    make_hovertext($df, $aes_names)
+    make_hovertext($df, ArrayRef $hover_labels)
+
+This method is called by L<Chart::GGPlot::Backend::Plotly> for preparing
+Plotly hovertext.
+C<$hover_labels> is an associative arrayref that maps aes names to hover
+text labels.
    
 =cut
 
-classmethod make_hovertext ($df, $hover_labels) {
+classmethod make_hovertext ($df, ArrayRef $hover_labels) {
     my %seen_hover_aes;
     my @hover_assoc = pairmap {
         my ( $aes, $var ) = ( $a, $b );

@@ -1,4 +1,4 @@
-package Chart::GGPLot::Geom::Blank;
+package Chart::GGPlot::Geom::Blank;
 
 # ABSTRACT: Class for blank geom
 
@@ -18,3 +18,6 @@ __PACKAGE__->meta->make_immutable();
 
 __END__
 
+=head1 SEE ALSO
+
+L<Chart::GGPlot::Geom>

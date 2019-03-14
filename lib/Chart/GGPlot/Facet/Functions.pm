@@ -23,7 +23,7 @@ our %EXPORT_TAGS = (
 
     facet_null(:$shrink=true)
 
-This method creates a L<Chart::GGPLot::Facet::Null> object.
+This method creates a L<Chart::GGPlot::Facet::Null> object.
 
 =cut
 

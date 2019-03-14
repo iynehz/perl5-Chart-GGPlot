@@ -16,5 +16,6 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 SEE ALSO
 
-L<Chart::GGPlot::Backend::Plotly::Geom>
+L<Chart::GGPlot::Backend::Plotly::Geom>,
+L<Chart::GGPlot::Geom::Blank>
 

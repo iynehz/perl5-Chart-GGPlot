@@ -165,13 +165,15 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
     ];
 }
 
-=method to_plotly
+=method ggplotly
 
-Returns a Chart::GPlotly object.
+    ggplotly($ggplot)
+
+Returns a L<Chart::Plotly> object.
 
 =cut
 
-method to_plotly ($plot_built) {
+method _to_plotly ($plot_built) {
     my $plot   = $plot_built->plot;
     my $layers = $plot->layers;
     my $layout = $plot_built->layout;
@@ -402,13 +404,13 @@ method to_plotly ($plot_built) {
 
 =method show
     
-    $backend->show($ggplot, HashRef $opts={});
+    show($ggplot, HashRef $opts={})
 
 Show the plot like in web browser.
 
 =method save
 
-    $backend->save($ggplot, $filename, HashRef $opts={});
+    save($ggplot, $filename, HashRef $opts={})
 
 Export the plot to a static image file.
 
@@ -422,7 +424,7 @@ Below options are supported for C<$opts>:
 
 method ggplotly ($ggplot) {
     my $plot_built = $self->build($ggplot);
-    return $self->to_plotly($plot_built);
+    return $self->_to_plotly($plot_built);
 }
 
 method show ($ggplot, HashRef $opts={}) {

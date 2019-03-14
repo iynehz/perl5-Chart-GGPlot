@@ -19,15 +19,19 @@ use Chart::GGPlot::Util qw(:all);
 
 =attr scales
 
-Returns an arrayref of scales object with the ScalesList object.
+Returns an arrayref of L<Chart::GGPlot::Scale> objects.
 
 =cut
 
-has scales => ( is => 'rw', isa => ArrayRef, default => sub { [] } );
+has scales => ( is => 'ro', default => sub { [] } );
 
-=method find($aesthetic)
+=method find
 
-Returns an arrayref of indexes. 
+    find(ArrayRef $aes_names)
+    find(Str $aes_name)
+
+Returns an arrayref of indices in the C<scales> attr, for the given
+aesthetics names.
 
 =cut
 
@@ -36,12 +40,18 @@ sub find {
         ArrayRef->plus_coercions(ArrayRefFromAny) );
     my ( $self, $aesthetic ) = $check->(@_);
 
-    return PDL->pdl(
-        map { $_->aesthetics->intersect($aesthetic)->length > 0 }
-          @{ $self->scales } );
+    return pdl(
+        [
+            map { $_->aesthetics->intersect($aesthetic)->length > 0 }
+              @{ $self->scales }
+        ]
+    );
 }
 
-=method has_scale($aesthetic)
+=method has_scale
+
+    has_scale(ArrayRef $aes_names)
+    has_scale(Str $aes_name)
 
 =cut
 
@@ -68,6 +78,14 @@ method add ($scale) {
     $self->scales->push($scale);
 }
 
+=method length
+
+    length()
+
+Size of the C<scales> attribute.
+
+=cut
+
 method length () { $self->scales->length; }
 
 method input () {
@@ -80,23 +98,29 @@ method non_position_scales () {
     return $class->new( scales => $self->scales->slice( \@indices ) );
 }
 
-=method get_scales($output)
+=method get_scales
+    
+    get_scales(ArrayRef $aes_names)
+    get_scales(Str $aes_name)
 
 Returns the first scale object found.
 
 =cut
 
-method get_scales ($output) {
-    my $indexes = which( $self->find($output) );
+method get_scales ($aesthetic) {
+    my $indexes = which( $self->find($aesthetic) );
     return undef if ( $indexes->isempty );
     return $self->scales->at( $indexes->at(0) );
 }
 
-method isempty () { $self->scales->isempty }
+method isempty () { $self->length == 0 }
 
-=method train_df($df)
+=method train_df
+
+    train_df($df)
 
 Train scales from a dataframe.
+Returns an arrayref of scale objects.
 
 =cut
 
@@ -106,10 +130,13 @@ method train_df ($df, $drop=false) {
     return $self->scales->map( sub { $_->train_df($df) } );
 }
 
-=method map_df($df)
+=method map_df
 
-Map values from a dataframe.
-Returns a dataframe whose columns processed to map to the scales' limits.
+    map_df($df)
+
+Map values from a data frame.
+Returns a new data frame whose columns processed to map to the scales'
+limits.
 
 =cut
 
@@ -205,3 +232,6 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=head1 SEE ALSO
+
+L<Chart::GGPlot::Scale>

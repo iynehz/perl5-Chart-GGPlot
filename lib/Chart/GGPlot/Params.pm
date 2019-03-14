@@ -4,6 +4,7 @@ package Chart::GGPlot::Params;
 
 use Chart::GGPlot::Setup;
 use Function::Parameters qw(classmethod);
+use namespace::autoclean;
 
 # VERSION
 
@@ -11,7 +12,6 @@ use List::AllUtils qw(pairgrep pairmap);
 use Storable qw(dclone);
 use Type::Params;
 use Types::Standard qw(HashRef);
-use namespace::autoclean;
 
 use Chart::GGPlot::Types qw(GGParams);
 
@@ -100,6 +100,8 @@ method isempty () { $self->length == 0; }
 
     delete($key)
 
+Delete a key.
+
 =cut
 
 method delete ($key) {
@@ -126,9 +128,12 @@ Get associated value of the given key.
 
 =cut
 
-method _at ($key) { $self->_hash->{$key}; }
+sub _at {
+    my ( $self, $key ) = @_;
+    $self->_hash->{$key};
+}
 
-method at ($key) { $self->_hash->{ $self->transform_key($key) }; }
+method at ($key) { $self->_at( $self->transform_key($key) ); }
 
 =method flatten
 
@@ -217,6 +222,7 @@ method defaults ($other) {
 Returns a new object.
 
     my $p2 = $p1->rename( { $from_key => $to_key, ... } );
+    my $p3 = $p1->rename( sub { my ($old_key) = @_; ... return $new_key; } );
     
 =cut
 
@@ -274,10 +280,11 @@ __END__
 
 This class provides a duck typing interface similar as
 L<Data::Frame::Autobox::HashRef>, and adds a mechanism to its
-derived classes to customize aliasing of hash keys by overriding
+derived classes to allow customize aliasing of hash keys by overriding
 the C<transform_key> classmethod.
 
 =head1 SEE ALSO
 
-L<Data::Frame::Autobox::HashRef>
+L<Data::Frame::Autobox::HashRef>,
+L<Chart::GGPlot::Aes>
 

@@ -18,30 +18,43 @@ use Chart::GGPlot::Aes;
 use Chart::GGPlot::Stat::Functions qw(:all);
 use Chart::GGPlot::Util qw(:all);
 
+=attr data
+
+The data to be displayed in this layer.
+If C<undef>, the default, the data is inherited from the plot data as
+specified in the call to C<ggplot()>.
+
+=attr mapping
+
+Set of aesthetic mappings created by C<aes()>.
+If specified and C<inherit_aes> is true (the default), it's combined with
+the default mapping at the top level of the plot.
+You must supply this attribute if there no plot mapping.
+
 =attr geom
 
-The geometric object to display the data.
+The geometric object to use display the data.
 
 =attr stat
 
-The statistical transformation to use on the data for this
-layer, as a string.
+The statistical transformation to use on the data for this layer, as a
+string.
 
 =attr position
 
-Position adjustment, either as a string, or the result of
-a call to a position adjust function.
+Position adjustment, either as a string, or the result of a call to a
+position adjust function.
 
 =attr inherit_aes
 
-If `false`, overrides the default aesthetics,
-rather than combining with them. This is most useful for helper functions
-that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. [borders()].
+If false, overrides the default aesthetics, rather than combining with them.
+This is most useful for helper functions that define both data and
+aesthetics and shouldn't inherit behaviour from the default plot
+specification.
 
 =attr params
 
-Additional parameters to the `geom` and `stat`.
+Additional parameters to the "geom" and "stat".
 
 =cut
 
@@ -188,10 +201,6 @@ method string () {
     $s .= sprintf( "%s\n", ref( $self->position ) );
     return $s;
 }
-
-=method layer_data($plot_data)
-
-=cut
 
 method layer_data ($plot_data) {
     return $plot_data unless ( defined $self->data );
@@ -360,6 +369,6 @@ __END__
 =head1 DESCRIPTION
 
 A layer is a combination of data, stat and geom with a potential position
-adjustment. Usually layers are created using `geom_*` or `stat_*`
+adjustment. Usually layers are created using C<geom_*> or C<stat_*>
 calls but it can also be created directly using this class.
 

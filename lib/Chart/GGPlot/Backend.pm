@@ -12,13 +12,13 @@ use Chart::GGPlot::Built;
 
 =method show
     
-    $backend->show($ggplot, HashRef $opts={});
+    show($ggplot, HashRef $opts={})
 
 Show the plot (like in web browser).
 
 =method save
 
-    $backend->save($ggplot, $filename, HashRef $opts={});
+    save($ggplot, $filename, HashRef $opts={})
 
 Export the plot to a static image file.
 
@@ -29,7 +29,7 @@ requires 'save';
 
 =classmethod build
 
-    my $built = $backend->build($ggplot);
+    build($ggplot)
 
 This method takes a Chart::GGPlot object, and performs all steps necessary
 to produce a Chart::GGPlot::Built object that can be rendered.
@@ -151,4 +151,4 @@ This module is the role for Chart::GGPlot backend classes.
 
 =head1 SEE ALSO
 
-L<Chart::GGPLot>
+L<Chart::GGPlot>

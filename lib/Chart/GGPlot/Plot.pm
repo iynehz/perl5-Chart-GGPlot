@@ -116,7 +116,7 @@ method AUTOCAN ($method) {
 =attr backend
 
 Consumer of L<Chart::GGPlot::Backend>.
-Defaults to an L<Chart::GGPlot::Backend::Plotly> object.
+Default is a L<Chart::GGPlot::Backend::Plotly> object.
 
 =cut
 

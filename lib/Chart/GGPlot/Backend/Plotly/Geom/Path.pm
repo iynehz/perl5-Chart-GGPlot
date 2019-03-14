@@ -90,5 +90,5 @@ __END__
 
 =head1 SEE ALSO
 
-L<Chart::GGPlot::Backend::Plotly::Geom>
-
+L<Chart::GGPlot::Backend::Plotly::Geom>,
+L<Chart::GGPlot::Geom::Path>

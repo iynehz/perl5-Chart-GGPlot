@@ -13,7 +13,8 @@ use Types::Standard qw(ConsumerOf InstanceOf);
 
 =attr theme_current
 
-The current theme.
+RW. The current theme.
+L<Chart::GGPlot::Theme> object.
 
 =cut
 
@@ -31,7 +32,8 @@ method _build_theme_current () {
 
 =attr element_tree
 
-Element tree for the theme elements.
+RW. Element tree for the theme elements.
+L<Chart::GGPlot::Theme::ElementTree> object.
 
 =cut
 
@@ -61,5 +63,5 @@ __END__
 =head1 DESCRIPTION
 
 This is a singleton class that holds various global variables and settings
-for Chart::GGPlot.
+for the Chart::GGPlot system.
 

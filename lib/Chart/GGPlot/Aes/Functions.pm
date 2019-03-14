@@ -27,15 +27,16 @@ our %EXPORT_TAGS = (
 
 =func aes
 
-    my $aes = aes(%aesthetics_mapping);
+    aes(%aesthetics_mapping);
 
-This function is not equivalent to C<Chart::GGPlot::Aes-E<gt>new()>. This
+This function is not exactly same as C<Chart::GGPlot::Aes-E<gt>new()>. This
 function is specifically for creating aesthetics mapping which specifies
 the mapping from data to aesthetics. Returned aes object from this function
-is usually used for the C<mapping> attr of C<Chart::GGPlot> objects or
-C<Chart::GGPlot::Geom> consumers.
+is usually used for the C<mapping> attr of C<Chart::GGPlot::Plot> objects or
+C<Chart::GGPlot::Geom> objects.
 
 Values of C<%aesthetics_mapping> need to be one of the following:
+
 =for :list
 * An C<Eval::Quosure> object.
 * Anything else would be stringified and converted to an C<Eval::Quosure>
@@ -93,7 +94,15 @@ fun is_position_aes ($aes_names) {
     return ( List::AllUtils::all { $_ eq 'x' or $_ eq 'y' } @$new_names );
 }
 
-# Given a character vector, create a set of identity mappings
+=method aes_all
+
+    aes_all(@aes_names)
+
+Given a array of aes names, create a set of identity mappings, that is
+like C<aes(x =E<gt> 'x', y =E<gt> 'y', ...)>.
+
+=cut
+
 fun aes_all (@names) {
     return _aes( { map { $_ => $_ } @names }, $aes_level_default );
 }

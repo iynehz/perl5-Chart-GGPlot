@@ -12,6 +12,23 @@ use Types::Standard qw(ArrayRef);
 
 use Chart::GGPlot::Types qw(:all);
 
+=attr data
+
+An arrayref of data frames, one for each layer's processed data that would
+later be used for rendering the plot.
+
+=attr layout
+
+A L<Chart::GGPlot::Layout> object, which contains info about axis limits,
+breaks, etc.
+
+=attr plot
+
+The L<Chart::GGPlot::Plot> object from which the L<Chart::GGPlot::Built>
+object is created.
+
+=cut
+
 has data   => ( is => 'ro' );
 has layout => ( is => 'ro' );
 has plot   => ( is => 'ro' );
@@ -25,7 +42,7 @@ C<$i> is the index of layer.
 
     my $data = $ggplot->layer_data(0);
 
-=method layer_scales($self, $i=0, $j=0)
+=method layer_scales
 
     layer_scales($i=0, $j=0)
 
@@ -51,19 +68,19 @@ method layer_scales ( $i = 0, $j = 0 ) {
     };
 }
 
-method summarize_layout () {
-    my $l = $self->layout;
-
-    my $layout =
-      [qw(panel row col)]->map( sub { $l->layout->at( uc( $_[0] ) ) } );
-
-    my $facet_vars = $l->facet->vars();
-
-    # Add a list-column of panel vars (for facets).
-    #$layout->at('vars') =
-
-    return $layout;
-}
+#method summarize_layout () {
+#    my $l = $self->layout;
+#
+#    my $layout =
+#      [qw(panel row col)]->map( sub { $l->layout->at( uc( $_[0] ) ) } );
+#
+#    my $facet_vars = $l->facet->vars();
+#
+#    # Add a list-column of panel vars (for facets).
+#    #$layout->at('vars') =
+#
+#    return $layout;
+#}
 
 1;
 
@@ -71,12 +88,13 @@ __END__
 
 =head1 DESCRIPTION
 
-This class represents a processed Chart::GGPlot object that can be rendered.
-A Chart::GGPlot::Backend consumer generates an object of this class as an
-intermediate form during rendering a Chart::GGPlot object.
+This class represents a processed L<Chart::GGPlot::Plot> object that can
+be rendered.
+A L<Chart::GGPlot::Backend> consumer generates an object of this class as
+an intermediate form during rendering a L<Chart::GGPlot::Plot> object.
     
 =head1 SEE ALSO
 
-L<Chart::GGPlot>,
+L<Chart::GGPlot::Plot>,
 L<Chart::GGPlot::Backend>
 
