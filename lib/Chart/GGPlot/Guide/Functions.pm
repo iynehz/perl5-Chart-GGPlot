@@ -18,6 +18,12 @@ our %EXPORT_TAGS = (
     'ggplot' => [qw(guide_legend)],
 );
 
+=func guide_legend
+
+    guide_legend(:$title=undef, %rest)
+
+=cut
+
 sub guide_legend {
     return Chart::GGPlot::Guide::Legend->new(@_);   
 }
@@ -30,3 +36,4 @@ __END__
 =head1 SEE ALSO
 
 L<Chart::GGPlot::Guide>
+

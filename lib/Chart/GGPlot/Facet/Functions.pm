@@ -6,7 +6,6 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 # VERSION
 
-#use Chart::GGPlot::Facet::Grid;
 use Chart::GGPlot::Facet::Null;
 use Chart::GGPlot::Util qw(:all);
 

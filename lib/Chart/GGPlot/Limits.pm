@@ -28,7 +28,9 @@ our %EXPORT_TAGS = (
     ggplot => \@export_ggplot,
 );
 
-=func lims(%pairs)
+=func lims
+
+    lims(%pairs)
 
 Call C<limits()> on each kv pair in C<%pairs>.
 Returns an array ref like C<[ limits($key1, $value1), ... ]>.
@@ -40,13 +42,17 @@ fun lims (%pairs) {
     return \@mapped;
 }
 
-=func xlim($a, $b)
+=func xlim
+
+    xlim($a, $b)
 
 This is a shortcut of 
 
     limits(x => [$a, $b]);
 
-=func ylim($a, $b)
+=func ylim
+
+    ylim($a, $b)
 
 This is a shortcut of 
 
@@ -57,7 +63,9 @@ This is a shortcut of
 fun xlim (@v) { limits( x => \@v ); }
 fun ylim (@v) { limits( y => \@v ); }
 
-=func limits($var, $v)
+=func limits
+
+    limits($var, $lims)
 
 =cut
 
@@ -118,13 +126,15 @@ fun _make_scale ( $type, $var, @rest ) {
     return $scale_f->(@rest);
 }
 
-=head2 expand_limits(%params)
+=head2 expand_limits
+
+    expand_limits(%params)
 
 Expand the plot limits, using data.
 
     my $p = ggplot($mtcars, aes( x=> 'mpg', y => 'wt')) + geom_point();
-    $p += expand_limits(x => 0);
-    $p += expand_limits(y => [1, 9]);
+    $p->expand_limits(x => 0);
+    $p->expand_limits(y => [1, 9]);
 
 =cut
 
@@ -161,6 +171,6 @@ __END__
 
 =head1 DESCRIPTION
 
-By default, any values outside limits will be treated as C<NA> and
-are thus not plotted.
+The module provides some functions for specifying limits of a plot.
+By default, any values outside limits will be not plottted.
 

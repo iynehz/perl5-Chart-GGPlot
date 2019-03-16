@@ -24,40 +24,14 @@ use Chart::GGPlot::Params;
 use Chart::GGPlot::ScalesList;
 use Chart::GGPlot::Types qw(:all);
 
-# We use Perl's autoloading feature, to get this class to support as its
-# member methods all exported functions of C<:ggplot> tag from several
-# other namespaces:
-#
-# Chart::GGPlot::Coord::Functions
-# Chart::GGPlot::Facet::Functions
-# Chart::GGPlot::Geom::Functions
-# Chart::GGPlot::Guide::Functions
-# Chart::GGPlot::Labels::Functions
-# Chart::GGPlot::Scale::Functions
-# Chart::GGPlot::Limits
-# Chart::GGPlot::Theme::Defaults
-#
-# For example, when you do
-#
-#    $plot->geom_point(...)
-#
-# It internally does something like,
-#
-#    my $layer = Chart::GGPlot::Geom::Functions::geom_point(...);
-#    $plot->add_layer($layer);
-#
-# Depend on the return type of the function it would call one of the class's
-# add/set methods. In this case of geom_point() we get a layer object so
-# add_layer() is called.
-
 my @function_namespaces = qw(
+  Chart::GGPlot::Geom::Functions
+  Chart::GGPlot::Scale::Functions
+  Chart::GGPlot::Labels::Functions
+  Chart::GGPlot::Limits
   Chart::GGPlot::Coord::Functions
   Chart::GGPlot::Facet::Functions
-  Chart::GGPlot::Geom::Functions
   Chart::GGPlot::Guide::Functions
-  Chart::GGPlot::Labels::Functions
-  Chart::GGPlot::Scale::Functions
-  Chart::GGPlot::Limits
   Chart::GGPlot::Theme::Defaults
 );
 
@@ -355,9 +329,38 @@ __END__
 
 =head1 DESCRIPTION
 
-This class represents the ggplot class.
+This class represents the ggplot plot class.
 Instead of this class you would usually want to directly use L<Chart::GGPlot>,
-which is a function interface of this library and is closer to R ggplot2's API.
+which is a function interface of this library and is closer to R ggplot2's
+API.
+
+=head1 MORE METHODS
+
+This class uses Perl's autoloading feature, to allow this class to get
+into its member methods exported functions of C<:ggplot> tag from several
+other namespaces:
+
+L<Chart::GGPlot::Geom::Functions>
+L<Chart::GGPlot::Scale::Functions>
+L<Chart::GGPlot::Labels::Functions>
+L<Chart::GGPlot::Limits>
+L<Chart::GGPlot::Coord::Functions>
+L<Chart::GGPlot::Facet::Functions>
+L<Chart::GGPlot::Guide::Functions>
+L<Chart::GGPlot::Theme::Defaults>
+
+For example, when you do
+
+   $plot->geom_point(...)
+
+It internally does something like,
+
+   my $layer = Chart::GGPlot::Geom::Functions::geom_point(...);
+   $plot->add_layer($layer);
+
+Depend on the return type of the function it would call one of the class's
+add/set methods. In this case of C<geom_point()> we get a layer object so
+L<add_layer()> is called.
 
 =head1 SEE ALSO
 

@@ -22,10 +22,12 @@ use Chart::GGPlot::Util qw(:all);
 =attr coord
 
 The coordinate system.
+Default is the output of C<coord_cartesian()>
 
 =attr facet
 
 The facetting specification.
+Default is the output of C<facet_null()>
 
 =cut
 

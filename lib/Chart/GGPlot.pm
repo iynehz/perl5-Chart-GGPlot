@@ -29,7 +29,7 @@ our @EXPORT_OK = qw(ggplot qplot);
 =head1 DESCRIPTION
 
 This Chart-GGPlot library is an implementation of
-L<ggplot|https://en.wikipedia.org/wiki/Ggplot> in Perl. It's designed to
+L<ggplot2|https://en.wikipedia.org/wiki/Ggplot2> in Perl. It's designed to
 be possible to support multiple plotting backends. And it ships a default
 backend which uses L<Chart::Plotly>.
 
@@ -46,6 +46,8 @@ Example exported image files:
 <img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/scale_viridis_02_01.png" alt="viridis color scale" width="45%">
 <img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/theme_01_06.png" alt="theme 'minimal'" width="45%">
 </p>
+
+See the C<examples> dir in the library's distribution for more examples.
 
 =end html
 
@@ -177,13 +179,30 @@ __END__
 
 =head1 STATUS
 
-At this moment this library is still under active development (at my
-after-work time) and is highly incomplete. Basically only what's in the
-C<examples> directory is able to work now. And its API can change
-without notice.
+At this moment this library is experimental and still under active
+development (at my after-work time). It's still quite incomplete compared
+to R's ggplot2 library, but the core features are working.
 
 Besides, it heavily depends on my L<Alt::Data::Frame::ButMore> library,
 which is also experimental.
+
+=head1 SYNOPSIS
+
+    use Chart::GGPlot qw(:all);
+    use Data::Frame::Examples qw(mtcars);
+
+    my $plot = ggplot(
+        data => mtcars(),
+        mapping => aes( x => 'wt', y => 'mpg' )
+    )->geom_point();
+
+    # show in browser
+    $plot->show;
+
+    # export to image file
+    $plot->save('mtcars.png');
+
+    # see "examples" dir of this library's distribution for more examples.
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -193,7 +212,7 @@ A positive integer would enable debug messages.
 
 =head1 SEE ALSO
 
-L<ggplot|https://en.wikipedia.org/wiki/Ggplot>
+L<ggplot2|https://en.wikipedia.org/wiki/Ggplot2>
 
 L<Chart::GGPlot::Plot>
 

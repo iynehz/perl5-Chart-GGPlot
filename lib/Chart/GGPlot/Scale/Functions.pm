@@ -14,11 +14,6 @@ use Types::Standard qw(Any CodeRef Maybe Str);
 
 use Chart::GGPlot::Aes::Functions qw(:all);
 use Chart::GGPlot::Range::Functions qw(:all);
-use Chart::GGPlot::Scale::Continuous;
-use Chart::GGPlot::Scale::ContinuousPosition;
-use Chart::GGPlot::Scale::DiscretePosition;
-use Chart::GGPlot::Scale::ContinuousIdentity;
-use Chart::GGPlot::Scale::DiscreteIdentity;
 use Chart::GGPlot::Trans::Functions qw(as_trans);
 use Chart::GGPlot::Types qw(:all);
 use Chart::GGPlot::Util qw(:all);
@@ -52,14 +47,10 @@ my @export_ggplot = (
           scale_color_identity scale_shape_identity scale_linetype_identity
           scale_alpha_identity scale_size_identity
           )
-    ),
-    qw(
-      register_scale find_scale
-      )
+    )
 );
 
-our @EXPORT_OK =
-  map { $_ =~ /color/ ? ( $_, $_ =~ s/color/color/r ) : $_ } @export_ggplot;
+our @EXPORT_OK = ( @export_ggplot, qw(find_scale) );
 our %EXPORT_TAGS = (
     all    => \@EXPORT_OK,
     ggplot => \@export_ggplot,
@@ -67,18 +58,12 @@ our %EXPORT_TAGS = (
 
 my %scale_funcs;
 
-=func register_scale($name, $func)
-
 =func find_scale($aes, $x)
 
 Find scale function by aes name and data type. The scale function is in the
-form of C<scale_${aes}_${type}>.
+form of C<scale_${aes}_${type}>, where C<$type> is decided by C<$x>.
 
 =cut
-
-fun register_scale (Str $name, CodeRef $func) {
-    $scale_funcs{$name} = $func;
-}
 
 fun find_scale ($aes, $x) {
     my $type      = scale_type($x);
@@ -134,6 +119,137 @@ fun _check_breaks_labels ( $breaks, $labels ) {
     return ($breaks, $labels);
 }
 
+=func continuous_scale
+
+    continuous_scale (:$aesthetics, :$scale_name, :$palette, :$name=undef,
+        :$breaks=undef, :$minor_breaks=undef, :$labels=undef,
+        :$limits=null(), :$rescaler=\&rescale, :$oob=\&censor,
+        :$expand=undef, :$na_value='nan', :$trans="identity",
+        :$guide="legend", PositionEnum :$position="left",
+        Str :$super='Chart::GGPlot::Scale::Continuous',
+        %rest)
+
+Continuous scale constructor.
+It's internally used by the continous scales in this module.
+
+Arguments:
+
+=over 4
+
+=item * $aesthetics
+
+The name of the aesthetics that this scale works with.
+
+=item * $scale_name
+
+The name of the scale.
+
+=item * $palette
+
+A palette function that when called with a numeric piddle with values
+between 0 and 1 returns the corresponding values in the range the scale maps
+to.
+
+=item * $name
+
+The name of the scale. Used as the axis or legend title.
+If C<undef>, the default, the name of the scale is taken from the first
+mapping used for that aesthetic.
+
+=item * $breaks
+
+Major breaks.
+
+One of:
+
+=begin :list :over<8>
+
+* An empty piddle for no breaks
+* C<undef> for default breaks computed by the transformation object
+* A numeric piddle of positions
+* A function that given the limits and returns a piddle of breaks
+
+=end :list
+
+=item * $minor_breaks
+
+One of:
+
+=begin :list :over<8>
+
+* An empty piddle for no minor breaks
+* C<undef> for the default breaks (one minor break betwen each major break)
+* A numeric piddle of positions
+* A function that given the limits and return a piddle of minor breaks
+
+=end :list
+
+=item * $labels
+
+One of:
+
+=begin :list :over<8>
+
+* An empty piddle for no labels
+* C<undef> for the default labels computed by the transformation object
+* A L<PDL::SV> piddle giving labels (must be same length as C<$breaks>)
+* A function that given the breaks and returns labels
+
+=end :list
+
+=item * $limits
+
+A numeric piddle of length two providing limits of the scale. Use C<BAD>
+to refer to the existing minimum or maximum.
+
+=item * $rescaler
+
+A function used to scale the input values to the range C<[0, 1]>.
+Used by diverging and n color gradients (i.e. C<scale_color_gradient2()>,
+C<scale_colour_gradientn()>). 
+
+=item * $oob 	
+
+Function that handles limits outside of the scale limits (out of bounds).
+The default replaces out of bounds values with C<BAD>.
+
+=item * $expand
+
+Vector of range expansion constants used to add some padding around the
+data, to ensure that they are placed some distance away from the axes.
+Use the convenience function C<expand_scale()> to generate the values for
+the expand argument.
+The defaults are to expand the scale by 5% on each side for continuous
+variables, and by 0.6 units on each side for discrete variables.
+
+=item * $na_value
+
+Missing values will be replaced with this value.
+
+=item * $trans
+
+Either the name of a transformation object, or the object itself.
+See L<Chart::GGPlot::Trans::Functions> for built-in transformations.
+Default is C<"identity">.
+
+=item * $guide
+
+A function used to create a guide or its name.
+
+=item * $position
+
+The position of the axis. C<"left"> or C<"right"> for vertical scales,
+C<"top"> or C<"bottom"> for horizontal scales.
+
+=item * super 	
+
+The class to use for the constructed scale.
+Default is L<Chart::GGPlot::Scale::Continuous>.
+
+=back
+
+=cut
+
 fun continuous_scale (:$aesthetics, :$scale_name,
                       :$palette, :$name=undef,
                       :$breaks=undef, :$minor_breaks=undef,
@@ -142,7 +258,7 @@ fun continuous_scale (:$aesthetics, :$scale_name,
                       :$na_value='nan',
                       :$trans="identity", :$guide="legend",
                       PositionEnum :$position="left",
-                      :$super='Chart::GGPlot::Scale::Continuous',
+                      Str :$super='Chart::GGPlot::Scale::Continuous',
                       %rest
   ) {
     ($breaks, $labels) = _check_breaks_labels( $breaks, $labels );
@@ -184,6 +300,130 @@ fun continuous_scale (:$aesthetics, :$scale_name,
     );
 }
 
+=func discrete_scale
+
+    discrete_scale(:$aesthetics, :$scale_name, :$palette, :$name=undef,
+        :$breaks=undef, :$labels=undef, :$limits=PDL::SV->new([]),
+        :$expand=undef, :$na_translate=true, :$na_value=undef,
+        :$drop=true, :$guide="legend", PositionEnum :$position = "left",
+        Str :$super = 'Chart::GGPlot::Scale::Discrete',
+        %rest)
+
+Discrete scale constructor.
+It's internally used by the discrete scales in this module.
+
+Arguments:
+
+=over 4
+
+=item * $aesthetics
+
+The name of the aesthetics that this scale works with.
+
+=item * $scale_name
+
+The name of the scale.
+
+=item * $palette
+
+A palette function that when called with a single argument (the number of
+levels in the scale) returns the values that they should take.
+
+=item * $name
+
+The name of the scale. Used as the axis or legend title.
+If C<undef>, the default, the name of the scale is taken from the first
+mapping used for that aesthetic.
+
+=item * $breaks
+
+Major breaks.
+
+One of:
+
+=begin :list :over<8>
+
+* An empty piddle for no breaks
+* C<undef> for default breaks computed by the transformation object
+* A L<PDL::SV> piddle of positions
+* A function that given the limits and returns a piddle of breaks
+
+=end :list
+
+=item * $minor_breaks
+
+One of:
+
+=begin :list :over<8>
+
+* An empty piddle for no minor breaks
+* C<undef> for the default breaks (one minor break betwen each major break)
+* A L<PDL::SV> piddle of positions
+* A function that given the limits and return a piddle of minor breaks
+
+=end :list
+
+=item * $labels
+
+One of:
+
+=begin :list :over<8>
+
+* An empty piddle for no labels
+* C<undef> for the default labels computed by the transformation object
+* A L<PDL::SV> piddle giving labels (must be same length as C<$breaks>)
+* A function that given the breaks and returns labels
+
+=end :list
+
+=item * $limits
+
+A L<PDL::SV> piddle of length two providing limits of the scale. Use C<BAD>
+to refer to the existing minimum or maximum.
+
+=item * $expand
+
+Vector of range expansion constants used to add some padding around the
+data, to ensure that they are placed some distance away from the axes.
+Use the convenience function C<expand_scale()> to generate the values for
+the expand argument.
+The defaults are to expand the scale by 5% on each side for continuous
+variables, and by 0.6 units on each side for discrete variables.
+
+=item * $na_translate
+
+Unlike continuous scales, discrete scales can easily show missing values,
+and do so by default. If you want to remove missing values from a discrete
+scale, specify C<na_translate =C<gt> 0>.
+
+=item * $na_value
+
+Missing values will be replaced with this value.
+
+=item * $drop
+
+Should unused factor levels be omitted from the scale? The default, true,
+uses the levels that appear in the data; false uses all the levels in the
+factor.
+
+=item * $guide
+
+A function used to create a guide or its name.
+
+=item * $position
+
+The position of the axis. C<"left"> or C<"right"> for vertical scales,
+C<"top"> or C<"bottom"> for horizontal scales.
+
+=item * super 	
+
+The class to use for the constructed scale.
+Default is L<Chart::GGPlot::Scale::Discrete>.
+
+=back
+
+=cut
+
 fun discrete_scale (:$aesthetics, :$scale_name,
                     :$palette, :$name=undef,
                     :$breaks=undef, :$labels=undef,
@@ -191,7 +431,7 @@ fun discrete_scale (:$aesthetics, :$scale_name,
                     :$expand=undef, :$na_translate=true, :$na_value=undef,
                     :$drop=true, :$guide="legend",
                     PositionEnum :$position = "left",
-                    :$super = 'Chart::GGPlot::Scale::Discrete',
+                    Str :$super = 'Chart::GGPlot::Scale::Discrete',
                     %rest
   ) {
     ($breaks, $labels) = _check_breaks_labels( $breaks, $labels );
@@ -202,6 +442,8 @@ fun discrete_scale (:$aesthetics, :$scale_name,
     {
         $guide = "none";
     }
+
+    load $super;
     return $super->new(
         pairgrep { defined $b }
         (
@@ -235,6 +477,28 @@ fun scale_flip_position ($scale) {
     $scale->position( $switch->{ $scale->position } );
 }
 
+=func scale_color_hue
+
+    scale_color_hue(:$h = pdl( [ 0, 360 ] ) + 15, :$c = 100, :$l = 65,
+        :$h_start = 0, :$direction = 1, :$na_value = 'grey50',
+        %rest)
+
+=func scale_color_discrete
+
+This is same as the C<scale_color_hue()> function.
+
+=func scale_fill_hue
+
+    scale_fill_hue(:$h = pdl( [ 0, 360 ] ) + 15, :$c = 100, :$l = 65,
+        :$h_start = 0, :$direction = 1, :$na_value = 'grey50',
+        %rest)
+
+=func scale_fill_discrete
+
+This is same as the C<scale_fill_hue()> function.
+
+=cut
+
 fun _scale_hue ($aes) {
     return fun(:$h = pdl( [ 0, 360 ] ) + 15,
                :$c = 100, :$l = 65,
@@ -264,6 +528,20 @@ fun _scale_hue ($aes) {
 *scale_fill_hue       = _scale_hue('fill');
 *scale_fill_discrete  = \&scale_fill_hue;
 
+=func scale_color_brewer
+
+    scale_color_brewer(ColorBrewerTypeEnum :$type = "seq",
+        :$palette = 0, :$direction = 1,
+        %rest)
+
+=func scale_fill_brewer
+
+    scale_fill_brewer(ColorBrewerTypeEnum :$type = "seq",
+        :$palette = 0, :$direction = 1,
+        %rest)
+
+=cut
+
 fun _scale_brewer ($aes) {
     return fun(ColorBrewerTypeEnum :$type = "seq",
                :$palette = 0,
@@ -281,6 +559,22 @@ fun _scale_brewer ($aes) {
 
 *scale_color_brewer = _scale_brewer('color');
 *scale_fill_brewer  = _scale_brewer('fill');
+
+=func scale_color_distiller
+
+    scale_color_distiller(ColorBrewerTypeEnum :$type = "seq",
+        :$palette = 1, :$direction = -1,
+        :$values = [], :$na_value = "grey50", :$guide = "colorbar",
+        %rest)
+
+=func scale_fill_distiller
+
+    scale_fill_distiller(ColorBrewerTypeEnum :$type = "seq",
+        :$palette = 1, :$direction = -1,
+        :$values = [], :$na_value = "grey50", :$guide = "colorbar",
+        %rest)
+
+=cut
 
 fun _scale_distiller ($aes) {
     return fun(ColorBrewerTypeEnum :$type = "seq",
@@ -310,6 +604,20 @@ fun _scale_distiller ($aes) {
 *scale_color_distiller = _scale_distiller('color');
 *scale_fill_distiller  = _scale_distiller('fill');
 
+=func scale_color_gradient
+
+    scale_color_gradient(:$low = "#132B43", :$high = "#56B1F7",
+        :$na_value = "grey50", :$guide = "colorbar",
+        %rest)
+
+=func scale_fill_gradient
+
+    scale_fill_gradient(:$low = "#132B43", :$high = "#56B1F7",
+        :$na_value = "grey50", :$guide = "colorbar",
+        %rest)
+
+=cut
+
 fun _scale_gradient ($aes) {
     return fun(:$low = "#132B43", :$high = "#56B1F7",
                :$na_value = "grey50",
@@ -330,6 +638,101 @@ fun _scale_gradient ($aes) {
 *scale_color_gradient = _scale_gradient('color');
 *scale_fill_gradient  = _scale_gradient('fill');
 
+=func scale_color_gradient2
+
+    scale_color_gradient2(:$low = muted("red"), :$mid = "white",
+        :$high = muted("blue"), :$midpoint = 0, :$na_value = "grey50",
+        :$guide = "colorbar",
+        %rest)
+
+=func scale_fill_gradient2
+
+    scale_fill_gradient2(:$low = muted("red"), :$mid = "white",
+        :$high = muted("blue"), :$midpoint = 0, :$na_value = "grey50",
+        :$guide = "colorbar",
+        %rest)
+
+=cut
+
+fun _scale_gradient2 ($aes) {
+    return fun(:$low = muted("red"), :$mid = "white",
+               :$high = muted("blue"),
+               :$midpoint = 0,
+               :$na_value = "grey50",
+               :$guide = "colorbar",
+               %rest
+      ) {
+        return continuous_scale(
+            aesthetics => $aes,
+            scale_name => "gradient2",
+            palette    => div_gradient_pal( $low, $mid, $high ),
+            na_value   => _na_value_color($na_value),
+            guide      => $guide,
+            rescaler   => _mid_rescaler($midpoint),
+            %rest
+        );
+    };
+}
+
+*scale_color_gradient2 = _scale_gradient2('color');
+*scale_fill_gradient2  = _scale_gradient2('fill');
+
+=func scale_color_gradientn
+
+    scale_color_gradientn(:$colors, :$values = [],
+        :$na_value = "grey50", :$guide = "colorbar",
+        %rest)
+
+=func scale_fill_gradientn
+
+    scale_fill_gradientn(:$colors, :$values = [],
+        :$na_value = "grey50", :$guide = "colorbar",
+        %rest)
+
+=cut
+
+fun _scale_gradientn ($aes) {
+    return fun(:$values = [], :$na_value = "grey50",
+               :$guide = "colorbar",
+               %rest
+      ) {
+        my $colors = ( delete $rest{colors} ) // ( delete $rest{colours} );
+        continuous_scale(
+            aesthetics => $aes,
+            scale_name => "gradientn",
+            palette    => gradient_n_pal( $colors, $values ),
+            na_value   => _na_value_color($na_value),
+            guide      => $guide,
+            %rest
+        );
+    };
+}
+
+*scale_color_gradientn = _scale_gradientn('color');
+*scale_fill_gradientn  = _scale_gradientn('fill');
+
+=func scale_color_viridis_d
+
+    scale_color_viridis_d(:$begin = 0, :$end = 1,
+        :$direction = 1, :$option = 'viridis',
+        %rest)
+
+=func scale_color_ordinal
+
+This is same as the C<scale_color_viridis_d()> function.
+
+=func scale_fill_viridis_d
+
+    scale_fill_viridis_d(:$begin = 0, :$end = 1,
+        :$direction = 1, :$option = 'viridis',
+        %rest)
+
+=func scale_fill_ordinal
+
+This is same as the C<scale_fill_viridis_d()> function.
+
+=cut
+
 fun _scale_viridis_d ($aes) {
     return fun (:$begin = 0, :$end = 1,
                 :$direction = 1, :$option = 'viridis',
@@ -348,6 +751,22 @@ fun _scale_viridis_d ($aes) {
 *scale_color_ordinal   = \&scale_color_viridis_d;
 *scale_fill_viridis_d  = _scale_viridis_d('fill');
 *scale_fill_ordinal    = \&scale_fill_viridis_d;
+
+=func scale_color_viridis_c
+
+    scale_color_viridis_c(:$begin = 0, :$end = 1,
+        :$direction = 1, :$option = 'viridis', :$values = null(),
+        :$na_value = 'grey50', :$guide = 'colorbar',
+        %rest)
+
+=func scale_fill_viridis_c
+
+    scale_fill_viridis_c(:$begin = 0, :$end = 1,
+        :$direction = 1, :$option = 'viridis', :$values = null(),
+        :$na_value = 'grey50', :$guide = 'colorbar',
+        %rest)
+
+=cut
 
 fun _scale_viridis_c ($aes) {
     return fun (:$begin = 0, :$end = 1,
@@ -374,62 +793,32 @@ fun _scale_viridis_c ($aes) {
 *scale_color_viridis_c = _scale_viridis_c('color');
 *scale_fill_viridis_c  = _scale_viridis_c('fill');
 
-fun _mid_rescaler ($mid) {
-    return fun( $v, $to = [ 0, 1 ], $from = range( $v, true ) ) {
-        rescale_mid( $v, $to, $from, $mid );
-    };
-}
+=func scale_color_continuous
 
-fun _scale_gradient2 ($aes) {
-    return fun(:$low = muted("red"), :$mid = "white",
-               :$high = muted("blue"),
-               :$midpoint = 0,
-               :$na_value = "grey50",
-               :$guide = "colorbar",
-               %rest
-      ) {
-        return continuous_scale(
-            aesthetics => $aes,
-            scale_name => "gradient2",
-            palette    => div_gradient_pal( $low, $mid, $high ),
-            na_value   => _na_value_color($na_value),
-            guide      => $guide,
-            rescaler   => _mid_rescaler($midpoint),
-            %rest
-        );
-    };
-}
+    scale_color_continuous(:$type="gradient, %rest")
 
-*scale_color_gradient2 = _scale_gradient2('color');
-*scale_fill_gradient2  = _scale_gradient2('fill');
+Depending on C<$type>, 
 
-fun _scale_gradientn ($aes) {
-    return fun(:$values = [], :$na_value = "grey50",
-               :$guide = "colorbar",
-               %rest
-      ) {
-        my $colors = ( delete $rest{colors} ) // ( delete $rest{colors} );
-        continuous_scale(
-            aesthetics => $aes,
-            scale_name => "gradientn",
-            palette    => gradient_n_pal( $colors, $values ),
-            na_value   => _na_value_color($na_value),
-            guide      => $guide,
-            %rest
-        );
-    };
-}
+=for :list
+* C<"gradient"> calls C<scale_color_gradient(%rest)>
+* C<"viridis"> calls C<scale_color_viridis_c(%rest)>
 
-*scale_color_gradientn = _scale_gradientn('color');
-*scale_fill_gradientn  = _scale_gradientn('fill');
+=func scale_fill_continuous
+
+    scale_fill_continuous(:$type="gradient, %rest")
+
+Depending on C<$type>, 
+
+=for :list
+* C<"gradient"> calls C<scale_fill_gradient(%rest)>
+* C<"viridis"> calls C<scale_fill_viridis_c(%rest)>
+
+=cut
 
 fun scale_color_continuous ( : $type = "gradient", %rest ) {
-
-    # TODO: viridis is not available until we port R's viridis package
     state $switch = {
         gradient => \&scale_color_gradient,
-
-        #viridis  => \&scale_color_viridis_c,
+        viridis  => \&scale_color_viridis_c,
     };
     if ( my $func = $switch->{$type} ) {
         return $func->(%rest);
@@ -438,12 +827,9 @@ fun scale_color_continuous ( : $type = "gradient", %rest ) {
 }
 
 fun scale_fill_continuous ( : $type = "gradient", %rest ) {
-
-    # TODO: viridis is not available until we port R's viridis package
     state $switch = {
         gradient => \&scale_fill_gradient,
-
-        #viridis  => \&scale_fill_viridis_c,
+        viridis  => \&scale_fill_viridis_c,
     };
     if ( my $func = $switch->{$type} ) {
         return $func->(%rest);
@@ -451,11 +837,73 @@ fun scale_fill_continuous ( : $type = "gradient", %rest ) {
     die("Unknown scale type");
 }
 
+=func scale_alpha_continuous
+
+=func scale_alpha
+
+This is same as the C<scale_alpha_continuous()> method.
+
+=cut
+
+fun scale_alpha_continuous (:$range=[0, 1], %rest) {
+    return continuous_scale(
+        pairgrep { defined $b } (
+            aesthetics => "alpha",
+            scale_name => "alpha_c",
+            palette    => rescale_pal($range),
+            %rest
+        )
+    );
+}
+*scale_alpha = \&scale_alpha_continuous;
+
+=func scale_x_continuous
+
+    scale_x_continuous(:$name = undef, :$breaks = undef,
+        :$minor_breaks = undef, :$labels = undef, :$limits = [],
+        :$expand = undef, :$oob = \&censor, :$na_value = 'nan',
+        :$trans = 'identity', :$position = "bottom", :$sec_axis = undef,
+        %rest)
+
+=func scale_y_continuous
+
+    scale_y_continuous(:$name = undef, :$breaks = undef,
+        :$minor_breaks = undef, :$labels = undef, :$limits = [],
+        :$expand = undef, :$oob = \&censor, :$na_value = 'nan',
+        :$trans = 'identity', :$position = "left", :$sec_axis = undef,
+        %rest)
+
+=func scale_x_log10
+
+    scale_x_log10(...)
+
+=func scale_y_log10
+
+    scale_y_log10(...)
+
+=func scale_x_reverse
+
+    scale_x_reverse(...)
+
+=func scale_y_reverse
+
+    scale_y_reverse(...)
+
+=func scale_x_sqrt
+
+    scale_x_sqrt(...)
+
+=func scale_y_sqrt
+
+    scale_y_sqrt(...)
+
+=cut
+
 fun _scale_position_continuous ($aes) {
     return fun(:$name = undef, :$breaks = undef, :$minor_breaks = undef,
                :$labels = undef, :$limits = [],
                :$expand = undef, :$oob = \&censor, :$na_value = 'nan',
-               :$trans = 'identity', :$position = "bottom",
+               :$trans = 'identity', :$position = _default_position($aes),
                :$sec_axis = undef,
                %rest,
       )
@@ -488,7 +936,7 @@ fun _scale_position_continuous ($aes) {
                 guide        => "none",
                 position     => $position,
                 ( $sec_axis ? ( secondary_axis => $sec_axis ) : () ),
-                super => 'Chart::GGPlot::Scale::ContinuousPosition',
+                super        => 'Chart::GGPlot::Scale::ContinuousPosition',
                 %rest
             )
         );
@@ -503,6 +951,29 @@ fun _scale_position_continuous ($aes) {
 *scale_y_continuous = _scale_position_continuous(
     [qw(y ymin ymax yend yintercept ymin_final ymax_final lower middle upper)]
 );
+
+for my $trans (qw(log10 reverse sqrt)) {
+    for my $aes (qw(x y)) {
+        my $scale_func      = "scale_${aes}_${trans}";
+        my $continuous_func = "scale_${aes}_continuous";
+        no strict 'refs';
+        *{$scale_func} = sub { $continuous_func->( @_, trans => $trans ) }
+    }
+}
+
+=func scale_size_continuous
+
+    scale_size_continuous(:$range=[1,6], %rest)
+
+=func scale_size
+
+This is same as the C<scale_size_continuous()> function.
+
+=func scale_size_discrete
+
+    scale_size_discrete(:$range=[1,6], %rest)
+
+=cut 
 
 fun scale_size_continuous (:$name=undef, :$breaks=undef, :$labels=undef,
                           :$limits=[], :$range=[1, 6],
@@ -522,29 +993,19 @@ fun scale_size_continuous (:$name=undef, :$breaks=undef, :$labels=undef,
     );
 }
 
-fun scale_alpha_continuous (:$range=[0, 1], %rest) {
-    return continuous_scale(
-        pairgrep { defined $b } (
-            aesthetics => "alpha",
-            scale_name => "alpha_c",
-            palette    => rescale_pal($range),
-            %rest
-        )
-    );
-}
-*scale_alpha = \&scale_alpha_continuous;
+=func scale_x_discrete
 
-for my $trans (qw(log10 reverse sqrt)) {
-    for my $aes (qw(x y)) {
-        my $scale_func      = "scale_${aes}_${trans}";
-        my $continuous_func = "scale_${aes}_continuous";
-        no strict 'refs';
-        *{$scale_func} = sub { $continuous_func->( @_, trans => $trans ) }
-    }
-}
+    scale_x_discrete(:$expand = undef, :$position = "bottom", %rest )
+
+=func scale_y_discrete
+
+    scale_y_discrete(:$expand = undef, :$position = "left", %rest )
+
+=cut
 
 fun _scale_discrete ($aes) {
-    return fun( : $expand = undef, : $position = "bottom", %rest ) {
+    return fun( :$expand = undef, :$position = _default_position($aes),
+                %rest ) {
         return discrete_scale(
             pairgrep { defined $b } (
                 aesthetics => $aes,
@@ -563,6 +1024,41 @@ fun _scale_discrete ($aes) {
 
 *scale_x_discrete = _scale_discrete( [qw(x xmin xmax xend)] );
 *scale_y_discrete = _scale_discrete( [qw(y ymin ymax yend)] );
+
+
+=func scale_color_identity
+    
+    scale_color_identity(:$guide="none", %rest)
+
+=func scale_fill_identity
+
+    scale_fill_identity(:$guide="none", %rest)
+
+=func scale_shape_identity
+    
+    scale_shape_identity(:$guide="none", %rest)
+
+=func scale_linetype_identity
+
+    scale_linetype_identity(:$guide="none", %rest)
+
+=func scale_alpha_identity
+
+    scale_alpha_identity(:$guide="none", %rest)
+
+=func scale_size_identity
+
+    scale_size_identity(:$guide="none", %rest)
+
+=func scale_continuous_identity
+
+    scale_continuous_identity(:$aesthetics, :$guide="none", %rest)
+    
+=func scale_discrete_identity
+
+    scale_discrete_identity(:$aesthetics, :$guide="none", %rest)
+
+=cut
 
 fun scale_continuous_identity ( :$aesthetics, :$guide='none', %rest ) {
     return continuous_scale(
@@ -605,6 +1101,44 @@ for my $aes (qw(alpha size)) {
         scale_continuous_identity( %rest, aesthetics => $aes )
     };
 }
+
+#=func scale_x_date
+#
+#    scale_x_date(:$name = undef, :$breaks = undef,
+#        :$date_breaks = undef, :$labels = undef, :$date_labels = undef, 
+#        :$minor_breaks = undef, :$date_minor_breaks = undef,
+#        :$limits = undef, :$expand = undef,
+#        PositionEnum :$position = "bottom",
+#        :$sec_axis = undef)
+#
+#=func scale_y_date
+#
+#    scale_y_date(:$name = undef, :$breaks = undef,
+#        :$date_breaks = undef, :$labels = undef, :$date_labels = undef, 
+#        :$minor_breaks = undef, :$date_minor_breaks = undef,
+#        :$limits = undef, :$expand = undef,
+#        PositionEnum :$position = "left",
+#        :$sec_axis = undef)
+
+=func scale_x_datetime
+
+    scale_y_date(:$name = undef, :$breaks = undef,
+        :$date_breaks = undef, :$labels = undef, :$date_labels = undef, 
+        :$minor_breaks = undef, :$date_minor_breaks = undef,
+        :$limits = undef, :$expand = undef,
+        PositionEnum :$position = "bottom",
+        :$sec_axis = undef)
+
+=func scale_y_datetime
+
+    scale_y_date(:$name = undef, :$breaks = undef,
+        :$date_breaks = undef, :$labels = undef, :$date_labels = undef, 
+        :$minor_breaks = undef, :$date_minor_breaks = undef,
+        :$limits = undef, :$expand = undef,
+        PositionEnum :$position = "left",
+        :$sec_axis = undef)
+
+=cut
 
 fun datetime_scale (:$aesthetics, :$trans, :$palette,
                     :$breaks = pretty_breaks(), :$minor_breaks = undef,
@@ -670,7 +1204,7 @@ fun _scale_datetime ($aes) {
                :$minor_breaks = undef, :$date_minor_breaks = undef,
                :$timezone = undef,
                :$limits = undef, :$expand = undef,
-               PositionEnum :$position = "bottom",
+               PositionEnum :$position = _default_position($aes),
                :$sec_axis = undef) {
         my $sc = datetime_scale(
             aesthetics        => $aes,
@@ -696,8 +1230,24 @@ fun _scale_datetime ($aes) {
 *scale_x_datetime = _scale_datetime([qw(x xmin xmax xend)]);
 *scale_y_datetime = _scale_datetime([qw(y ymin ymax yend)]);
 
+fun _mid_rescaler ($mid) {
+    return fun( $v, $to = [ 0, 1 ], $from = range( $v, true ) ) {
+        rescale_mid( $v, $to, $from, $mid );
+    };
+}
+
 # TODO: remove this
 sub _na_value_color { $_[0] }
+
+sub _default_position {
+    my ($aes) = @_;
+    $aes = $aes->[0] if ref($aes);
+    return ($aes =~ /^x/ ? 'bottom' : 'left');
+}
+
+fun _register_scale (Str $name, CodeRef $func) {
+    $scale_funcs{$name} = $func;
+}
 
 INIT {
     # register scale functions within this pacakge
@@ -706,7 +1256,7 @@ INIT {
     my $stash   = Package::Stash->new(__PACKAGE__);
     my $symbols = $stash->get_all_symbols('CODE');
     for my $key ( grep { /^scale_/ } keys %$symbols ) {
-        register_scale( $key, $symbols->{$key} );
+        _register_scale( $key, $symbols->{$key} );
     }
 }
 

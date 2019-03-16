@@ -11,19 +11,27 @@ use Chart::GGPlot::Theme::Element::Functions qw(:all);
 
 use parent qw(Exporter::Tiny);
 
-our @EXPORT_OK = qw(
-  theme_grey theme_bw
+my @theme_funcs = qw(
+  theme_grey theme_gray theme_bw
   theme_linedraw theme_light theme_dark
   theme_minimal theme_classic theme_void
 );
+our @EXPORT_OK   = @theme_funcs;
 our %EXPORT_TAGS = (
     all    => \@EXPORT_OK,
-    ggplot => \@EXPORT_OK,
+    ggplot => \@theme_funcs,
 );
 
 =func theme_grey
 
+    theme_grey(:$base_size=11, :$base_family="",
+        :$base_line_size=$base_size / 22, :$base_rect_size=$base_size / 22)
+
 The signature ggplot2 theme with a grey background and white gridlines.
+
+=func theme_gray
+
+This is same as the C<theme_grey()> method.
 
 =cut
 
@@ -189,6 +197,9 @@ fun theme_grey (:$base_size=11, :$base_family="",
 
 =func theme_bw
 
+    theme_bw(:$base_size=11, :$base_family="",
+        :$base_line_size=$base_size / 22, :$base_rect_size=$base_size / 22)
+
 The classic dark-on-light ggplot2 theme.
 
 =cut
@@ -220,6 +231,9 @@ fun theme_bw (%rest) {
 }
 
 =func theme_linedraw
+
+    theme_linedraw(:$base_size=11, :$base_family="",
+        :$base_line_size=$base_size / 22, :$base_rect_size=$base_size / 22)
 
 A theme with only black lines of various widths on white backgrounds,
 reminiscent of a line drawings.
@@ -266,6 +280,9 @@ fun theme_linedraw ( :$base_size = 11, %rest ) {
 }
 
 =func theme_light
+
+    theme_light(:$base_size=11, :$base_family="",
+        :$base_line_size=$base_size / 22, :$base_rect_size=$base_size / 22)
 
 A theme similar to C<theme_linedraw> but with light grey lines and axes,
 to direct more attention towards the data.
@@ -315,6 +332,9 @@ fun theme_light (:$base_size = 11, %rest) {
 
 =func theme_dark
 
+    theme_dark(:$base_size=11, :$base_family="",
+        :$base_line_size=$base_size / 22, :$base_rect_size=$base_size / 22)
+
 The dark cousin of C<theme_light>, with similar line sizes but a dark
 background. Useful to make thin colored lines pop out.
 
@@ -362,6 +382,9 @@ fun theme_dark (:$base_size = 11, %rest) {
 
 =func theme_minimal
 
+    theme_minimal(:$base_size=11, :$base_family="",
+        :$base_line_size=$base_size / 22, :$base_rect_size=$base_size / 22)
+
 A minimalistic theme with no background annotations.
 
 =cut
@@ -392,6 +415,9 @@ fun theme_minimal (:$base_size=11, :$base_family="",
 }
 
 =func theme_classic
+
+    theme_classic(:$base_size=11, :$base_family="",
+        :$base_line_size=$base_size / 22, :$base_rect_size=$base_size / 22)
 
 A classic-looking theme, with x and y axis lines and no gridlines.
 
@@ -427,6 +453,9 @@ fun theme_classic (%rest) {
 }
 
 =func theme_void
+
+    theme_void(:$base_size=11, :$base_family="",
+        :$base_line_size=$base_size / 22, :$base_rect_size=$base_size / 22)
 
 A completely empyt theme.
 
@@ -506,8 +535,9 @@ __END__
 
 =head1 DESCRIPTION
 
-Some predefined themes.
+Some predefined themes for the Chart::GGPlot library.
 
 =head1 SEE ALSO
 
 L<Chart::GGPlot::Theme>
+

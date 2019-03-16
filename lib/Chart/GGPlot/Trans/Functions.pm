@@ -17,7 +17,6 @@ use parent qw(Exporter::Tiny);
 
 our @EXPORT_OK = qw(
   is_trans as_trans trans_range
-  register_trans
   asn_trans      atanh_trans
   identity_trans log_trans
   log10_trans    log2_trans
@@ -29,17 +28,13 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 sub is_trans { $_[0]->$_isa('Chart::GGPlot::Trans'); }
 
-
-
-=func register_trans($trans)
-
 =func as_trans($x)
 
 =cut
 
 my %trans_registry = ();
 
-fun register_trans($trans) {
+fun _register_trans($trans) {
     $trans_registry{ $trans->name } = $trans;
 }
 
@@ -204,7 +199,12 @@ for my $trans (
     time_trans(),
   )
 {
-    register_trans($trans);
+    _register_trans($trans);
 }
 
 1;
+
+=head1 SEE ALSO
+
+L<Chart::GGPlot::Trans>
+
