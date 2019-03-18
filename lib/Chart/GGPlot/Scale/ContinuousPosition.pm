@@ -32,8 +32,8 @@ method map_to_limits ( $p, $limits = $self->get_limits ) {
     return $scaled;
 }
 
-method break_info ($range = null()) {
-    my $breaks = $self->SUPER::break_info($range);
+around break_info ($range = null()) {
+    my $breaks = $self->$orig($range);
     if ( defined $self->secondary_axis
         and not $self->secondary_axis->empty() )
     {

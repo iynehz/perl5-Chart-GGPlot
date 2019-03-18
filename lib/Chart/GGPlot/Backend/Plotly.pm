@@ -237,7 +237,21 @@ method _to_plotly ($plot_built) {
         my $axis_title = $sc->name // $labels->at($xy) // '';
 
         my $range = $panel_params->{"$xy.range"}->unpdl;
-        my $labels = $panel_params->{"$xy.labels"}->as_pdlsv->unpdl;
+        my $labels = $panel_params->{"$xy.labels"}->as_pdlsv;
+
+        # TODO: fix this in Data::Frame's PDL patch
+        unless ( $labels->DOES('PDL::SV') and $labels->type >= PDL::float ) {
+            $labels = PDL::SV->new(
+                [
+                    map {
+                        my $s = sprintf( $PDL::doubleformat, $_ );
+                        $s =~ s/^\s*//gr;
+                    } @{ $labels->unpdl }
+                ]
+            );
+        }
+        $labels = $labels->unpdl;
+
         my $major_source = $panel_params->{"$xy.major_source"}->unpdl;
         my %ticks = pairwise { $a => $b } @$major_source, @$labels;
 

@@ -17,6 +17,7 @@ use Machine::Epsilon qw(machine_epsilon);
 use Math::Gradient qw(multi_array_gradient);
 use Math::Round qw(nearest round);
 use Math::Interpolate;
+use PDL::Primitive qw(which);
 use Number::Format 1.75;
 use Scalar::Util qw(looks_like_number);
 use Time::Moment;
@@ -42,7 +43,7 @@ our @EXPORT_OK = qw(
   seq_gradient_pal div_gradient_pal
   area_pal
   identity_pal
-  extended_breaks regular_minor_breaks
+  extended_breaks regular_minor_breaks log_breaks
   pretty pretty_breaks
   number comma percent dollar
 );
@@ -413,6 +414,90 @@ fun regular_minor_breaks ( $reverse = false ) {
           map { @{ $seq_between->( $b[$_], $b[ $_ + 1 ] ) } } ( 0 .. $#b - 1 );
         return discard( PDL->new( [ @breaks, $b[-1] ] ), $limits );
     }
+}
+
+=func log_breaks
+    
+    log_breaks($base=10, $n=5)
+
+=cut
+
+
+# Intermediate log-scale breaks
+# Integer powers of base do not always return sufficient breaks. This function
+# adds intermediate breaks which are integer multiples of integer powers of
+# base.
+
+# $rng is $base-base log range
+fun log_sub_breaks ($base, $n, $rng) {
+    my $min = floor( $rng->at(0) );
+    my $max = ceil( $rng->at(1) );
+    if ( $base <= 2 ) {
+        return $base**pdl( [ $min .. $max ] );
+    }
+    my @steps = (1);
+
+    # delta() calculates the smallest distance in the log scale between the
+    # currectly selected breaks and a new candidate 'x'
+    my $delta = sub {
+        my ($x) = @_;
+        return ( pdl( [ $x, @steps, $base ] )->qsort->log / log($base) )
+          ->diff->min;
+    };
+    my $candidate =
+      pdl( [ 2 .. ( floor($base) == $base ? $base - 1 : $base ) ] );
+    while ( $candidate->length ) {
+        my $best =
+          pdl( [ map { $delta->($_) } $candidate->flatten ] )->maximum_ind;
+        push @steps, $candidate->at($best);
+        $candidate = $candidate->slice(
+            pdl(
+                [ ( 0 .. $best - 1 ), ( $best + 1 .. $candidate->length - 1 ) ]
+            )
+        );
+
+        my $breaks = pdl( map { ( $base**pdl( [ $min .. $max ] ) * $_ )->flatten }
+              @steps );
+        my $relevant_breaks =
+          ( ( $base**$rng->at(0) <= $breaks ) &
+              ( $breaks <= $base**$rng->at(1) ) );
+        if ( $relevant_breaks->sum >= $n - 2 ) {
+            my $breaks = $breaks->qsort;
+            my $lower_end =
+              List::AllUtils::max(
+                which( $base**$rng->at(0) <= $breaks )->min - 1, 0 );
+            my $upper_end =
+              List::AllUtils::min(
+                which( $breaks <= $base**$rng->at(1) )->max + 1,
+                $breaks->length - 1 );
+            return $breaks->slice( pdl( [ $lower_end .. $upper_end ] ) );
+        }
+    }
+
+    return extended_breaks($n)->( $base**$rng );
+}
+
+fun log_breaks ($base=10, $n=5) {
+    return fun($x) {
+        my $rng = range_( $x, true )->log / pdl($base)->log;
+        my $min = floor( $rng->at(0) );
+        my $max = ceil( $rng->at(1) );
+        if ( $max == $min ) { 
+            return $base**$min;
+        }   
+        my $by     = floor( ( $max - $min ) / $n + 1 );
+        do {
+            my $breaks = $base**seq_by( $min, $max, $by );
+            my $relevant_breaks =
+              ( ( $base**$rng->at(0) <= $breaks ) & 
+                  ( $breaks <= $base**$rng->at(1) ) );
+            if ( $relevant_breaks->sum >= $n - 2 ) { 
+                return $breaks;
+            }   
+            $by -= 1;
+        } while ( $by > 0 );
+        return log_sub_breaks( $base, $n, $rng );
+    };  
 }
 
 =func pretty

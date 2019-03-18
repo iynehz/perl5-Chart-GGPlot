@@ -7,6 +7,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 # VERSION
 
 use PDL::Math;
+use PDL::Primitive qw(which);
 use Role::Tiny ();
 
 use Chart::GGPlot::Trans;
@@ -113,7 +114,8 @@ fun log_trans( $base = undef ) {
     $base //= exp(1);
     _trans_new( $name,
         fun($p) { $p->log / log($base) },
-        fun($p) { pdl($base) ** $p }
+        fun($p) { pdl($base) ** $p },
+        breaks => log_breaks($base),
     );
 }
 

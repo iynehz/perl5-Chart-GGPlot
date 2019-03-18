@@ -10,6 +10,7 @@ use Data::Munge qw(elem);
 use Data::Frame::Types qw(DataFrame);
 use Data::Frame::Util qw(guess_and_convert_to_pdl);
 use Module::Load;
+use Types::PDL qw(Piddle1D);
 use Types::Standard qw(Maybe Str);
 
 use Chart::GGPlot::Plot;
@@ -87,24 +88,23 @@ sub ggplot {
 
 =head2 qplot
 
-    qplot(:$x, :$y,
-          Str :$geom='auto',
-          :$xlim=undef, :$ylim=undef,
-          :$title=undef, :$xlab='x', :$ylab='y',
-          %rest)
+    qplot(Piddle1D :$x, Piddle1D :$y, Str :$geom='auto',
+        :$xlim=undef, :$ylim=undef,
+        :$log='', :$title=undef, :$xlab='x', :$ylab='y',
+        %rest)
 
 =cut
 
 fun qplot (
-    :$x, :$y, 
+    Piddle1D :$x, Piddle1D :$y, 
     :$facets = undef,
     Str :$geom = "auto",
     :$xlim = undef, :$ylim = undef,
     :$title = undef, :$xlab = 'x', :$ylab = 'y',
-#    : $log     = "",
 #    : $asp     = undef,
     %rest
   ) {
+    my $log_mode = $rest{log} // '';
 
     my $all_aesthetics = Chart::GGPlot::Aes->all_aesthetics;
 
@@ -145,30 +145,17 @@ fun qplot (
         die "'facets' is not yet supported.";
     }
 
+    my $geom_func = $geom eq 'auto' ? 'geom_point' : "geom_${geom}";
+    $p->$geom_func();
+
+    if ( $log_mode =~ /x/ ) { $p->scale_x_log10(); }
+    if ( $log_mode =~ /y/ ) { $p->scale_y_log10(); }
+
     $p->ggtitle($title) if ( defined $title );
     $p->xlab($xlab)     if ( defined $xlab );
     $p->ylab($ylab)     if ( defined $ylab );
-
-    my $geom_func;
-    if ( $geom eq 'auto' ) {
-        $geom_func = 'geom_point';
-    }
-    else {
-        $geom_func = "geom_${geom}";
-    }
-
-    $p->$geom_func();
-
-    #    my $logv = fun($var) { index( $log, $var ) >= 0 };
-    #
-    #    if ( $logv->('x') ) { $p = $p + scale_x_log10(); }
-    #    if ( $logv->('y') ) { $p = $p + scale_y_log10(); }
-    #
-    #    if ( defined $asp ) { $p = $p + theme( aspect_ratio = $asp ); }
-    #    if ( defined $xlab ) { $p = $p + xlim($xlab); }
-    #    if ( defined $ylab ) { $p = $p + ylim($ylab); }
-    #    if ( defined $xlim ) { $p = $p + xlim($xlim); }
-    #    if ( defined $ylim ) { $p = $p + ylim($ylim); }
+    $p->xlim($xlim)     if ( defined $xlim );
+    $p->ylim($ylim)     if ( defined $ylim );
 
     return $p;
 }

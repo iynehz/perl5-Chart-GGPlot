@@ -211,6 +211,19 @@ subtest 'pretty' => sub {
     );
 };
 
+subtest log_breaks => sub {
+    pdl_is(
+        Chart::GGPlot::Util::Scales::log_sub_breaks( 10, 5, pdl( 1, 3 ) ),
+        pdl( 10, 30, 100, 300, 1000, 3000 ),
+        'log_sub_breaks()'
+    );
+    pdl_is(
+        log_breaks()->( pdl( 1, 1e6 ) ),
+        pdl( 1, 1e2, 1e4, 1e6 ),
+        'log_breaks()'
+    );
+};
+
 subtest pretty_dt => sub {
     pdl_is(
         Chart::GGPlot::Util::Scales::seq_dt(
