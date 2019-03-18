@@ -7,14 +7,11 @@ use Getopt::Long;
 use PDL::Primitive qw(grandom random);
 
 use Chart::GGPlot qw(:all);
-use Data::Frame::Examples qw(mtcars);
 
 srand(0);
 
 my $save_as;
 GetOptions( 'o=s' => \$save_as );
-
-my $mtcars = mtcars();
 
 my $p = qplot(
     x     => [ 0 .. 9 ],
