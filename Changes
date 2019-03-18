@@ -1,11 +1,5 @@
 Revision history for Chart::GGPlot
  
-0.0000_03   TBD
-  - TBD
-
-0.0000_02   2019-03-12
-  - Trying to fix a test.
-
-0.0000_01   2019-03-10
-  - First test release.
+0.0001      2019-03-18
+  - First release.
 

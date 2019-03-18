@@ -6,22 +6,41 @@ Chart::GGPlot - ggplot2 port in Perl
 
 # VERSION
 
-version 0.0000\_03
+version 0.0001
 
 # STATUS
 
-At this moment this library is still under active development (at my
-after-work time) and is highly incomplete. Basically only what's in the
-`examples` directory is able to work now. And its API can change
-without notice.
+At this moment this library is experimental and still under active
+development (at my after-work time). It's still quite incomplete compared
+to R's ggplot2 library, but the core features are working.
 
 Besides, it heavily depends on my [Alt::Data::Frame::ButMore](https://metacpan.org/pod/Alt::Data::Frame::ButMore) library,
 which is also experimental.
 
+# SYNOPSIS
+
+```perl
+use Chart::GGPlot qw(:all);
+use Data::Frame::Examples qw(mtcars);
+
+my $plot = ggplot(
+    data => mtcars(),
+    mapping => aes( x => 'wt', y => 'mpg' )
+)->geom_point();
+
+# show in browser
+$plot->show;
+
+# export to image file
+$plot->save('mtcars.png');
+
+# see "examples" dir of this library's distribution for more examples.
+```
+
 # DESCRIPTION
 
 This Chart-GGPlot library is an implementation of
-[ggplot](https://en.wikipedia.org/wiki/Ggplot) in Perl. It's designed to
+[ggplot2](https://en.wikipedia.org/wiki/Ggplot2) in Perl. It's designed to
 be possible to support multiple plotting backends. And it ships a default
 backend which uses [Chart::Plotly](https://metacpan.org/pod/Chart::Plotly).
 
@@ -39,6 +58,8 @@ Example exported image files:
     </p>
 </div>
 
+See the `examples` dir in the library's distribution for more examples.
+
 # FUNCTIONS
 
 ## ggplot
@@ -53,11 +74,10 @@ See [Chart::GGPlot::Plot](https://metacpan.org/pod/Chart::GGPlot::Plot) for deta
 ## qplot
 
 ```
-qplot(:$x, :$y,
-      Str :$geom='auto',
-      :$xlim=undef, :$ylim=undef,
-      :$title=undef, :$xlab='x', :$ylab='y',
-      %rest)
+qplot(Piddle1D :$x, Piddle1D :$y, Str :$geom='auto',
+    :$xlim=undef, :$ylim=undef,
+    :$log='', :$title=undef, :$xlab='x', :$ylab='y',
+    %rest)
 ```
 
 # ENVIRONMENT VARIABLES
@@ -68,7 +88,7 @@ A positive integer would enable debug messages.
 
 # SEE ALSO
 
-[ggplot](https://en.wikipedia.org/wiki/Ggplot)
+[ggplot2](https://en.wikipedia.org/wiki/Ggplot2)
 
 [Chart::GGPlot::Plot](https://metacpan.org/pod/Chart::GGPlot::Plot)
 
