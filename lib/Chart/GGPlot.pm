@@ -48,9 +48,9 @@ Example exported image files:
 <img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/theme_01_06.png" alt="theme 'minimal'" width="45%">
 </p>
 
-See the C<examples> dir in the library's distribution for more examples.
-
 =end html
+
+See the C<examples> dir in the library's distribution for more examples.
 
 =cut
 
