@@ -340,14 +340,15 @@ This class uses Perl's autoloading feature, to allow this class to get
 into its member methods exported functions of C<:ggplot> tag from several
 other namespaces:
 
-L<Chart::GGPlot::Geom::Functions>
-L<Chart::GGPlot::Scale::Functions>
-L<Chart::GGPlot::Labels::Functions>
-L<Chart::GGPlot::Limits>
-L<Chart::GGPlot::Coord::Functions>
-L<Chart::GGPlot::Facet::Functions>
-L<Chart::GGPlot::Guide::Functions>
-L<Chart::GGPlot::Theme::Defaults>
+=for :list
+* L<Chart::GGPlot::Geom::Functions>
+* L<Chart::GGPlot::Scale::Functions>
+* L<Chart::GGPlot::Labels::Functions>
+* L<Chart::GGPlot::Limits>
+* L<Chart::GGPlot::Coord::Functions>
+* L<Chart::GGPlot::Facet::Functions>
+* L<Chart::GGPlot::Guide::Functions>
+* L<Chart::GGPlot::Theme::Defaults>
 
 For example, when you do
 
@@ -360,7 +361,7 @@ It internally does something like,
 
 Depend on the return type of the function it would call one of the class's
 add/set methods. In this case of C<geom_point()> we get a layer object so
-L<add_layer()> is called.
+C<add_layer()> is called.
 
 =head1 SEE ALSO
 

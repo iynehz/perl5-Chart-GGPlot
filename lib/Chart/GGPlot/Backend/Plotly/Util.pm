@@ -1,6 +1,6 @@
 package Chart::GGPlot::Backend::Plotly::Util;
 
-# ABSTRACT:
+# ABSTRACT: Utilities used by Chart::GGPlot::Backend::Plotly
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 

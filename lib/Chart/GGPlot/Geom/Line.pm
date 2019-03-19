@@ -1,6 +1,6 @@
 package Chart::GGPlot::Geom::Line;
 
-# ABSTRACT: Class for path geom
+# ABSTRACT: Class for line geom
 
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;

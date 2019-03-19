@@ -1,6 +1,6 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Path;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Bar
+# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Path
 
 use Chart::GGPlot::Class qw(:pdl);
 
