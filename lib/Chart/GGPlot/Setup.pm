@@ -34,6 +34,7 @@ use MooseX::MungeHas          ();
 use MooseX::LazyRequire       ();
 use MooseX::StrictConstructor ();
 use boolean                   ();
+use indirect                  ();
 
 use List::AllUtils qw(uniq);
 
@@ -105,6 +106,7 @@ sub _import_tag {
         PerlX::Maybe->import::into($target);
         Syntax::Keyword::Try->import::into($target);
         boolean->import::into($target);
+        indirect->unimport::out_of($target);
 
         # TODO: See if I can help this issue
         #  https://rt.cpan.org/Public/Bug/Display.html?id=123935
