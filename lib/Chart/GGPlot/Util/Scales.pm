@@ -915,15 +915,20 @@ fun dollar ($p, :$accuracy=undef, :$scale=1,
     my $negative  = ( $p->isgood & ( $p < 0 ) );
 
     my $fmt = Number::Format->new(
-        -thousands_sep   => $big_mark,
-        -decimal_point   => $decimal_mark,
-        -int_curr_symbol => $prefix,
+        -thousands_sep     => $big_mark,
+        -mon_thousands_sep => $big_mark,
+        -decimal_point     => $decimal_mark,
+        -mon_decimal_point => $decimal_mark,
+        -int_curr_symbol   => $prefix,
         ( $negative_parens ? ( -n_sign_posn => 0 ) : () ),
 
-        # Number::Format defaulty uses locale's P/N_SEP_BY_SPACE.
-        # Here we force these values to 0 to be align with R's scale::dollar.
-        -p_sep_by_space  => 0,
-        -n_sep_by_space  => 0,
+        # Number::Format would use locale's settings like P/N_SEP_BY_SPACE.
+        # Here we force these values to align with R's scale::dollar to make
+        # the behavior simple.
+        -p_sep_by_space => 0,
+        -n_sep_by_space => 0,
+        -p_cs_precedes  => 1,
+        -n_cs_precedes  => 1,
     );
 
     no warnings 'numeric';
