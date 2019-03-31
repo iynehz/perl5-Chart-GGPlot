@@ -10,7 +10,7 @@ use Data::Munge qw(elem);
 use Data::Frame::Types qw(DataFrame);
 use Data::Frame::Util qw(guess_and_convert_to_pdl);
 use Module::Load;
-use Types::PDL qw(Piddle1D);
+use Types::PDL qw(Piddle1D PiddleFromAny);
 use Types::Standard qw(Maybe Str);
 
 use Chart::GGPlot::Plot;
@@ -95,15 +95,18 @@ sub ggplot {
 
 =cut
 
+# Do not check :$x, :$y's types here as we would like to allow coercion
+# from arrayref to piddle.
 fun qplot (
-    Piddle1D :$x, Piddle1D :$y, 
+    :$x, :$y, 
     :$facets = undef,
     Str :$geom = "auto",
     :$xlim = undef, :$ylim = undef,
     :$title = undef, :$xlab = 'x', :$ylab = 'y',
-#    : $asp     = undef,
     %rest
   ) {
+    # Can't do :$log in func params as it would conflict with $log
+    # from Log::Any.
     my $log_mode = $rest{log} // '';
 
     my $all_aesthetics = Chart::GGPlot::Aes->all_aesthetics;

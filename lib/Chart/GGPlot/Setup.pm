@@ -13,7 +13,7 @@ use feature ':5.16';
 use Import::Into;
 
 use Alt::Data::Frame::ButMore;
-use Data::Frame;
+use Data::Frame;    # TODO: removes this after releasing Data::Frame 0.043
 
 use Carp;
 use Data::Dumper ();
@@ -23,7 +23,6 @@ use Log::Any::Adapter;
 use Safe::Isa 1.000010 ();
 use PerlX::Maybe ();
 
-#use PerlX::Assert        ();
 use Syntax::Keyword::Try ();
 use Module::Load;
 use Moose 2.1400;
@@ -113,8 +112,6 @@ sub _import_tag {
         #PerlX::Assert->import::into($target);
 
         Moose::Autobox->import::into($target);
-
-        Data::Frame->import::into($target);
     }
     elsif ( $tag eq ':class' ) {
         $class->_import_tag( $target, ':base' );
