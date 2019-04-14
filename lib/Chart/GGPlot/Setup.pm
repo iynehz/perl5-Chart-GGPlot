@@ -12,8 +12,7 @@ use feature ':5.16';
 
 use Import::Into;
 
-use Alt::Data::Frame::ButMore;
-use Data::Frame;    # TODO: removes this after releasing Data::Frame 0.043
+use Alt::Data::Frame::ButMore 0.0043;
 
 use Carp;
 use Data::Dumper ();
