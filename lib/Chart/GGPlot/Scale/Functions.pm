@@ -1245,19 +1245,17 @@ sub _default_position {
     return ($aes =~ /^x/ ? 'bottom' : 'left');
 }
 
+# register scale functions within this pacakge
 fun _register_scale (Str $name, CodeRef $func) {
     $scale_funcs{$name} = $func;
 }
 
-INIT {
-    # register scale functions within this pacakge
-    use Package::Stash;
+use Package::Stash;
 
-    my $stash   = Package::Stash->new(__PACKAGE__);
-    my $symbols = $stash->get_all_symbols('CODE');
-    for my $key ( grep { /^scale_/ } keys %$symbols ) {
-        _register_scale( $key, $symbols->{$key} );
-    }
+my $stash   = Package::Stash->new(__PACKAGE__);
+my $symbols = $stash->get_all_symbols('CODE');
+for my $key ( grep { /^scale_/ } keys %$symbols ) {
+    _register_scale( $key, $symbols->{$key} );
 }
 
 1;
