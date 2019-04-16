@@ -9,6 +9,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 use Data::Munge qw(elem);
 use Graphics::Color::RGB;
 use List::AllUtils qw(pairmap reduce);
+use Memoize;
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle);
 use Types::Standard qw(Str);
@@ -42,30 +43,30 @@ fun to_rgb ($x) {
 
     my $rgb = sub {
         my ($color) = @_;
-
-        if ( $color =~ /^\#/ ) {
-            return $color;
-        }
-        else {
-            try {
-                my $c = Graphics::Color::RGB->from_color_library($color);
-                return $c->as_css_hex;
-            }
-            catch {
-                return $color;
-            }
-        }
+        return ( $color =~ /^\#/ ? $color : _color_name_to_rgb($color) );
     };
 
-    if ( !ref($x) ) {
+    if ( not Ref::Util::is_ref($x) ) {
         return $rgb->($x);
     }
     else {
-        my $p = PDL::SV->new( $x->unpdl->map($rgb) );
+        my $p = PDL::SV->new( [ map { $rgb->($_) } $x->flatten ] );
         $p = $p->setbadif( $x->isbad ) if $x->badflag;
         return $p;
     }
 }
+
+sub _color_name_to_rgb {
+    my ($color) = @_;
+
+    try {
+        return Graphics::Color::RGB->from_color_library($color)->as_css_hex;
+    }
+    catch {
+        return $color;
+    }
+}
+memoize('_color_name_to_rgb');
 
 =func group_to_NA
 
