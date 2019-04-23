@@ -99,4 +99,30 @@ subtest group_to_NA => sub {
     );
 };
 
+subtest to_rgb => sub {
+    pdl_is(
+        to_rgb( PDL::SV->new( [qw(black white)] ) ),
+        PDL::SV->new( [qw(#000000 #ffffff)] ),
+        'to_rgb([qw(black white)])'
+    );
+
+    pdl_is(
+        to_rgb( PDL::SV->new( [qw(black white)] ), pdl(1) ),
+        PDL::SV->new( [qw(#000000 #ffffff)] ),
+        'to_rgb([qw(black white)]), pdl(1)'
+    );
+
+    pdl_is(
+        to_rgb( PDL::SV->new( [qw(black white)] ), pdl( [ 0.2, 0.8 ] ) ),
+        PDL::SV->new( [qw{rgba(0,0,0,51) rgba(255,255,255,204)}] ),
+        'to_rgb([qw(black white)]), pdl([0.2, 0.8])'
+    );
+
+    pdl_is(
+        to_rgb( PDL::SV->new( [qw(black white)] ), pdl( [ 0.2, 1 ] ) ),
+        PDL::SV->new( [qw{rgba(0,0,0,51) #ffffff}] ),
+        'to_rgb([qw(black white)]), pdl([0.2, 1])'
+    );
+};
+
 done_testing();

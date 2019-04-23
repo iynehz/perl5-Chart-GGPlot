@@ -8,7 +8,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 use Data::Munge qw(elem);
 use Graphics::Color::RGB;
-use List::AllUtils qw(pairmap reduce);
+use List::AllUtils qw(all min max pairmap pairwise reduce);
 use Memoize;
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle);
@@ -37,21 +37,48 @@ fun cex_to_px ($x) { pt_to_px( 12 * $x * 0.75 * 0.3 ) }
 sub br { '<br />' }
 
 # plotly does not understands some non-rgb colors like "grey35"
-fun to_rgb ($x) {
-    state $check = Type::Params::compile((Piddle | Str));
-    ($x) = $check->($x);
+fun to_rgb ($color, $alpha=pdl(1)) {
+    state $check = Type::Params::compile((Piddle | Str), Piddle);
+    ($color, $alpha) = $check->($color, $alpha);
 
     my $rgb = sub {
-        my ($color) = @_;
-        return ( $color =~ /^\#/ ? $color : _color_name_to_rgb($color) );
+        my ($c, $a) = @_;
+        unless ( $c =~ /^\#/ ) {
+             $c = _color_name_to_rgb($c);
+        }
+        return $c if $a == 1;
+
+        if ( my @rgb = ( $c =~ /^#(..)(..)(..)/ ) ) {
+            $a = max( min( $a, 1 ), 0 );
+            return sprintf(
+                "rgba(%s,%s,%s,%s)",
+                ( map { hex($_) } @rgb ),
+                int( $a * 255 + 0.5 )
+            );
+        }
+        return $c;
     };
 
-    if ( not Ref::Util::is_ref($x) ) {
-        return $rgb->($x);
+    if ( !ref($color) ) {
+        return $rgb->($color, 1);
     }
     else {
-        my $p = PDL::SV->new( [ map { $rgb->($_) } $x->flatten ] );
-        $p = $p->setbadif( $x->isbad ) if $x->badflag;
+        if ($alpha->length != $color->length and $alpha->length != 1) {
+            die "alpha must be of length 1 or the same length as x";
+        }
+        $alpha->slice($alpha->isbad) .= 1 if $alpha->badflag;
+        
+        my @color = $color->flatten;
+        my @rgba;
+        if ($alpha->uniq->length == 1 and $alpha->at(0) == 1) {
+            @rgba = map { $rgb->($_, 1) } @color;
+        } else {
+            my @alpha = $alpha->flatten;
+            @rgba = pairwise { $rgb->($a, $b) } @color, @alpha;
+        }
+
+        my $p = PDL::SV->new(\@rgba);
+        $p = $p->setbadif( $color->isbad ) if $color->badflag;
         return $p;
     }
 }
