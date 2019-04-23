@@ -33,7 +33,7 @@ fun range_ (Piddle $p, $na_rm = false, $finite = false) {
     }
     my $p = $finite ? $p->where( $p->isfinite ) : $p;
     my $class = ref($p);
-    return $class->new( [ $p->min, $p->max ] );
+    return $class->new( [ $p->minmax ] );
 }
 
 # the R seq function is implemented by seq_n and seq_by here,
