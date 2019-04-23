@@ -44,6 +44,7 @@ my @export_all = (
       dist_euclidean dist_polar
       split_indices
       find_line_formula spiral_arc_length
+      has_groups
       ),
 );
 
@@ -320,6 +321,18 @@ Note that this function has same name as Perl's CORE C<stat> function.
 =cut
 
 fun stat($x) { $x }
+
+use constant NO_GROUP => -1;
+
+fun has_groups ($df) {
+
+    # If no group aesthetic is specified, all values of the group column
+    # equal to NO_GROUP. On the other hand, if a group aesthetic is
+    # specified, all values are different from NO_GROUP.
+    # undef is returned for 0-row data frames.
+    return undef if ( $df->nrow == 0 );
+    return ( $df->at('group')->at(0) >= 0 );
+}
 
 1;
 
