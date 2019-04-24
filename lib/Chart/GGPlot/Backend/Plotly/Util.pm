@@ -22,6 +22,7 @@ our @EXPORT_OK = qw(
   br
   to_rgb
   group_to_NA
+  pdl_to_plotly
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
@@ -196,6 +197,33 @@ fun group_to_NA ($df, :$group_vars=['group'],
         ( shift @splitted ),
         @splitted
     );
+}
+
+# prepare from piddle to aref or value, to be send to Chart::Plotly
+fun pdl_to_plotly ($p, $allow_collapse=false) {
+    return [] if $p->length == 0;
+
+    if ( $p->badflag ) {
+        return $p->unpdl;
+    }
+
+    if ($allow_collapse) {
+        if ( $p->$_DOES('PDL::SV') ) {
+            my @lst  = $p->flatten;
+            my $elem = shift @lst;
+            if ( all { $_ eq $elem } @lst ) {
+                return $elem;
+            }
+        }
+        else {
+            my $elem = $p->at(0);
+            if ( ( $p == $elem )->all ) {
+                return $elem;
+            }
+        }
+    }
+
+    return $p->unpdl;
 }
 
 1;

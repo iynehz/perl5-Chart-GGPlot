@@ -10,7 +10,7 @@ with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
 use Module::Load;
 
-use Chart::GGPlot::Backend::Plotly::Util qw(to_rgb);
+use Chart::GGPlot::Backend::Plotly::Util qw(to_rgb pdl_to_plotly);
 
 classmethod to_trace ($df, %rest) {
     load Chart::Plotly::Trace::Bar;
@@ -20,22 +20,22 @@ classmethod to_trace ($df, %rest) {
     my $opacity = $df->at('alpha')->setbadtoval(1);
 
     my $marker = Chart::Plotly::Trace::Bar::Marker->new(
-        color   => $fill->unpdl,
-        opacity => $opacity->unpdl,
+        color   => pdl_to_plotly( $fill,    true ),
+        opacity => pdl_to_plotly( $opacity, true ),
     );
 
-    my $x     = $df->at('x')->unpdl;
-    my $y     = ( $df->at('ymax') - $df->at('ymin') )->unpdl;
-    my $base  = $df->at('ymin')->unpdl;
-    my $width = ( $df->at('xmax') - $df->at('xmin') )->unpdl;
+    my $x     = $df->at('x');
+    my $base  = $df->at('ymin');
+    my $y     = $df->at('ymax') - $base;
+    my $width = $df->at('xmax') - $df->at('xmin');
 
     return Chart::Plotly::Trace::Bar->new(
-        x         => $x,
-        y         => $y,
-        base      => $base,
-        width     => $width,
+        x         => pdl_to_plotly($x),
+        y         => pdl_to_plotly($y),
+        base      => pdl_to_plotly( $base, true ),
+        width     => pdl_to_plotly( $width, true ),
         marker    => $marker,
-        hovertext => $df->at('hovertext')->unpdl,
+        hovertext => pdl_to_plotly( $df->at('hovertext') ),
         hoverinfo => 'text',
     );
 }

@@ -65,19 +65,21 @@ my $df =
     );
 }
 
+## Please see file perltidy.ERR
 subtest split_indices => sub {
     is(
-        split_indices( [ 0, 1, 2, 2, 1, 0 ] )->map( sub { $_->unpdl } ),
+        split_indices( pdl( [ 0, 1, 2, 2, 1, 0 ] ) )->map( sub { $_->unpdl } ),
         [ [ 0, 5 ], [ 1, 4 ], [ 2, 3 ] ],
         'split_indices()'
     );
     is(
-        split_indices( [ 1, 2, 3, 3, 2, 1 ] )->map( sub { $_->unpdl } ),
+        split_indices( pdl( [ 1, 2, 3, 3, 2, 1 ] ) )->map( sub { $_->unpdl } ),
         [ [], [ 0, 5 ], [ 1, 4 ], [ 2, 3 ] ],
         'split_indices()'
     );
     is(
-        split_indices( [ 0, 1, 2, 2, 1, 0 ], 1 )->map( sub { $_->unpdl } ),
+        split_indices( pdl( [ 0, 1, 2, 2, 1, 0 ] ), 1 )
+          ->map( sub { $_->unpdl } ),
         [ [ 0, 5 ], [ 1, 2, 3, 4 ] ],
         'split_indices()'
     );

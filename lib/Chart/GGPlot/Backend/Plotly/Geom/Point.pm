@@ -10,7 +10,7 @@ extends qw(Chart::GGPlot::Backend::Plotly::Geom::Path);
 
 use Module::Load;
 
-use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb);
+use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb pdl_to_plotly);
 use Chart::GGPlot::Util qw(ifelse);
 
 sub mode {
@@ -38,16 +38,16 @@ classmethod marker ($df, %rest) {
     load $plotly_marker_class;
 
     return $plotly_marker_class->new(
-        color => $fill->unpdl,
-        size  => $size->unpdl,
+        color => pdl_to_plotly( $fill, true ),
+        size  => pdl_to_plotly( $size, true ),
         line  => {
-            color => $color->unpdl,
-            width => $stroke->unpdl,
+            color => pdl_to_plotly( $color,  true ),
+            width => pdl_to_plotly( $stroke, true ),
         },
 
         # TODO: support scatter symbol
         symbol  => [ (0) x $df->at('size')->length ],
-        opacity => $opacity->unpdl,
+        opacity => pdl_to_plotly( $opacity, true ),
     );
 }
 

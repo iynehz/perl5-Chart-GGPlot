@@ -16,6 +16,7 @@ use Data::Frame;
 use Math::Trig ();
 use constant PI => Math::Trig::pi;
 
+use List::AllUtils qw(min);
 use PDL::Primitive qw(which);
 use Package::Stash;
 use Types::PDL qw(Piddle1D PiddleFromAny);
@@ -287,12 +288,10 @@ fun spiral_arc_length ($a, $theta1, $theta2) {
 
 # Split indices of an indices array ref into groups
 # Return an arrayref of piddles.
-fun split_indices ((ArrayRef | Piddle1D) $indices, $n=List::AllUtils::max(@$indices)) {
-    my @rslt = map { [] } ( 0 .. $n - 1 );
+fun split_indices (Piddle1D $indices, $n=$indices->max) {
+    my @rslt = map { [] } ( 1 .. $n );
     for my $i ( 0 .. $indices->length - 1 ) {
-        my $id = $indices->at($i);
-        $id = $n if ( $id > $n );
-        $rslt[$id] //= [];
+        my $id = min($indices->at($i), $n);
         push @{ $rslt[$id] }, $i;
     }
     return [ map { pdl($_) } @rslt ];
