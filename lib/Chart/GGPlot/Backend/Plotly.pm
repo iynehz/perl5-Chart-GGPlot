@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 with qw(Chart::GGPlot::Backend);
 
-use Chart::Plotly 0.023 qw(show_plot);
+use Chart::Plotly 0.025 qw(show_plot);
 use Chart::Plotly::Plot;
 use Chart::Plotly::Image::Orca;
 
