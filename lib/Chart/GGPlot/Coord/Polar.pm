@@ -54,8 +54,6 @@ sub _build_limits {
     return { x => $self->xlim, y => $self->ylim };
 }
 
-has '+is_linear' => ( default => sub { false } );
-
 method aspect ($details) { 1 }
 
 method distance ($x, $y, $details) {

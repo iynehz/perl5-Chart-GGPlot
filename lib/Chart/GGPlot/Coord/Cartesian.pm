@@ -54,7 +54,7 @@ has default => (is => 'ro', default => sub { false } );
 
 with qw(Chart::GGPlot::Coord);
 
-has '+is_linear' => ( default => sub { false } );
+classmethod is_linear() { true }
 
 method distance ($x, $y, $panel_params) {
     my $max_dist = dist_euclidean( $panel_params->at('x_range'),

@@ -18,13 +18,15 @@ has render_axis_v => ( is => 'rw' );
 # Returns the x and y ranges
 has range => ( is => 'rw' );
 
-=attr is_linear
+=classmethod is_linear
+
+    is_linear()
 
 Returns true if the coordinate system is linear; false otherwise.
 
 =cut 
 
-has is_linear => ( is => 'ro', init_arg => undef, lazy_required => 1 );
+classmethod is_linear() { false; }
 
 =method render_bg($panel_params, $theme) 
 

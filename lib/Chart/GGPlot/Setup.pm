@@ -29,7 +29,6 @@ use Moose::Role               ();
 use Moose::Autobox            ();
 use MooseX::Aliases           ();
 use MooseX::MungeHas          ();
-use MooseX::LazyRequire       ();
 use MooseX::StrictConstructor ();
 use boolean                   ();
 
