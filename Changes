@@ -1,7 +1,11 @@
 Revision history for Chart::GGPlot
 
-0.0002_01   TBD
-  - TBD
+0.0002_01   2019-04-27
+  - New feature: Boxplot
+  - Make Chart::GGPlot::Util::dollar() behavior more consistant. (github #6)
+  - Performance improvements: Together with improments in
+    Alt::Data::Frame::ButMore, now for an extreme case of "diamonds scatter"    example, which is quite slow among the examples, it's become 3x faster
+    compared to before to run in exporting-to-png mode.
  
 0.0001      2019-03-18
   - First release.
