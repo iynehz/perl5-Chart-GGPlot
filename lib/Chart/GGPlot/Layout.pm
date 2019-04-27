@@ -256,16 +256,7 @@ classmethod scale_apply ($data, $vars, $method,
                 $pieces = $pieces->[0]->glue( 0, @$pieces[ 1 .. $#$pieces ] );
 
                 # Join pieces back together, if necessary
-
-                # Normally for a continuous scale, it gets only a pdl of
-                #  length 2. But below it would create a pdl of full length
-                #  of $data->nrow. We pad with bad values.
                 if ( $pieces->length ) {
-                    my $indices = $scale_indices_flattened->copy;
-                    $indices->slice(
-                        pdl( [ $pieces->length .. $indices->length - 1 ] ) ) .=
-                      'nan';
-                    $indices->setnantobad;
                     return ( $var => $pieces->slice($scale_indices_flattened) );
                 }
                 else {
