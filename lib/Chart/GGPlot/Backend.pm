@@ -85,6 +85,10 @@ classmethod build($ggplot) {
     $data = $layout->map_position($data, true);
     $debug_data->($data, 'after map_position()');
 
+    # store prestats data.
+    # no need to copy, to save some time
+    my $prestats_data = $data;
+
     # Apply and map statistics
     $data = &$by_layer( fun( $l, $d ) { $l->compute_statistic( $d, $layout ) }
     );
@@ -135,9 +139,10 @@ classmethod build($ggplot) {
     $plot->guides->build($scales, labels => $plot->labels);
 
     return Chart::GGPlot::Built->new(
-        data   => $data,
-        layout => $layout,
-        plot   => $plot
+        data          => $data,
+        layout        => $layout,
+        plot          => $plot,
+        prestats_data => $prestats_data,
     );
 }
 

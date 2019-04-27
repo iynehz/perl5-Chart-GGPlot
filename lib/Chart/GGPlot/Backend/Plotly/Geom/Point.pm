@@ -17,14 +17,14 @@ sub mode {
     return 'markers';
 }
 
-classmethod marker ($df, %rest) {
+classmethod marker ($df, $params, @rest) {
     my $color = to_rgb( $df->at('color') );
     my $fill =
       $df->exists('fill')
       ? ifelse( $df->at('fill')->isbad, $color, to_rgb( $df->at('fill') ) )
       : $color;
     my $size = cex_to_px( $df->at('size') );
-    $size = ifelse( $size < 2, 2, $size );
+    $size = ifelse( $size > 2, $size, 2 );
     my $opacity = $df->at('alpha')->setbadtoval(1);
     my $stroke  = cex_to_px( $df->at('stroke') );
 

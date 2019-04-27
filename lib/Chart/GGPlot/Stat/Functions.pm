@@ -6,6 +6,8 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 # VERSION
 
+use Module::Load;
+
 use Chart::GGPlot::Layer::Functions qw(layer);
 use Chart::GGPlot::Types;
 use Chart::GGPlot::Util qw(:all);
@@ -68,6 +70,17 @@ fun stat_count (:$mapping = undef, :$data = undef,
         inherit_aes => $inherit_aes,
         params      => $params,
     );
+}
+
+my @stat_namespaces = qw(Boxplot);
+
+for my $partial_ns (@stat_namespaces) {
+    my $package = "Chart::GGPlot::Stat::$partial_ns";
+    load $package;
+
+    my $func_name = "stat_" . lc($partial_ns);
+    no strict 'refs';
+    *{$func_name} = $package->ggplot_function;
 }
 
 1;

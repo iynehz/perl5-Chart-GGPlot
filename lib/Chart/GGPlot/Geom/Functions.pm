@@ -6,6 +6,8 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 # VERSION
 
+use Module::Load;
+
 use Chart::GGPlot::Layer::Functions qw(layer);
 use Chart::GGPlot::Types;
 use Chart::GGPlot::Util qw(:all);
@@ -17,15 +19,6 @@ my @export_ggplot = qw(
   geom_point
   geom_path geom_line
   geom_bar geom_histogram
-);
-
-our @EXPORT_OK = (
-    @export_ggplot,
-);
-
-our %EXPORT_TAGS = (
-    all    => \@EXPORT_OK,
-    ggplot => \@export_ggplot,
 );
 
 fun geom_blank (:$mapping = undef, :$data = undef,
@@ -204,6 +197,28 @@ fun geom_histogram (:$data = undef, :$mapping = undef,
         },
     );
 }
+
+my @geom_namespaces = qw(Boxplot);
+
+for my $partial_ns (@geom_namespaces) {
+    my $package = "Chart::GGPlot::Geom::$partial_ns";
+    load $package;
+
+    my $func_name = "geom_" . lc($partial_ns);
+    no strict 'refs';
+    *{$func_name} = $package->ggplot_function;
+    push @export_ggplot, $func_name;
+}
+
+our @EXPORT_OK = (
+    @export_ggplot,
+);
+
+our %EXPORT_TAGS = (
+    all    => \@EXPORT_OK,
+    ggplot => \@export_ggplot,
+);
+
 
 1;
 

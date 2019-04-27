@@ -12,7 +12,7 @@ use Module::Load;
 
 use Chart::GGPlot::Backend::Plotly::Util qw(to_rgb pdl_to_plotly);
 
-classmethod to_trace ($df, %rest) {
+classmethod to_trace ($df, $params, @rest) {
     load Chart::Plotly::Trace::Bar;
     load Chart::Plotly::Trace::Bar::Marker;
 

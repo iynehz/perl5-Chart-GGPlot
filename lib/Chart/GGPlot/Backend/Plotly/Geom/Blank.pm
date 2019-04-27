@@ -8,7 +8,7 @@ use Chart::GGPlot::Class;
 
 with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
-classmethod to_trace ($df, %rest) { }
+classmethod to_trace ($df, $params, @rest) { }
 
 __PACKAGE__->meta->make_immutable;
 

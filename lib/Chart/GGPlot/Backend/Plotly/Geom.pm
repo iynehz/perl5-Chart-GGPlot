@@ -33,7 +33,7 @@ method use_webgl ($df) {
 
 =method to_trace
 
-    to_trace($df, %rest)
+    to_trace($df, $params, @rest)
 
 This shall be implemented by consumers of this role.
 It should return an arrayref of Chart::Plotly::Trace::X objects.  
@@ -83,6 +83,10 @@ classmethod _hovertext_data_for_aes ($df, $aes) {
         : $df->exists($aes)         ? $df->at($aes)
         :                             undef
     );
+}
+
+classmethod to_basic($data, $prestats_data, $layout, $params, $plot) {
+    return $data;
 }
 
 1;
