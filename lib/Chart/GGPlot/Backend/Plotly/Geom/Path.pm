@@ -19,11 +19,11 @@ sub mode {
     return 'lines';
 }
 
-classmethod marker ($df, %rest) {
+classmethod marker ($df, @rest) {
     return;
 }
 
-classmethod to_trace ($df, %rest) {
+classmethod to_trace ($df, $params, @rest) {
     $df = group_to_NA($df);
 
     my $use_webgl = $class->use_webgl($df);
@@ -39,7 +39,7 @@ classmethod to_trace ($df, %rest) {
     }
 
     my ( $x, $y ) = map { $df->at($_) } qw(x y);
-    my $marker = $class->marker( $df, %rest );
+    my $marker = $class->marker( $df, $params, @rest );
 
     my $mode = $class->mode;
     my $line;

@@ -67,7 +67,7 @@ fun to_rgb ($color, $alpha=pdl(1)) {
         if ($alpha->length != $color->length and $alpha->length != 1) {
             die "alpha must be of length 1 or the same length as x";
         }
-        $alpha->slice($alpha->isbad) .= 1 if $alpha->badflag;
+        $alpha = $alpha->setbadtoval(1);
         
         my @color = $color->flatten;
         my @rgba;
@@ -208,6 +208,8 @@ fun pdl_to_plotly ($p, $allow_collapse=false) {
     }
 
     if ($allow_collapse) {
+        return $p->at(0) if $p->length == 1;
+
         if ( $p->$_DOES('PDL::SV') ) {
             my @lst  = $p->flatten;
             my $elem = shift @lst;

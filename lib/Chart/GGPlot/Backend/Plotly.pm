@@ -32,7 +32,7 @@ classmethod _split_on($data) {
     return [];
 }
 
-method layer_to_traces ($layer, $data, $layout, $plot) {
+method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
     return if ( $data->isempty );
 
     my $geom            = $layer->geom;
@@ -44,7 +44,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
     my $geom_params = $layer->geom_params;
     my $stat_params = $layer->stat_params;
     my $aes_params  = $layer->aes_params;
-    my $param = $geom_params->merge($stat_params)->merge($aes_params);
+    my $params = $geom_params->merge($stat_params)->merge($aes_params);
 
     my $coord  = $layout->coord;
 
@@ -99,8 +99,6 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
         my $hovertext = $class_geom_impl->make_hovertext($d, \@hover_labels);
         $d->set( 'hovertext', PDL::SV->new($hovertext) );
 
-        #my $na_rm = $params->at('na_rm') // false;
-
         my @splitted_sorted;
         if ( $split_vars->length ) {
             my $fac = do {
@@ -127,7 +125,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
             sub {
                 my ($d) = @_;
 
-                my $trace = $class_geom_impl->to_trace($d);
+                my $trace = $class_geom_impl->to_trace($d, $params);
 
                 # If we need a legend, set legend info.
                 my $show_legend =
@@ -153,15 +151,23 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
         );
     };
 
-    my $splitted = $data->split( $data->at('PANEL') );
+    my $splitted_data = $data->split( $data->at('PANEL') );
+    my $splitted_prestats_data =
+      $prestats_data->split( $prestats_data->at('PANEL') );
     return [
         pairmap {
-            my ( $panel_idx, $data ) = ( $a, $b );
+            my ( $panel_id, $panel_data ) = ( $a, $b );
 
-            my $panel_params = $layout->panel_params->at($panel_idx);
-            $panel_to_traces->( $data, $panel_params );
+            my $panel_prestats_data = $splitted_prestats_data->{$panel_id};
+            $panel_to_traces->(
+                $class_geom_impl->to_basic(
+                    $panel_data, $panel_prestats_data, $layout,
+                    $params,     $plot
+                ),
+                $layout->panel_params->at($panel_id)
+            );
         }
-        %$splitted
+        %$splitted_data
     ];
 }
 
@@ -337,12 +343,14 @@ method _to_plotly ($plot_built) {
 
     for my $i ( 0 .. $#$layers ) {
         my $layer = $layers->[$i];
-        my $data  = $plot_built->data->[$i];
+        my $data  = $plot_built->layer_data($i);
+        my $prestats_data  = $plot_built->layer_prestats_data($i);
 
         $log->debug( "data at layer $i:\n" . $data->string ) if $log->is_debug;
 
         my $panels_traces =
-          $self->layer_to_traces( $layer, $data, $layout, $plot );
+          $self->layer_to_traces( $layer, $data, $prestats_data,
+            $layout, $plot );
         for my $panel (@$panels_traces) {
             for my $trace (@$panel) {
                 $plotly->add_trace($trace);
