@@ -428,13 +428,21 @@ method _to_plotly ($plot_built) {
     
     show($ggplot, HashRef $opts={})
 
-Show the plot like in web browser.
+Show the plot in web browser.
+
+On POSIX systems L<Chart::Plotly> internally uses L<Browser::Open> to open
+the browser. L<Browser::Open> has a default list of browsers and tries
+them one by one. You may want to override that behavior by set env var
+C<BROWSER> to force a browser command on your system, for example, 
+
+    export BROWSER=chromium-browser
 
 =method save
 
     save($ggplot, $filename, HashRef $opts={})
 
-Export the plot to a static image file.
+Export the plot to a static image file. This internally uses
+L<Chart::Plotly::Image::Orca>.
 
 Below options are supported for C<$opts>:
 
@@ -479,5 +487,7 @@ The Plotly backend for Chart::GGPlot.
 
 L<https://plot.ly/|Plotly>
 
-L<Chart::GGPlot::Backend>, L<Chart::Plotly>
+L<Chart::GGPlot::Backend>
+
+L<Chart::Plotly>, L<Chart::Plotly::Image::Orca>
 

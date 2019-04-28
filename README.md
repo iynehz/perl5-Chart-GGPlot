@@ -62,6 +62,15 @@ Example exported image files:
 
 See the `examples` dir in the library's distribution for more examples.
 
+## Document Conventions
+
+Function signatures in docs of this library follow the
+[Function::Parameters](https://metacpan.org/pod/Function::Parameters) conventions, for example,
+
+```perl
+myfunc(Type1 $positional_parameter, Type2 :$named_parameter)
+```
+
 # FUNCTIONS
 
 ## ggplot
@@ -76,11 +85,43 @@ See [Chart::GGPlot::Plot](https://metacpan.org/pod/Chart::GGPlot::Plot) for deta
 ## qplot
 
 ```
-qplot(Piddle1D :$x, Piddle1D :$y, Str :$geom='auto',
+qplot((Piddle1D|ArrayRef) :$x, (Piddle1D|ArrayRef) :$y,
+    Str :$geom='auto',
     :$xlim=undef, :$ylim=undef,
-    :$log='', :$title=undef, :$xlab='x', :$ylab='y',
+    Str :$log='',
+    Maybe[Str] :$title=undef, Str :$xlab='x', Str :$ylab='y',
     %rest)
 ```
+
+Arguments:
+
+- $x, $y
+
+    Data. Supports either 1D piddles or arrayrefs. When arrayref is specified, it
+    would be converted to either a numeric piddle or a PDL::SV piddle, guessing by
+    its contents.
+
+- $geom
+
+    Geom type. `"auto"` is treated as `'point'`.
+    It would internally call a `geom_${geom}` function.
+
+- $xlim, $ylim
+
+    Axes limits.
+
+- $log
+
+    Which axis use logarithmic scale?
+    One of `''`, `'x'`, `'y'`, `'xy'`.
+
+- $title
+
+    Plot title. Default is `undef`, for no title.
+
+- $xlabel, $ylabel
+
+    Axes labels.
 
 # ENVIRONMENT VARIABLES
 

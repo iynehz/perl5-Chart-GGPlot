@@ -53,6 +53,13 @@ Example exported image files:
 
 See the C<examples> dir in the library's distribution for more examples.
 
+=head2 Document Conventions
+
+Function signatures in docs of this library follow the
+L<Function::Parameters> conventions, for example,
+
+    myfunc(Type1 $positional_parameter, Type2 :$named_parameter)
+
 =cut
 
 =head1 FUNCTIONS
@@ -89,10 +96,32 @@ sub ggplot {
 
 =head2 qplot
 
-    qplot(Piddle1D :$x, Piddle1D :$y, Str :$geom='auto',
+    qplot((Piddle1D|ArrayRef) :$x, (Piddle1D|ArrayRef) :$y,
+        Str :$geom='auto',
         :$xlim=undef, :$ylim=undef,
-        :$log='', :$title=undef, :$xlab='x', :$ylab='y',
+        Str :$log='',
+        Maybe[Str] :$title=undef, Str :$xlab='x', Str :$ylab='y',
         %rest)
+
+Arguments:
+
+=for :list
+* $x, $y
+Data. Supports either 1D piddles or arrayrefs. When arrayref is specified, it
+would be converted to either a numeric piddle or a PDL::SV piddle, guessing by
+its contents.
+* $geom
+Geom type. C<"auto"> is treated as C<'point'>.
+It would internally call a C<geom_${geom}> function.
+* $xlim, $ylim
+Axes limits.
+* $log
+Which axis use logarithmic scale?
+One of C<''>, C<'x'>, C<'y'>, C<'xy'>.
+* $title
+Plot title. Default is C<undef>, for no title.
+* $xlabel, $ylabel
+Axes labels.
 
 =cut
 
@@ -109,6 +138,11 @@ fun qplot (
     # Can't do :$log in func params as it would conflict with $log
     # from Log::Any.
     my $log_mode = $rest{log} // '';
+    state $supported_log_modes = ['', 'x', 'y', 'xy'];
+    unless ( elem( $log_mode, $supported_log_modes ) ) {
+        die "'log' shall be one of "
+          . join( ', ', map { qq("$_") } @$supported_log_modes );
+    }
 
     my $all_aesthetics = Chart::GGPlot::Aes->all_aesthetics;
 
