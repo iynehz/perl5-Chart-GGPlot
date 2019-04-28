@@ -26,6 +26,8 @@ has '+default_aes'     => (
     }
 );
 
+classmethod ggplot_functions() { ... }
+
 classmethod required_aes() { [qw(xmin xmax ymin ymax)] };
 
 __PACKAGE__->meta->make_immutable;

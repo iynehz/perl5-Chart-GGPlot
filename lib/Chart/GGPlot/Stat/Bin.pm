@@ -13,6 +13,7 @@ use POSIX qw(floor);
 
 use Chart::GGPlot::Aes::Functions qw(aes);
 use Chart::GGPlot::Bins;
+use Chart::GGPlot::Layer::Functions qw(layer);
 use Chart::GGPlot::Util qw(call_if_coderef seq_n stat);
 
 with qw(
@@ -37,6 +38,49 @@ classmethod _parameters () {
           bins binwidth boundary breaks center pad
           )
     ]
+}
+
+my $stat_bin_pod = <<'END_OF_TEXT';
+END_OF_TEXT
+my $stat_bin_code = fun (
+    :$mapping=undef, :$data=undef,
+    :$geom="bar", :$position="stack",
+    :$binwidth=undef, :$bins=undef,
+    :$center=undef, :$boundary=undef, :$breaks=undef,
+    :$pad=false,
+    :$na_rm=false,
+    :$show_legend='auto', :$inherit_aes=true,
+    %rest )
+{                           
+    return layer(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => 'bin',
+        geom        => $geom,
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        params      => {
+            binwidth => $binwidth,
+            bins     => $bins,
+            center   => $center,
+            boundary => $boundary,
+            breaks   => $breaks,
+            pad      => $pad,
+            na_rm    => $na_rm,
+            %rest
+        }
+    );
+};
+
+classmethod ggplot_functions () {
+    return [
+        {
+            name => 'stat_bin',
+            code => $stat_bin_code,
+            pod  => $stat_bin_pod,
+        }
+    ];
 }
 
 method setup_params ($data, $params) {

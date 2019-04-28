@@ -17,6 +17,7 @@ use Math::Trig ();
 use constant PI => Math::Trig::pi;
 
 use List::AllUtils qw(min);
+use Module::Load;
 use PDL::Primitive qw(which);
 use Package::Stash;
 use Types::PDL qw(Piddle1D PiddleFromAny);
@@ -46,6 +47,7 @@ my @export_all = (
       split_indices
       find_line_formula spiral_arc_length
       has_groups
+      collect_functions_from_package
       ),
 );
 
@@ -331,6 +333,30 @@ fun has_groups ($df) {
     # undef is returned for 0-row data frames.
     return undef if ( $df->nrow == 0 );
     return ( $df->at('group')->at(0) >= 0 );
+}
+
+sub collect_functions_from_package {
+    my ($package) = @_; 
+
+    load $package;
+
+    my ($caller_package) = caller();
+    my @func_names;
+    my $funcs = $package->ggplot_functions();
+    for (@$funcs) {
+        my $name = $_->{name};
+
+        no strict 'refs';
+        if (defined &{$name}) {
+            warn qq{Duplicate function definitions for "$name". } . 
+                "Definition from package $package would mask earlier " .
+                "definition loaded into " . __PACKAGE__ . ".";
+        }
+
+        *{"${caller_package}::${name}"} = $_->{code};
+        push @func_names, $name;
+    }   
+    return @func_names;
 }
 
 1;

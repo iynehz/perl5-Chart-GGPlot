@@ -11,12 +11,102 @@ extends qw(Chart::GGPlot::Geom::Rect);
 # VERSION
 
 use Chart::GGPlot::Aes;
+use Chart::GGPlot::Layer::Functions qw(layer);
 use Chart::GGPlot::Util qw(:all);
 
 has '+non_missing_aes' => ( default => sub { [qw(xmin xmax ymin ymax)] } );
 
 classmethod required_aes() { [qw(x y)] }
 classmethod extra_params() { [qw(na_rm width)] }
+
+my $geom_bar_pod = <<'END_OF_TEXT';
+
+    geom_bar(:$mapping = undef, :$data = undef, :$stat = 'count',
+        :$position = 'stack', :$width = undef,
+        :$na_rm = false, :$show_legend = 'auto', :$inherit_aes = true,
+        %rest)
+
+The "bar" geom makes the height bar proportional to the number of cases in each group (or if the C<weight> aesthetic is supplied, the sum of the
+C<weights>). 
+It uses C<stat_count()> by default: it counts the number of cases at each x
+position. 
+
+END_OF_TEXT
+my $geom_bar_code = fun (
+        :$mapping = undef, :$data = undef,
+        :$stat = 'count', :$position = 'stack',
+        :$width = undef, :$na_rm = false,
+        :$show_legend = 'auto', :$inherit_aes = true,
+        %rest )
+{
+    return layer(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => $stat,
+        geom        => 'bar',
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        params      => {
+            width => $width,
+            na_rm => $na_rm,
+            %rest,
+        },
+    );
+};
+
+my $geom_histogram_pod = <<'END_OF_TEXT';
+
+    geom_histogram(:$data = undef, :$mapping = undef, :$stat = "bin",
+        :$position = "stack", :$binwidth = undef, :$bins = undef,
+        :$na_rm = false, :$show_legend = 'auto', :$inherit_aes = true,
+        %rest)
+
+Visualise the distribution of a single continuous variable by dividing the 
+x axis into bins and counting the number of observations in each bin.
+This "histogram" geom displays the counts with bars.
+
+END_OF_TEXT
+my $geom_histogram_code = fun (
+        :$data = undef, :$mapping = undef,
+        :$stat = "bin", :$position = "stack",
+        :$binwidth = undef, :$bins = undef,
+        :$na_rm = false,
+        :$show_legend = 'auto', :$inherit_aes = true,
+        %rest )
+{
+    return layer(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => $stat,
+        geom        => 'bar',
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        params      => {
+            binwidth => $binwidth,
+            bins     => $bins,
+            na_rm    => $na_rm,
+            pad      => false,
+            %rest
+        },
+    );  
+};
+
+classmethod ggplot_functions() {
+    return [
+        {
+            name => 'geom_bar',
+            code => $geom_bar_code,
+            pod => $geom_bar_pod,
+        },
+        {
+            name => 'geom_histogram',
+            code => $geom_histogram_code,
+            pod => $geom_histogram_pod,
+        },
+    ];  
+}
 
 method setup_data ($data, $params) {
     unless ( $data->exists('width') ) {

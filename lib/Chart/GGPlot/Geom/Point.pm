@@ -9,6 +9,7 @@ use MooseX::Singleton;
 # VERSION
 
 use Chart::GGPlot::Aes;
+use Chart::GGPlot::Layer::Functions qw(layer);
 use Chart::GGPlot::Util qw(:all);
 
 with qw(Chart::GGPlot::Geom);
@@ -28,6 +29,48 @@ has '+default_aes'     => (
 );
 
 classmethod required_aes() { [qw(x y)] }
+
+my $geom_point_pod = <<'END_OF_TEXT'; 
+
+    geom_point(:$mapping = undef, :$data = undef, :$stat = 'identity',
+        :$position = 'identity', :$na_rm = false, :$show_legend = 'auto',
+        :$inherit_aes = true, %rest)
+
+The "point" geom is used to create scatterplots.
+The scatterplot is most useful for displaying the relationship between two
+continuous variables.
+A bubblechart is a scatterplot with a third variable mapped to the size of
+points.
+
+END_OF_TEXT
+my $geom_point_code = fun (
+        :$mapping = undef, :$data = undef,
+        :$stat = 'identity', :$position = 'identity',
+        :$na_rm = false,
+        :$show_legend = 'auto', :$inherit_aes = true,
+        %rest )
+{
+    return layer(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => $stat,
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        geom        => 'point',
+        params      => { na_rm => $na_rm, %rest },
+    );
+};
+
+classmethod ggplot_functions() {
+    return [
+        {
+            name => 'geom_point',
+            code => $geom_point_code,
+            pod => $geom_point_pod,
+        }
+    ];
+}
 
 __PACKAGE__->meta->make_immutable();
 

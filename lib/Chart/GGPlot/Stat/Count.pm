@@ -11,6 +11,7 @@ use MooseX::Singleton;
 use Data::Frame;
 
 use Chart::GGPlot::Aes::Functions qw(aes);
+use Chart::GGPlot::Layer::Functions qw(layer);
 use Chart::GGPlot::Util qw(resolution stat);
 
 with qw(
@@ -27,6 +28,46 @@ has '+default_aes'  => (
 );
 
 classmethod required_aes() { ['x'] }
+
+my $stat_count_pod = <<'END_OF_TEXT';
+END_OF_TEXT
+my $stat_count_code = fun (
+        :$mapping = undef, :$data = undef,
+        :$geom = 'bar', :$position = 'stack', 
+        :$width = undef, :$na_rm = false,
+        :$show_legend = undef, :$inherit_aes = true,
+        %rest )
+{ 
+    my $params = { 
+        na_rm => $na_rm,
+        width => $width,
+        %rest
+    };  
+    if ( $data->exists('y') ) { 
+        die "stat_count() must not be used with a y aesthetic.";
+    }   
+
+    return layer(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => 'count',
+        geom        => $geom,
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        params      => $params,
+    );  
+};
+
+classmethod ggplot_functions() {
+    return [
+        {
+            name => 'stat_count',
+            code => $stat_count_code,
+            pod  => $stat_count_pod,
+        }
+    ];
+}
 
 method setup_params ($data, $params) {
     if ( $data->exists('y') ) {

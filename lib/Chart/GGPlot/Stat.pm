@@ -23,6 +23,7 @@ with qw(
   Chart::GGPlot::HasDefaultAes
   Chart::GGPlot::HasNonMissingAes
   Chart::GGPlot::HasParams
+  Chart::GGPlot::HasCollectibleFunctions
 );
 
 method setup_data ( $data, $params ) { $data }

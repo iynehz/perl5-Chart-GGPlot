@@ -41,54 +41,107 @@ classmethod extra_params () {
     ]
 }
 
-classmethod ggplot_function() {
-    return fun(
-            :$data=undef, :$mapping=undef, 
-            :$stat='boxplot', :$position='dodge2',
-            :$outlier_color=undef, :$outlier_colour=undef,
-            :$outlier_fill=undef, :$outlier_shape=undef,
-            :$outlier_size=1.5, :$outlier_stroke=undef,
-            :$outlier_alpha=undef,
-            :$notch=false, :$notchwidth=0.5,
-            :$varwidth=false, :$na_rm=false,
-            :$show_legend='auto', :$inherit_aes=true,
-            %rest)
-    {
-        if ( not Ref::Util::is_ref($position) ) {
-            if ($varwidth) {
-                $position = position_dodge2( preserve => 'single' );
-            }
-        }
-        else {
-            if ( $position->preserve eq 'total' and $varwidth ) {
-                warn "Can't preserve total widths when varwidth is true.";
-                $position->preserve('single');
-            }
-        }
+my $geom_boxplot_pod = <<'END_OF_TEXT';
 
-        return layer(
-            data        => $data,
-            mapping     => $mapping,
-            stat        => $stat,
-            geom        => 'boxplot',
-            position    => $position,
-            show_legend => $show_legend,
-            inherit_aes => $inherit_aes,
-            params      => {
-                outlier_color  => ( $outlier_color // $outlier_colour ),
-                outlier_fill   => $outlier_fill,
-                outlier_shape  => $outlier_shape,
-                outlier_size   => $outlier_size,
-                outlier_stroke => $outlier_stroke,
-                outlier_alpha  => $outlier_alpha,
-                notch          => $notch,
-                notchwidth     => $notchwidth,
-                varwidth       => $varwidth,
-                na_rm          => $na_rm,
-                %rest
-            },
-        );
-    };
+    $geom_boxplot(
+        :$data=undef, :$mapping=undef, 
+        :$stat='boxplot', :$position='dodge2',
+        :$outlier_color=undef, :$outlier_colour=undef,
+        :$outlier_fill=undef, :$outlier_shape=undef,
+        :$outlier_size=1.5, :$outlier_stroke=undef,
+        :$outlier_alpha=undef,
+        :$notch=false, :$notchwidth=0.25,
+        :$varwidth=false, :$na_rm=false,
+        :$show_legend='auto', :$inherit_aes=true,
+        %rest )
+
+The boxplot compactly displays the distribution of a continuous variable. It
+visualises five summary statistics (the median, two hinges and two whiskers),
+and all "outlying" points individually.
+
+Arguments:
+
+=begin :list
+* $data
+* $mapping
+* $outlier_color, $outlier_fill, $outlier_size, $outlier_stroke, $outlier_alpha
+Default aesthetics for outliers. Set to C<undef> to inherit from the aesthetics
+used for the box.
+
+Sometimes it can be useful to hide the outliers, for example when overlaying
+the raw data points on top of the boxplot. Hiding the outliers can be achieved
+by setting outlier.shape = ''. Importantly, this does not remove the outliers,
+it only hides them, so the range calculated for the y-axis will be the same with
+outliers shown and outliers hidden.
+* $notch
+If false (default) make a standard box plot. If true, make a notched box plot.
+Notches are used to compare groups; if the notches of two boxes do not overlap,
+this suggests that the medians are significantly different.
+* $notchwidth
+For a notched box plot, width of the notch relative to the body. 
+* $na_rm
+If false, the default, missing values are removed with a warning.
+If true, missing values are silently removed.
+
+=end :list
+
+END_OF_TEXT
+my $geom_boxplot_code = fun (
+        :$data=undef, :$mapping=undef, 
+        :$stat='boxplot', :$position='dodge2',
+        :$outlier_color=undef, :$outlier_colour=undef,
+        :$outlier_fill=undef, :$outlier_shape=undef,
+        :$outlier_size=1.5, :$outlier_stroke=undef,
+        :$outlier_alpha=undef,
+        :$notch=false, :$notchwidth=0.25,
+        :$varwidth=false, :$na_rm=false,
+        :$show_legend='auto', :$inherit_aes=true,
+        %rest )
+{
+    if ( not Ref::Util::is_ref($position) ) {
+        if ($varwidth) {
+            $position = position_dodge2( preserve => 'single' );
+        }
+    }
+    else {
+        if ( $position->preserve eq 'total' and $varwidth ) {
+            warn "Can't preserve total widths when varwidth is true.";
+            $position->preserve('single');
+        }
+    }
+
+    return layer(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => $stat,
+        geom        => 'boxplot',
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        params      => {
+            outlier_color  => ( $outlier_color // $outlier_colour ),
+            outlier_fill   => $outlier_fill,
+            outlier_shape  => $outlier_shape,
+            outlier_size   => $outlier_size,
+            outlier_stroke => $outlier_stroke,
+            outlier_alpha  => $outlier_alpha,
+            notch          => $notch,
+            notchwidth     => $notchwidth,
+            varwidth       => $varwidth,
+            na_rm          => $na_rm,
+            %rest
+        },
+    );
+};
+
+classmethod ggplot_functions() {
+    return [
+        {
+            name => 'geom_boxplot',
+            code => $geom_boxplot_code,
+            pod => $geom_boxplot_pod,
+        }
+    ];
 }
 
 method setup_data ($data, $params) {

@@ -3,7 +3,7 @@ package Chart::GGPlot::Stat::Boxplot;
 # ABSTRACT: Statistic method that gets the statistics data for boxplot
 
 use Chart::GGPlot::Class qw(:pdl);
-use namespace::autoclean -except => 'stat';
+use namespace::autoclean;
 use MooseX::Singleton;
 
 # VERSION
@@ -16,7 +16,7 @@ use POSIX qw(floor);
 use Chart::GGPlot::Aes::Functions qw(aes);
 use Chart::GGPlot::Layer::Functions qw(layer);
 use Chart::GGPlot::Util qw(
-  stat is_discrete range_ has_groups resolution remove_missing
+  is_discrete range_ has_groups resolution remove_missing
 );
 
 with qw(
@@ -35,28 +35,40 @@ classmethod _parameters () {
     ]
 }
 
-classmethod ggplot_function() {
-    return fun (:$mapping=undef, :$data=undef,
-                :$geom='boxplot', :$position='dodge2',
-                :$coef=1.5, :$na_rm=false,
-                :$show_legend='auto', :$inherit_aes=true,
-                %rest)
-    {
-        return layer(
-            data        => $data,
-            mapping     => $mapping,
-            stat        => 'boxplot',
-            geom        => $geom,
-            position    => $position,
-            show_legend => $show_legend,
-            inherit_aes => $inherit_aes,
-            params      => {
-                na_rm => $na_rm,
-                coef  => $coef,
-                %rest,
-            }
-        );
-    };
+my $stat_boxplot_pod = <<'END_OF_TEXT';
+
+END_OF_TEXT
+my $stat_boxplot_code = fun (
+        :$mapping=undef, :$data=undef,
+        :$geom='boxplot', :$position='dodge2',
+        :$coef=1.5, :$na_rm=false,
+        :$show_legend='auto', :$inherit_aes=true,
+        %rest )
+{
+    return layer(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => 'boxplot',
+        geom        => $geom,
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        params      => {
+            na_rm => $na_rm,
+            coef  => $coef,
+            %rest,
+        }
+    );
+};
+
+classmethod ggplot_functions () {
+    return [
+        {
+            name => 'stat_boxplot',
+            code => $stat_boxplot_code,
+            pod  => $stat_boxplot_pod,
+        }
+    ];
 }
 
 method setup_data($data, $params) {

@@ -12,6 +12,7 @@ use List::AllUtils qw(reduce);
 use PDL::Primitive qw(which);
 
 use Chart::GGPlot::Aes;
+use Chart::GGPlot::Layer::Functions qw(layer);
 use Chart::GGPlot::Util qw(:all);
 
 with qw(Chart::GGPlot::Geom);
@@ -29,6 +30,46 @@ has '+default_aes'     => (
 );
 
 classmethod required_aes () { [qw(x y)] }
+
+my $geom_path_pod = <<'END_OF_TEXT';
+
+    geom_path(:$mapping = undef, :$data = undef, :$stat = 'identity',
+        :$position = 'identity', :$na_rm = false, :$show_legend = 'auto',
+        :$inherit_aes = true, 
+        %rest)
+
+The "path" geom connects the observations in the order in which they appear
+in the data.
+
+END_OF_TEXT
+my $geom_path_code = fun (
+        :$mapping = undef, :$data = undef,
+        :$stat = 'identity', :$position = 'identity',
+        :$na_rm = false,
+        :$show_legend = 'auto', :$inherit_aes = true,
+        %rest )
+{
+    return layer(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => $stat,
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        geom        => 'path',
+        params      => { na_rm => $na_rm, %rest },
+    );
+};
+
+classmethod ggplot_functions() {
+    return [
+        {
+            name => 'geom_path',
+            code => $geom_path_code,
+            pod => $geom_path_pod,
+        }
+    ];
+}
 
 method handle_na ($data, $params) {
 
