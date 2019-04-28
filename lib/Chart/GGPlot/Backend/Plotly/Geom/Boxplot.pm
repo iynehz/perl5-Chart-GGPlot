@@ -95,14 +95,15 @@ classmethod to_trace ($df, $params, @rest) {
     $y = [ map { @$_ } @$y ];    # flatten y data
 
     return Chart::Plotly::Trace::Box->new(
-        x         => $x,
-        y         => $y,
-        hoverinfo => 'y',
-        type      => 'box',
-        fillcolor => $fillcolor,
-        marker    => $marker,
-        line      => $line,
-        notched   => ( $params->at('notch') ? JSON::true : JSON::false ),
+        x          => $x,
+        y          => $y,
+        hoverinfo  => 'y',
+        type       => 'box',
+        fillcolor  => $fillcolor,
+        marker     => $marker,
+        line       => $line,
+        notched    => ( $params->at('notch') ? JSON::true : JSON::false ),
+        notchwidth => $params->at('notchwidth'),
 
         # plotly defaults to 'suspectedoutliers' to show outliers and
         # suspected in different styles.
