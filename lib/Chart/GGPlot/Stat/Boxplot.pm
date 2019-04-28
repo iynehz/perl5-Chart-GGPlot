@@ -14,7 +14,7 @@ use PDL::Primitive qw(which);
 use POSIX qw(floor);
 
 use Chart::GGPlot::Aes::Functions qw(aes);
-use Chart::GGPlot::Layer::Functions qw(layer);
+use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(
   is_discrete range_ has_groups resolution remove_missing
 );
@@ -45,7 +45,7 @@ my $stat_boxplot_code = fun (
         :$show_legend='auto', :$inherit_aes=true,
         %rest )
 {
-    return layer(
+    return Chart::GGPlot::Layer->new(
         data        => $data,
         mapping     => $mapping,
         stat        => 'boxplot',

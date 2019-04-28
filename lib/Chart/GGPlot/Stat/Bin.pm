@@ -13,7 +13,7 @@ use POSIX qw(floor);
 
 use Chart::GGPlot::Aes::Functions qw(aes);
 use Chart::GGPlot::Bins;
-use Chart::GGPlot::Layer::Functions qw(layer);
+use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(call_if_coderef seq_n stat);
 
 with qw(
@@ -52,7 +52,7 @@ my $stat_bin_code = fun (
     :$show_legend='auto', :$inherit_aes=true,
     %rest )
 {                           
-    return layer(
+    return Chart::GGPlot::Layer->new(
         data        => $data,
         mapping     => $mapping,
         stat        => 'bin',

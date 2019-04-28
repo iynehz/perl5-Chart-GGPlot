@@ -9,7 +9,7 @@ extends qw(Chart::GGPlot::Geom::Path);
 
 # VERSION
 
-use Chart::GGPlot::Layer::Functions qw(layer);
+use Chart::GGPlot::Layer;
 
 my $geom_line_pod = <<'END_OF_TEXT';
 
@@ -29,7 +29,7 @@ my $geom_line_code = fun (
         :$show_legend = 'auto', :$inherit_aes = true,
         %rest )
 {
-    return layer(
+    return Chart::GGPlot::Layer->new(
         data        => $data,
         mapping     => $mapping,
         stat        => $stat,

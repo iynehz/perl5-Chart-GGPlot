@@ -10,7 +10,7 @@ use MooseX::Singleton;
 
 with qw(Chart::GGPlot::Geom);
 
-use Chart::GGPlot::Layer::Functions qw(layer);
+use Chart::GGPlot::Layer;
 
 my $geom_blank_pod = '';
 my $geom_blank_code = fun (
@@ -19,7 +19,7 @@ my $geom_blank_code = fun (
         :$show_legend = 'auto', :$inherit_aes = true,
         %rest )
 {
-    return layer(
+    return Chart::GGPlot::Layer->new(
         data        => $data,
         mapping     => $mapping,
         stat        => $stat,

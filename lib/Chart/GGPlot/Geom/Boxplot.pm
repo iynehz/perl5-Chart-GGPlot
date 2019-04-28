@@ -11,7 +11,7 @@ extends qw(Chart::GGPlot::Geom::Rect);
 # VERSION
 
 use Chart::GGPlot::Aes;
-use Chart::GGPlot::Layer::Functions qw(layer);
+use Chart::GGPlot::Layer;
 use Chart::GGPlot::Position::Functions qw(position_dodge2);
 use Chart::GGPlot::Util qw(:all);
 
@@ -110,7 +110,7 @@ my $geom_boxplot_code = fun (
         }
     }
 
-    return layer(
+    return Chart::GGPlot::Layer->new(
         data        => $data,
         mapping     => $mapping,
         stat        => $stat,

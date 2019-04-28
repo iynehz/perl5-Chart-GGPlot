@@ -8,6 +8,8 @@ use MooseX::Singleton;
 
 # VERSION
 
+use Chart::GGPlot::Layer;
+
 with qw(
   Chart::GGPlot::Stat
 );
@@ -20,7 +22,7 @@ my $stat_identity_code = fun (
         :$show_legend = undef, :$inherit_aes = true,
         %rest )
 {
-    return layer(
+    return Chart::GGPlot::Layer->new(
         mapping     => $mapping,
         data        => $data,
         stat        => 'identify',

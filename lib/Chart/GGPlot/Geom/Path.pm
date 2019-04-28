@@ -12,7 +12,7 @@ use List::AllUtils qw(reduce);
 use PDL::Primitive qw(which);
 
 use Chart::GGPlot::Aes;
-use Chart::GGPlot::Layer::Functions qw(layer);
+use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(:all);
 
 with qw(Chart::GGPlot::Geom);
@@ -49,7 +49,7 @@ my $geom_path_code = fun (
         :$show_legend = 'auto', :$inherit_aes = true,
         %rest )
 {
-    return layer(
+    return Chart::GGPlot::Layer->new(
         data        => $data,
         mapping     => $mapping,
         stat        => $stat,

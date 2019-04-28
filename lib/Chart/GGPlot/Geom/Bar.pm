@@ -11,7 +11,7 @@ extends qw(Chart::GGPlot::Geom::Rect);
 # VERSION
 
 use Chart::GGPlot::Aes;
-use Chart::GGPlot::Layer::Functions qw(layer);
+use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(:all);
 
 has '+non_missing_aes' => ( default => sub { [qw(xmin xmax ymin ymax)] } );
@@ -39,7 +39,7 @@ my $geom_bar_code = fun (
         :$show_legend = 'auto', :$inherit_aes = true,
         %rest )
 {
-    return layer(
+    return Chart::GGPlot::Layer->new(
         data        => $data,
         mapping     => $mapping,
         stat        => $stat,
@@ -75,7 +75,7 @@ my $geom_histogram_code = fun (
         :$show_legend = 'auto', :$inherit_aes = true,
         %rest )
 {
-    return layer(
+    return Chart::GGPlot::Layer->new(
         data        => $data,
         mapping     => $mapping,
         stat        => $stat,

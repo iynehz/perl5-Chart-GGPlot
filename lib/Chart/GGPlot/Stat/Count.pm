@@ -11,7 +11,7 @@ use MooseX::Singleton;
 use Data::Frame;
 
 use Chart::GGPlot::Aes::Functions qw(aes);
-use Chart::GGPlot::Layer::Functions qw(layer);
+use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(resolution stat);
 
 with qw(
@@ -47,7 +47,7 @@ my $stat_count_code = fun (
         die "stat_count() must not be used with a y aesthetic.";
     }   
 
-    return layer(
+    return Chart::GGPlot::Layer->new(
         data        => $data,
         mapping     => $mapping,
         stat        => 'count',
