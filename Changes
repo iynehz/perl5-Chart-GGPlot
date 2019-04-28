@@ -1,5 +1,8 @@
 Revision history for Chart::GGPlot
 
+0.0002_02   TBD
+  - TBD
+
 0.0002_01   2019-04-27
   - New feature: Boxplot
   - Make Chart::GGPlot::Util::dollar() behavior more consistant. (github #6)
