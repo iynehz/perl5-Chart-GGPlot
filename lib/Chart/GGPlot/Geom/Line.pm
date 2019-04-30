@@ -10,17 +10,27 @@ extends qw(Chart::GGPlot::Geom::Path);
 # VERSION
 
 use Chart::GGPlot::Layer;
+use Chart::GGPlot::Util::Pod qw(layer_func_pod);
 
-my $geom_line_pod = <<'END_OF_TEXT';
+my $geom_line_pod = layer_func_pod(<<'=cut');
 
-    geom_line(:$mapping = undef, :$data = undef, :$stat = 'identity',
-        :$position = 'identity', :$na_rm = false, :$show_legend = 'auto',           :$inherit_aes = true, 
-        %rest)
+    geom_line(:$mapping=undef, :$data=undef, :$stat='identity',
+              :$position='identity', :$na_rm=false, :$show_legend='auto',
+              :$inherit_aes=true, 
+              %rest)
 
 The "line" geom connects the observations in the order of the variable on
 the x axis.
 
-END_OF_TEXT
+Arguments:
+
+=over 4
+
+%TMPL_COMMON_ARGS%
+
+=back
+
+=cut
 
 my $geom_line_code = fun (
         :$mapping = undef, :$data = undef,

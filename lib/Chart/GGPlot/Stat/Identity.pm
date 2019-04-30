@@ -9,13 +9,29 @@ use MooseX::Singleton;
 # VERSION
 
 use Chart::GGPlot::Layer;
+use Chart::GGPlot::Util::Pod qw(layer_func_pod);
 
 with qw(
   Chart::GGPlot::Stat
 );
 
-my $stat_identity_pod = <<'END_OF_TEXT';
-END_OF_TEXT
+my $stat_identity_pod = layer_func_pod(<<'=cut');
+
+    stat_identity(:$mapping=undef, :$data=undef,
+                  :$geom="point", :$position="identity",
+                  :$show_legend=undef, :$inherit_aes=true,
+                  %rest)
+
+Arguments:
+
+=over 4
+
+%TMPL_COMMON_ARGS%
+
+=back
+
+=cut
+
 my $stat_identity_code = fun (
         :$mapping = undef, :$data = undef,
         :$geom = "point", :$position = "identity",

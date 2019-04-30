@@ -13,6 +13,7 @@ use Data::Frame;
 use Chart::GGPlot::Aes::Functions qw(aes);
 use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(resolution stat);
+use Chart::GGPlot::Util::Pod qw(layer_func_pod);
 
 with qw(
   Chart::GGPlot::Stat
@@ -29,8 +30,28 @@ has '+default_aes'  => (
 
 classmethod required_aes() { ['x'] }
 
-my $stat_count_pod = <<'END_OF_TEXT';
-END_OF_TEXT
+my $stat_count_pod = layer_func_pod(<<'=cut');
+
+    stat_count(:$mapping=undef, :$data=undef,
+               :$geom='bar', :$position='stack', 
+               :$width=undef,
+               :$na_rm=false, :$show_legend=undef, :$inherit_aes=true,
+               %rest)
+
+Arguments:
+
+=over 4
+
+%TMPL_COMMON_ARGS%
+
+=item * $width
+
+Bar width. By default, set to 90% of the resolution of the data.
+
+=back
+
+=cut
+
 my $stat_count_code = fun (
         :$mapping = undef, :$data = undef,
         :$geom = 'bar', :$position = 'stack', 

@@ -13,25 +13,41 @@ extends qw(Chart::GGPlot::Geom::Rect);
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(:all);
+use Chart::GGPlot::Util::Pod qw(layer_func_pod);
 
 has '+non_missing_aes' => ( default => sub { [qw(xmin xmax ymin ymax)] } );
 
 classmethod required_aes() { [qw(x y)] }
 classmethod extra_params() { [qw(na_rm width)] }
 
-my $geom_bar_pod = <<'END_OF_TEXT';
+my $geom_bar_pod = layer_func_pod(<<'=cut');
 
-    geom_bar(:$mapping = undef, :$data = undef, :$stat = 'count',
-        :$position = 'stack', :$width = undef,
-        :$na_rm = false, :$show_legend = 'auto', :$inherit_aes = true,
-        %rest)
+    geom_bar(:$mapping=undef, :$data=undef, :$stat='count',
+             :$position='stack', :$width=undef,
+             :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+             %rest)
 
 The "bar" geom makes the height bar proportional to the number of cases in each group (or if the C<weight> aesthetic is supplied, the sum of the
 C<weights>). 
 It uses C<stat_count()> by default: it counts the number of cases at each x
 position. 
 
-END_OF_TEXT
+Arguments:
+
+=over 4
+
+%TMPL_COMMON_ARGS%
+
+=item * $width
+
+Bar width. By default, set to 90% of the resolution of the data.
+
+=back
+
+See also L<Chart::GGPlot::Stat::Functions/stat_count>.
+
+=cut
+
 my $geom_bar_code = fun (
         :$mapping = undef, :$data = undef,
         :$stat = 'count', :$position = 'stack',
@@ -55,18 +71,41 @@ my $geom_bar_code = fun (
     );
 };
 
-my $geom_histogram_pod = <<'END_OF_TEXT';
+my $geom_histogram_pod = layer_func_pod(<<'=cut');
 
-    geom_histogram(:$data = undef, :$mapping = undef, :$stat = "bin",
-        :$position = "stack", :$binwidth = undef, :$bins = undef,
-        :$na_rm = false, :$show_legend = 'auto', :$inherit_aes = true,
-        %rest)
+    geom_histogram(:$mapping=undef, :$data=undef, :$stat="bin",
+                   :$position="stack", :$binwidth=undef, :$bins=undef,
+                   :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+                   %rest)
 
 Visualise the distribution of a single continuous variable by dividing the 
 x axis into bins and counting the number of observations in each bin.
 This "histogram" geom displays the counts with bars.
 
-END_OF_TEXT
+=over 4
+
+%TMPL_COMMON_ARGS%
+
+=item * $binwidth
+
+The width of the bins.
+Can be specified as a numeric value, or a function that calculates width
+from x. The default is to use C<$bins> bins that cover the range of the
+data.
+
+=item * $bins
+
+Number of bins. Overridden by C<$binwidth>. Defaults to 30.
+
+You should always override this C<$bins> or C<$binwidth>, exploring
+multiple widths to find the best to illustrate the stories in your data.
+
+=back
+
+See also L<Chart::GGPlot::Stat::Functions/stat_bin>.
+
+=cut
+
 my $geom_histogram_code = fun (
         :$data = undef, :$mapping = undef,
         :$stat = "bin", :$position = "stack",

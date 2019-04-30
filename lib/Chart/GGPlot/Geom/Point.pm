@@ -11,6 +11,7 @@ use MooseX::Singleton;
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(:all);
+use Chart::GGPlot::Util::Pod qw(layer_func_pod);
 
 with qw(Chart::GGPlot::Geom);
 
@@ -30,11 +31,12 @@ has '+default_aes'     => (
 
 classmethod required_aes() { [qw(x y)] }
 
-my $geom_point_pod = <<'END_OF_TEXT'; 
+my $geom_point_pod = layer_func_pod(<<'=cut');
 
-    geom_point(:$mapping = undef, :$data = undef, :$stat = 'identity',
-        :$position = 'identity', :$na_rm = false, :$show_legend = 'auto',
-        :$inherit_aes = true, %rest)
+    geom_point(:$mapping=undef, :$data=undef, :$stat='identity',
+               :$position='identity',
+               :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+               %rest)
 
 The "point" geom is used to create scatterplots.
 The scatterplot is most useful for displaying the relationship between two
@@ -42,7 +44,16 @@ continuous variables.
 A bubblechart is a scatterplot with a third variable mapped to the size of
 points.
 
-END_OF_TEXT
+Arguments:
+
+=over 4
+
+%TMPL_COMMON_ARGS%
+
+=back
+
+=cut
+
 my $geom_point_code = fun (
         :$mapping = undef, :$data = undef,
         :$stat = 'identity', :$position = 'identity',

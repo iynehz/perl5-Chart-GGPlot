@@ -299,6 +299,22 @@ fun split_indices (Piddle1D $indices, $n=$indices->max) {
     return [ map { pdl($_) } @rslt ];
 }
 
+=func resolution
+
+    resolution(Piddle1D $x, $zero=true)
+
+The resolution is the smallest non-zero distance between adjacent values.
+
+If C<$x> has a single value, or an interger vector which can be assumed to
+represent a discrete value, then the resolution is 1.
+If C<$x> is a float vector, the resolution is the minimal distance between
+ajacent values in sorted C<$x>.
+
+If C<$zero> is true, 0 would be inserted into the vector, if it's does not
+already in the vector, when computing the resolution.
+
+=cut
+
 fun resolution(Piddle1D $x, $zero=true) {
     if ($x->type < PDL::float or zero_range(range_($x, true))) {
         return 1;

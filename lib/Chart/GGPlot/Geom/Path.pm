@@ -14,6 +14,7 @@ use PDL::Primitive qw(which);
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(:all);
+use Chart::GGPlot::Util::Pod qw(layer_func_pod);
 
 with qw(Chart::GGPlot::Geom);
 
@@ -31,17 +32,24 @@ has '+default_aes'     => (
 
 classmethod required_aes () { [qw(x y)] }
 
-my $geom_path_pod = <<'END_OF_TEXT';
+my $geom_path_pod = layer_func_pod(<<'=cut');
 
-    geom_path(:$mapping = undef, :$data = undef, :$stat = 'identity',
-        :$position = 'identity', :$na_rm = false, :$show_legend = 'auto',
-        :$inherit_aes = true, 
-        %rest)
+    geom_path(:$mapping=undef, :$data=undef, :$stat='identity',
+              :$position='identity', :$na_rm=false, :$show_legend='auto',
+              :$inherit_aes=true, 
+              %rest)
 
 The "path" geom connects the observations in the order in which they appear
 in the data.
 
-END_OF_TEXT
+=over 4
+
+%TMPL_COMMON_ARGS%
+
+=back
+
+=cut
+
 my $geom_path_code = fun (
         :$mapping = undef, :$data = undef,
         :$stat = 'identity', :$position = 'identity',

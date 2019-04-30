@@ -18,6 +18,7 @@ use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(
   is_discrete range_ has_groups resolution remove_missing
 );
+use Chart::GGPlot::Util::Pod qw(layer_func_pod);
 
 with qw(
   Chart::GGPlot::Stat
@@ -35,9 +36,28 @@ classmethod _parameters () {
     ]
 }
 
-my $stat_boxplot_pod = <<'END_OF_TEXT';
+my $stat_boxplot_pod = layer_func_pod(<<'=cut');
 
-END_OF_TEXT
+    stat_boxplot(:$mapping=undef, :$data=undef,
+                 :$geom='boxplot', :$position='dodge2',
+                 :$coef=1.5,
+                 :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+                 %rest)
+
+Arguments:
+
+=over 4
+
+%TMPL_COMMON_ARGS%
+
+=item * $coef
+
+Length of the whiskers as multiple of IQR. Defaults to 1.5.
+
+=back
+
+=cut
+
 my $stat_boxplot_code = fun (
         :$mapping=undef, :$data=undef,
         :$geom='boxplot', :$position='dodge2',
