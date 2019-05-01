@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 # VERSION
 
-use Types::Standard qw(Bool Overload);
+use Types::Standard;
 
 use Chart::GGPlot::Util qw(:all);
 

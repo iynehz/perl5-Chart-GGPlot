@@ -125,7 +125,7 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
             sub {
                 my ($d) = @_;
 
-                my $trace = $class_geom_impl->to_trace($d, $params);
+                my $trace = $class_geom_impl->to_trace($d, $params, $plot);
 
                 # If we need a legend, set legend info.
                 my $show_legend =
@@ -235,10 +235,16 @@ method _to_plotly ($plot_built) {
             return ($theme->at("${elname}.${xy}") // $theme->at($elname));
         };
 
-        my $sc =
-            $plot->coordinates->DOES('Chart::GGPlot::Coord::Flip')
-          ? $scales->{ $xy eq 'x' ? 'y' : 'x' }
-          : $scales->{$xy};
+        my $axis_name;
+        my $sc;
+        if ( $plot->coordinates->DOES('Chart::GGPlot::Coord::Flip') ) {
+            my $new_xy = $xy eq 'x' ? 'y' : 'x';
+            $axis_name = "${new_xy}axis";
+            $sc = $scales->{$new_xy};
+        } else {
+            $axis_name = "${xy}axis";
+            $sc = $scales->{$xy};
+        }
 
         my $axis_title = $sc->name // $labels->at($xy) // '';
 
@@ -283,7 +289,7 @@ method _to_plotly ($plot_built) {
         my $el_panel_grid = $theme_el->('panel_grid_major')
           // $theme->at('panel_grid');
 
-        $plotly_layout{"${xy}axis"} = {
+        $plotly_layout{$axis_name} = {
             range     => $range,
             zeroline  => JSON::false,
             autorange => JSON::false,

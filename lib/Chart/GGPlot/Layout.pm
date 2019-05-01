@@ -12,7 +12,7 @@ use Data::Munge qw(elem);
 use List::AllUtils qw(pairwise);
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle1D);
-use Types::Standard qw(ArrayRef InstanceOf HashRef Bool);
+use Types::Standard qw(ArrayRef InstanceOf HashRef Maybe);
 
 use Chart::GGPlot::Types qw(:all);
 use Chart::GGPlot::Coord::Functions qw(:all);
@@ -42,7 +42,10 @@ has [qw(coord_params facet_params)] => (
 
 has layout => ( is => 'rw', isa => DataFrame, init_arg => undef );
 
-has [qw(panel_scales_x panel_scales_y)] => ( is => 'rw' );
+has [qw(panel_scales_x panel_scales_y)] => (
+    is  => 'rw',
+    isa => Maybe [ArrayRef]
+);
 has panel_params => ( is => 'rwp', isa => ArrayRef [HashRef] );
 
 method setup (ArrayRef $data, $plot_data=Data::Frame->new()) {

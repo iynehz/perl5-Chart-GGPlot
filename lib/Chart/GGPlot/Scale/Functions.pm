@@ -50,7 +50,7 @@ my @export_ggplot = (
     )
 );
 
-our @EXPORT_OK = ( @export_ggplot, qw(find_scale) );
+our @EXPORT_OK = ( @export_ggplot, qw(find_scale scale_flip_position) );
 our %EXPORT_TAGS = (
     all    => \@EXPORT_OK,
     ggplot => \@export_ggplot,
@@ -66,32 +66,38 @@ form of C<scale_${aes}_${type}>, where C<$type> is decided by C<$x>.
 =cut
 
 fun find_scale ($aes, $x) {
-    my $type      = scale_type($x);
-    my $func_name = join( '_', "scale", $aes, $type );
-    my $f         = $scale_funcs{$func_name};
-    return ( wantarray ? ( $f, $func_name ) : $f );
+    my $types = scale_type($x);
+
+    for my $t (@$types) {
+        my $func_name = join( '_', "scale", $aes, $t );
+        if ( my $f = $scale_funcs{$func_name} ) {
+            return ( wantarray ? ( $f, $func_name ) : $f );
+        }
+    }
+    return;
 }
 
-# TODO support various kind of types
 fun scale_type ($x) {
     if ( $x->$_DOES('PDL::Factor') ) {
-        return $x->DOES('PDL::Factor::Ordered') ? 'ordinal' : 'discrete';
+        return $x->DOES('PDL::Factor::Ordered')
+          ? [qw(ordinal discrete)]
+          : ['discrete'];
     }
     elsif ( $x->$_DOES('PDL::SV') ) {
-        return 'discrete';
+        return ['discrete'];
     }
     elsif ( $x->$_DOES('PDL::DateTime') ) {
-        return 'datetime';
+        return ['datetime'];
     }
     elsif ( $x->$_DOES('PDL') ) {
         if ( $x->type eq 'byte' ) {
-            return 'discrete';
+            return ['discrete'];
         }
         else {
-            return 'continuous';
+            return ['continuous'];
         }
     }
-    return 'identity';
+    return ['identity'];
 }
 
 fun _check_breaks_labels ( $breaks, $labels ) {
@@ -475,6 +481,7 @@ fun scale_flip_position ($scale) {
         right  => "left",
     };
     $scale->position( $switch->{ $scale->position } );
+    return $scale;
 }
 
 =func scale_color_hue

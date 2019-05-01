@@ -12,7 +12,7 @@ use Module::Load;
 
 use Chart::GGPlot::Backend::Plotly::Util qw(to_rgb pdl_to_plotly);
 
-classmethod to_trace ($df, $params, @rest) {
+classmethod to_trace ($df, $params, $plot) {
     load Chart::Plotly::Trace::Bar;
     load Chart::Plotly::Trace::Bar::Marker;
 
@@ -29,7 +29,7 @@ classmethod to_trace ($df, $params, @rest) {
     my $y     = $df->at('ymax') - $base;
     my $width = $df->at('xmax') - $df->at('xmin');
 
-    return Chart::Plotly::Trace::Bar->new(
+    my $trace = Chart::Plotly::Trace::Bar->new(
         x         => pdl_to_plotly($x),
         y         => pdl_to_plotly($y),
         base      => pdl_to_plotly( $base, true ),
@@ -38,6 +38,7 @@ classmethod to_trace ($df, $params, @rest) {
         hovertext => pdl_to_plotly( $df->at('hovertext') ),
         hoverinfo => 'text',
     );
+    return $class->_adjust_trace_for_flip($trace, $plot);
 }
 
 around _hovertext_data_for_aes( $orig, $class : $df, $aes ) {

@@ -40,7 +40,7 @@ classmethod to_basic ($data, $prestats_data, $layout, $params, $plot) {
     return $data;
 }
 
-classmethod to_trace ($df, $params, @rest) {
+classmethod to_trace ($df, $params, $plot) {
     load Chart::Plotly::Trace::Box;
     load Chart::Plotly::Trace::Box::Line;
     load Chart::Plotly::Trace::Box::Marker;
@@ -94,23 +94,24 @@ classmethod to_trace ($df, $params, @rest) {
           ( 0 .. $data_x->length - 1 ) ];
     $y = [ map { @$_ } @$y ];    # flatten y data
 
-    return Chart::Plotly::Trace::Box->new(
+    my $flip = $plot->coordinates->DOES('Chart::GGPlot::Coord::Flip');
+    my $trace = Chart::Plotly::Trace::Box->new(
         x          => $x,
         y          => $y,
-        hoverinfo  => 'y',
         type       => 'box',
         fillcolor  => $fillcolor,
         marker     => $marker,
         line       => $line,
         notched    => ( $params->at('notch') ? JSON::true : JSON::false ),
         notchwidth => $params->at('notchwidth'),
+        hoverinfo  => ( $flip ? 'x' : 'y' ),
 
         # plotly defaults to 'suspectedoutliers' to show outliers and
         # suspected in different styles.
         # we use 'outliers' here to align with ggplot2 behavior.
         boxpoints => 'outliers',
-
     );
+    return $class->_adjust_trace_for_flip($trace, $plot);
 }
 
 __PACKAGE__->meta->make_immutable;

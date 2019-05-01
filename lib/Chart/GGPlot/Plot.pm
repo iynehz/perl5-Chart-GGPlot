@@ -68,6 +68,7 @@ method AUTOCAN ($method) {
         [ ( ConsumerOf ['Chart::GGPlot::Facet'] ),  'facet' ],
         [ ( ConsumerOf ['Chart::GGPlot::Layer'] ),  'add_layer' ],
         [ ( ConsumerOf ['Chart::GGPlot::Labels'] ), 'add_labels' ],
+        [ ( ConsumerOf ['Chart::GGPlot::Coord'] ),  'add_coord' ],
         [ ( ConsumerOf ['Chart::GGPlot::Guide'] ),  'add_guide' ],
         [ ( ConsumerOf ['Chart::GGPlot::Scale'] ),  'add_scale' ],
         [ ( ConsumerOf ['Chart::GGPlot::Theme'] ),  '_set__theme' ],
@@ -142,7 +143,7 @@ has scales => (
 );
 has _theme   => ( is => 'rwp', isa => InstanceOf['Chart::GGPlot::Theme'] );
 has coordinates => (
-    is      => 'rw',
+    is      => 'rwp',
     isa     => Coord,
     default => sub {
         Chart::GGPlot::Coord::Functions::coord_cartesian( default => true );
@@ -295,6 +296,19 @@ You normally don't have to explicitly call this method.
 
 method add_scale ($scale) {
     $self->scales->add($scale);
+    return $self;
+}
+
+=method add_coord
+
+    add_coord($scale)
+
+You normally don't have to explicitly call this method.
+
+=cut
+
+method add_coord($coord) {
+    $self->_set_coordinates($coord);
     return $self;
 }
 

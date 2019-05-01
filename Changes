@@ -1,7 +1,8 @@
 Revision history for Chart::GGPlot
 
 0.0002_02   TBD
-  - TBD
+  - New feature: coord_flip()
+  - Some Pod improvements
 
 0.0002_01   2019-04-27
   - New feature: Boxplot

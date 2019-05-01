@@ -3,6 +3,7 @@
 use Chart::GGPlot::Setup qw(:base :pdl);
 
 use Data::Frame;
+use Module::Load;
 
 use Test2::V0;
 use Test2::Tools::DataFrame;
@@ -10,6 +11,18 @@ use Test2::Tools::PDL;
 
 use Chart::GGPlot::Backend::Plotly::Util qw(:all);
 use Chart::GGPlot qw(:all);
+
+# use all backend geom implementations for syntax test
+subtest syntax_check => sub {
+    my @geoms = qw(Bar Boxplot Path Point Line);
+    for (@geoms) {
+        my $package = "Chart::GGPlot::Backend::Plotly::Geom::$_"; 
+        eval { load $package };
+        unless (ok(!$@, "syntax check: $package")) {
+            diag $@;
+        }
+    }
+};
 
 subtest group_to_NA => sub {
     my $df1 = Data::Frame->new(
@@ -100,6 +113,8 @@ subtest group_to_NA => sub {
 };
 
 subtest to_rgb => sub {
+    no warnings 'qw';
+
     pdl_is(
         to_rgb( PDL::SV->new( [qw(black white)] ) ),
         PDL::SV->new( [qw(#000000 #ffffff)] ),

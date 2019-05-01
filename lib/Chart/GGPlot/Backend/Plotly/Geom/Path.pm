@@ -23,7 +23,7 @@ classmethod marker ($df, @rest) {
     return;
 }
 
-classmethod to_trace ($df, $params, @rest) {
+classmethod to_trace ($df, $params, $plot) {
     $df = group_to_NA($df);
 
     my $use_webgl = $class->use_webgl($df);
@@ -39,7 +39,7 @@ classmethod to_trace ($df, $params, @rest) {
     }
 
     my ( $x, $y ) = map { $df->at($_) } qw(x y);
-    my $marker = $class->marker( $df, $params, @rest );
+    my $marker = $class->marker( $df, $params, $plot );
 
     my $mode = $class->mode;
     my $line;
@@ -62,7 +62,7 @@ classmethod to_trace ($df, $params, @rest) {
         };
     }
 
-    return $plotly_trace_class->new(
+    my $trace = $plotly_trace_class->new(
         x    => $x,
         y    => $y,
         mode => $mode,
@@ -82,6 +82,7 @@ classmethod to_trace ($df, $params, @rest) {
             )
         ),
     );
+    return $class->_adjust_trace_for_flip($trace, $plot);
 }
 
 __PACKAGE__->meta->make_immutable;

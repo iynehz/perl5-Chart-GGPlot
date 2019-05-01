@@ -33,7 +33,7 @@ method use_webgl ($df) {
 
 =method to_trace
 
-    to_trace($df, $params, @rest)
+    to_trace($df, $params, $plot)
 
 This shall be implemented by consumers of this role.
 It should return an arrayref of Chart::Plotly::Trace::X objects.  
@@ -87,6 +87,21 @@ classmethod _hovertext_data_for_aes ($df, $aes) {
 
 classmethod to_basic($data, $prestats_data, $layout, $params, $plot) {
     return $data;
+}
+
+classmethod _adjust_trace_for_flip ($trace, $plot) {
+    if ( $plot->coordinates->DOES('Chart::GGPlot::Coord::Flip') ) {
+        my ( $x, $y ) = ( $trace->x, $trace->y );
+        $trace->x($y);
+        $trace->y($x);
+        $trace->$_call_if_can( 'orientation', 'h' );
+
+        my $error_x = $trace->$_call_if_can('error_x');
+        my $error_y = $trace->$_call_if_can('error_y');
+        $trace->error_x($error_y) if $error_y;
+        $trace->error_y($error_x) if $error_x;
+    }
+    return $trace;
 }
 
 1;
