@@ -15,8 +15,7 @@ has render_axis_h => ( is => 'rw' );
 # Renders the vertical axes.
 has render_axis_v => ( is => 'rw' );
 
-# Returns the x and y ranges
-has range => ( is => 'rw' );
+with qw(Chart::GGPlot::HasCollectibleFunctions);
 
 =classmethod is_linear
 

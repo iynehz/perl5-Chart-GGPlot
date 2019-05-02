@@ -7,7 +7,7 @@ use Data::Frame::Examples qw(mtcars);
 
 use Test2::V0;
 
-use Chart::GGPlot::Coord::Cartesian;
+use Chart::GGPlot::Coord::Flip;
 
 my @cases_construction = (
     {
@@ -19,8 +19,8 @@ my @cases_construction = (
 );
 
 for my $case (@cases_construction) {
-    my $coord = Chart::GGPlot::Coord::Cartesian->new( %{ $case->{params} } );
-    isa_ok( $coord, ['Chart::GGPlot::Coord::Cartesian'], 'construction' );
+    my $coord = Chart::GGPlot::Coord::Flip->new( %{ $case->{params} } );
+    isa_ok( $coord, ['Chart::GGPlot::Coord::Flip'], 'construction' );
 }
 
 done_testing();

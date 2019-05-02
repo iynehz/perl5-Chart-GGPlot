@@ -2,6 +2,7 @@ Revision history for Chart::GGPlot
 
 0.0002_02   TBD
   - New feature: coord_flip()
+  - coord_cartesian() now really supports :$xlim, :$ylim arguments.
   - Some Pod improvements
 
 0.0002_01   2019-04-27

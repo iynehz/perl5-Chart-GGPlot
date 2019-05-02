@@ -6,20 +6,22 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 # VERSION
 
-use Chart::GGPlot::Coord::Cartesian;
-use Chart::GGPlot::Coord::Flip;
-use Chart::GGPlot::Coord::Polar;
-use Chart::GGPlot::Types qw(:all);
-use Chart::GGPlot::Util qw(:all);
+use Chart::GGPlot::Util qw(collect_functions_from_package);
 
 use parent qw(Exporter::Tiny);
 
-my @export_ggplot = qw(coord_cartesian coord_flip coord_polar);
+my @export_ggplot;
+
+our @sub_namespaces = qw(Cartesian Flip);
+
+for my $name (@sub_namespaces) {
+    my $package = "Chart::GGPlot::Coord::$name";
+    my @func_names = collect_functions_from_package($package);
+    push @export_ggplot, @func_names;
+}
 
 our @EXPORT_OK = (
     @export_ggplot,
-    qw(
-      )
 );
 
 our %EXPORT_TAGS = (
@@ -27,22 +29,17 @@ our %EXPORT_TAGS = (
     ggplot => \@export_ggplot,
 );
 
-sub coord_cartesian {
-    return Chart::GGPlot::Coord::Cartesian->new(@_);
-}
-
-fun coord_polar(:$theta ='x', :$start = 0, :$direction = 1) {
-    return Chart::GGPlot::Coord::Polar->new(
-        theta     => $theta,
-        start     => $start,
-        direction => ( $direction <=> 0 )
-    );
-}
-
-sub coord_flip {
-    return Chart::GGPlot::Coord::Flip->new(@_);
-}
-
 1;
 
 __END__
+
+=head1 FUNCTIONS
+
+=srcAlias CoordFunctions temp/CoordFunctions.pod
+
+=include funcs@CoordFunctions
+
+=head1 SEE ALSO
+
+L<Chart::GGPlot::Coord>
+
