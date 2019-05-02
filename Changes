@@ -1,12 +1,12 @@
 Revision history for Chart::GGPlot
 
-0.0002_02   TBD
+0.0002_02   2019-05-02
   - New feature: coord_flip()
   - coord_cartesian() now really supports :$xlim, :$ylim arguments.
   - Some Pod improvements
 
 0.0002_01   2019-04-27
-  - New feature: Boxplot
+  - New feature: basic support of geom_boxplot()
   - Make Chart::GGPlot::Util::dollar() behavior more consistant. (github #6)
   - Performance improvements: Together with improments in
     Alt::Data::Frame::ButMore, now for an extreme case of "diamonds scatter"    example, which is quite slow among the examples, it's become 3x faster
