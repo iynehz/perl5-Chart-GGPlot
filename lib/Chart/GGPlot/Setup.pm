@@ -117,7 +117,6 @@ sub _import_tag {
 
         Moose->import::into($target);
         MooseX::Aliases->import::into($target);
-        MooseX::LazyRequire->import::into($target);
         MooseX::MungeHas->import::into($target);
         MooseX::StrictConstructor->import::into($target);
     }
@@ -129,7 +128,6 @@ sub _import_tag {
 
         Moose::Role->import::into($target);
         MooseX::Aliases->import::into($target);
-        MooseX::LazyRequire->import::into($target);
         MooseX::MungeHas->import::into($target);
     }
     elsif ( $tag eq ':pdl' ) {
