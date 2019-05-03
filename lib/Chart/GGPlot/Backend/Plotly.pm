@@ -456,6 +456,12 @@ Below options are supported for C<$opts>:
 * width
 * height
 
+=method iplot
+
+    iplot($ggplot, HashRef $opts={})
+
+Generate Plotly plot for L<IPerl> in Jupyter notebook.
+
 =cut
 
 method ggplotly ($ggplot) {
@@ -479,6 +485,16 @@ method save ($ggplot, $filename, HashRef $opts={}) {
         #>>>
     );
     die "Failed to save image via plotly-orca" unless $good;
+}
+
+method iplot ($ggplot, HashRef $opts={}) {
+    state $plugin_registered;
+    unless ($plugin_registered) {
+        IPerl->load_plugin('Chart::Plotly');
+        $plugin_registered = 1;
+    }
+
+    return $self->ggplotly($ggplot);
 }
 
 1;

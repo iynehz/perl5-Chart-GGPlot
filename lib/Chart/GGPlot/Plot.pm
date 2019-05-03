@@ -183,6 +183,13 @@ Implementation depends on the plotting backend.
 Export the plot to a static image file.
 Implementation depends on the plotting backend.
 
+=method iplot
+
+    iplot(HashRef $opts={})
+
+Generate plot for L<IPerl> in Jupyter notebook.
+Implementation depends on the plotting backend.
+
 =cut
 
 method show (HashRef $opts={}) {
@@ -191,6 +198,10 @@ method show (HashRef $opts={}) {
 
 method save ($filename, HashRef $opts={}) {
     $self->backend->save( $self, $filename, $opts );
+}
+
+method iplot (HashRef $opts={}) {
+    $self->backend->iplot( $self, $opts );
 }
 
 =method summary
@@ -380,3 +391,6 @@ C<add_layer()> is called.
 =head1 SEE ALSO
 
 L<Chart::GGPlot>
+
+L<Devel::IPerl>
+
