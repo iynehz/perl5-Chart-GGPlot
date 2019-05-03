@@ -1,4 +1,4 @@
-requires "Alt::Data::Frame::ButMore" => "0.0045";
+requires "Alt::Data::Frame::ButMore" => "0.0047";
 requires "Autoload::AUTOCAN" => "0";
 requires "Carp" => "0";
 requires "Chart::Plotly" => "0.025";
