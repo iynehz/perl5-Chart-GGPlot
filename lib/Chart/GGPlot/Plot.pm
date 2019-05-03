@@ -312,7 +312,7 @@ method add_scale ($scale) {
 
 =method add_coord
 
-    add_coord($scale)
+    add_coord($coord)
 
 You normally don't have to explicitly call this method.
 
