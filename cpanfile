@@ -91,5 +91,4 @@ on 'develop' => sub {
   requires "FindBin" => "0";
   requires "Path::Tiny" => "0";
   requires "Test2::V0" => "0";
-  requires "Test::Pod" => "1.41";
 };
