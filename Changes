@@ -1,5 +1,8 @@
 Revision history for Chart::GGPlot
 
+0.0004_01   TBD
+  - TBD
+
 0.0003      2019-05-04
   - New feature: basic support of geom_boxplot()
   - New feature: coord_flip()
