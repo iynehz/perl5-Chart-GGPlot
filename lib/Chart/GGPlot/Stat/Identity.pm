@@ -15,22 +15,22 @@ with qw(
   Chart::GGPlot::Stat
 );
 
-my $stat_identity_pod = layer_func_pod(<<'=cut');
+my $stat_identity_pod = layer_func_pod(<<'EOT');
 
-    stat_identity(:$mapping=undef, :$data=undef,
-                  :$geom="point", :$position="identity",
-                  :$show_legend=undef, :$inherit_aes=true,
-                  %rest)
+        stat_identity(:$mapping=undef, :$data=undef,
+                      :$geom="point", :$position="identity",
+                      :$show_legend=undef, :$inherit_aes=true,
+                      %rest)
 
-Arguments:
+    Arguments:
 
-=over 4
+    =over 4
 
-%TMPL_COMMON_ARGS%
+    %TMPL_COMMON_ARGS%
 
-=back
+    =back
 
-=cut
+EOT
 
 my $stat_identity_code = fun (
         :$mapping = undef, :$data = undef,

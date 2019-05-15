@@ -31,28 +31,28 @@ has '+default_aes'     => (
 
 classmethod required_aes() { [qw(x y)] }
 
-my $geom_point_pod = layer_func_pod(<<'=cut');
+my $geom_point_pod = layer_func_pod(<<'EOT');
 
-    geom_point(:$mapping=undef, :$data=undef, :$stat='identity',
-               :$position='identity',
-               :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
-               %rest)
+        geom_point(:$mapping=undef, :$data=undef, :$stat='identity',
+                   :$position='identity',
+                   :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+                   %rest)
 
-The "point" geom is used to create scatterplots.
-The scatterplot is most useful for displaying the relationship between two
-continuous variables.
-A bubblechart is a scatterplot with a third variable mapped to the size of
-points.
+    The "point" geom is used to create scatterplots.
+    The scatterplot is most useful for displaying the relationship between
+    two continuous variables.
+    A bubblechart is a scatterplot with a third variable mapped to the size
+    of points.
 
-Arguments:
+    Arguments:
 
-=over 4
+    =over 4
 
-%TMPL_COMMON_ARGS%
+    %TMPL_COMMON_ARGS%
 
-=back
+    =back
 
-=cut
+EOT
 
 my $geom_point_code = fun (
         :$mapping = undef, :$data = undef,

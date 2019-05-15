@@ -9,14 +9,16 @@ use namespace::autoclean;
 
 extends qw(Chart::GGPlot::Coord::Cartesian); 
 
-my $coord_flip_pod = <<'=cut';
+use Chart::GGPlot::Util::Pod qw(unindent);
 
-    coord_flip(:$xlim=undef, :$ylim=undef, :$expand=true)
+my $coord_flip_pod = unindent(<<'EOT');
 
-Flip cartesian coordinates so that horizontal becomes vertical, and
-vertical becoms horizontal.
+        coord_flip(:$xlim=undef, :$ylim=undef, :$expand=true)
 
-=cut
+    Flip cartesian coordinates so that horizontal becomes vertical, and
+    vertical becoms horizontal.
+
+EOT
 
 my $coord_flip_code = sub {
     return __PACKAGE__->new(@_);

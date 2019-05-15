@@ -52,11 +52,11 @@ with qw(
   Chart::GGPlot::HasCollectibleFunctions
 );
 
-my $coord_polar_pod = <<'=cut';
+my $coord_polar_pod = unindent(<<'EOT');
 
-    coord_ploar(:$theta='x', :$start=0, :$direction=1)
+        coord_ploar(:$theta='x', :$start=0, :$direction=1)
 
-=cut
+EOT
 
 my $coord_polar_code = fun (:$theta ='x', :$start = 0, :$direction = 1) {
     return __PACKAGE__->new(
