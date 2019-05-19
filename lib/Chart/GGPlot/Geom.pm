@@ -13,8 +13,6 @@ use Types::Standard qw(ArrayRef CodeRef);
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Util qw(:all);
 
-has optional_aes => ( is => 'ro', isa => ArrayRef, default => sub { [] } );
-
 with qw(
   Chart::GGPlot::HasRequiredAes
   Chart::GGPlot::HasDefaultAes
@@ -22,6 +20,8 @@ with qw(
   Chart::GGPlot::HasParams
   Chart::GGPlot::HasCollectibleFunctions
 );
+
+classmethod optional_aes() { [] }
 
 method setup_data ($data, $params) { $data }
 

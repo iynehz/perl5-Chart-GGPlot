@@ -23,7 +23,7 @@ classmethod marker ($df, @rest) {
     return;
 }
 
-classmethod to_trace ($df, $params, $plot) {
+classmethod to_traces ($df, $params, $plot) {
     $df = group_to_NA($df);
 
     my $use_webgl = $class->use_webgl($df);
@@ -82,7 +82,7 @@ classmethod to_trace ($df, $params, $plot) {
             )
         ),
     );
-    return $class->_adjust_trace_for_flip($trace, $plot);
+    return [ $class->_adjust_trace_for_flip($trace, $plot) ];
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -31,16 +31,16 @@ method use_webgl ($df) {
     return ( $df->nrow > $threshold );
 }
 
-=method to_trace
+=method to_traces
 
-    to_trace($df, $params, $plot)
+    to_traces($df, $params, $plot)
 
 This shall be implemented by consumers of this role.
 It should return an arrayref of Chart::Plotly::Trace::X objects.  
 
 =cut
 
-requires 'to_trace';
+requires 'to_traces';
 
 =method make_hovertext
 

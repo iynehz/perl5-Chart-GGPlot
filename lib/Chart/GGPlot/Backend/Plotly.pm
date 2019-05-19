@@ -125,28 +125,30 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
             sub {
                 my ($d) = @_;
 
-                my $trace = $class_geom_impl->to_trace($d, $params, $plot);
+                my $traces = $class_geom_impl->to_traces($d, $params, $plot);
+                for my $trace (@$traces) {
 
-                # If we need a legend, set legend info.
-                my $show_legend =
-                  @split_legend->intersect( $data->names )->length;
-                if ($show_legend) {
-                    my $legend_key = join(
-                        ', ',
-                        map {
-                            if ( $d->exists($_) ) {
-                                my $col_data = $d->at($_);
-                                $col_data->slice(pdl(0))->as_pdlsv->at(0);
-                            }
-                            else {
-                                ();
-                            }
-                        } @split_legend
-                    );
-                    $trace->{showlegend} = JSON::true;
-                    $trace->{name}       = $legend_key;
+                    # If we need a legend, set legend info.
+                    my $show_legend =
+                      @split_legend->intersect( $data->names )->length;
+                    if ($show_legend) {
+                        my $legend_key = join(
+                            ', ',
+                            map {
+                                if ( $d->exists($_) ) {
+                                    my $col_data = $d->at($_);
+                                    $col_data->slice(pdl(0))->as_pdlsv->at(0);
+                                }
+                                else {
+                                    ();
+                                }
+                            } @split_legend
+                        );
+                        $trace->{showlegend} = JSON::true;
+                        $trace->{name}       = $legend_key;
+                    }
                 }
-                return $trace;
+                return @$traces;
             } 
         );
     };

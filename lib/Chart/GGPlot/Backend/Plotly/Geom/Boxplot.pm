@@ -40,7 +40,7 @@ classmethod to_basic ($data, $prestats_data, $layout, $params, $plot) {
     return $data;
 }
 
-classmethod to_trace ($df, $params, $plot) {
+classmethod to_traces ($df, $params, $plot) {
     load Chart::Plotly::Trace::Box;
     load Chart::Plotly::Trace::Box::Line;
     load Chart::Plotly::Trace::Box::Marker;
@@ -111,7 +111,7 @@ classmethod to_trace ($df, $params, $plot) {
         # we use 'outliers' here to align with ggplot2 behavior.
         boxpoints => 'outliers',
     );
-    return $class->_adjust_trace_for_flip($trace, $plot);
+    return [ $class->_adjust_trace_for_flip($trace, $plot) ];
 }
 
 __PACKAGE__->meta->make_immutable;
