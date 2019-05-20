@@ -15,12 +15,41 @@ use Chart::GGPlot::Backend::Plotly::Util qw(
 );
 use Chart::GGPlot::Util qw(ifelse);
 
+classmethod split_on () { [qw(fill color size)] }
+
 sub mode {
     return 'lines';
 }
 
-classmethod marker ($df, @rest) {
+classmethod scatter_marker ($df, @rest) {
     return;
+}
+
+classmethod scatter_line ($df, $params, $plot) {
+    my $use_webgl = $class->use_webgl($df);
+    my $plotly_trace_class =
+      $use_webgl
+      ? 'Chart::Plotly::Trace::Scattergl'
+      : 'Chart::Plotly::Trace::Scatter';
+
+    my $line_class = "${plotly_trace_class}::Line";
+    load $line_class;
+
+    # TODO: plotly does not yet support gradient line color and width
+    #  See https://github.com/plotly/plotly.js/issues/581
+
+    my $color = to_rgb( $df->at('color'), $df->at('alpha') )->at(0);
+    my $size  = cex_to_px( $df->at('size')->slice( pdl(0) ) );
+    $size = ifelse( $size < 2, 2, $size );
+
+    # plotly supports solid, dashdot, dash, dot
+    my $linetype = $df->at('linetype')->at(0);
+
+    return $line_class->new(
+        color => $color,
+        width => $size->at(0),
+        ( $linetype ne 'solid' ? ( dash => $linetype ) : () ),
+    );
 }
 
 classmethod to_traces ($df, $params, $plot) {
@@ -39,28 +68,15 @@ classmethod to_traces ($df, $params, $plot) {
     }
 
     my ( $x, $y ) = map { $df->at($_) } qw(x y);
-    my $marker = $class->marker( $df, $params, $plot );
-
     my $mode = $class->mode;
-    my $line;
-    if ( $mode eq 'lines' ) {
-
-        # TODO: plotly does not yet support gradient line color and width
-        #  See https://github.com/plotly/plotly.js/issues/581
-
-        my $color = to_rgb( $df->at('color')->slice( pdl(0) ) );
-        my $size  = cex_to_px( $df->at('size')->slice( pdl(0) ) );
-        $size = ifelse( $size < 2, 2, $size );
-
-        # plotly supports solid, dashdot, dash, dot
-        my $linetype = $df->at('linetype')->at(0);
-
-        $line = {
-            color => $color->at(0),
-            width => $size->at(0),
-            ( $linetype ne 'solid' ? ( dash => $linetype ) : () ),
-        };
-    }
+    my $marker =
+        $mode eq 'markers'
+      ? $class->scatter_marker( $df, $params, $plot )
+      : undef;
+    my $line =
+        $mode eq 'lines'
+      ? $class->scatter_line( $df, $params, $plot )
+      : undef;
 
     my $trace = $plotly_trace_class->new(
         x    => $x,
@@ -79,6 +95,7 @@ classmethod to_traces ($df, $params, $plot) {
             : (
                 hovertext => pdl_to_plotly( $df->at('hovertext') ),
                 hoverinfo => 'text',
+                hoveron   => $class->hover_on,
             )
         ),
     );

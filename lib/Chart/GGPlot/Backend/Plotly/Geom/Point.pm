@@ -17,7 +17,7 @@ sub mode {
     return 'markers';
 }
 
-classmethod marker ($df, $params, @rest) {
+classmethod scatter_marker ($df, $params, @rest) {
     my $color = to_rgb( $df->at('color') );
     my $fill =
       $df->exists('fill')

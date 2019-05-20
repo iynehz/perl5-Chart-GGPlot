@@ -12,6 +12,8 @@ use Module::Load;
 
 use Chart::GGPlot::Backend::Plotly::Util qw(to_rgb pdl_to_plotly);
 
+classmethod split_on () { [qw(fill)] }
+
 classmethod to_traces ($df, $params, $plot) {
     load Chart::Plotly::Trace::Bar;
     load Chart::Plotly::Trace::Bar::Marker;
@@ -37,6 +39,7 @@ classmethod to_traces ($df, $params, $plot) {
         marker    => $marker,
         hovertext => pdl_to_plotly( $df->at('hovertext') ),
         hoverinfo => 'text',
+        hoveron   => $class->hover_on,
     );
     return [ $class->_adjust_trace_for_flip($trace, $plot) ];
 }

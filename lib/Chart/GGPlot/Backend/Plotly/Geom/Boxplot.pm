@@ -16,6 +16,8 @@ use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb pdl_to_plotly);
 use Chart::GGPlot::Geom::Boxplot;
 use Chart::GGPlot::Geom::Point;
 
+classmethod split_on () { [qw(color fill size)] }
+
 classmethod to_basic ($data, $prestats_data, $layout, $params, $plot) {
     my @join_on_columns = qw(PANEL group);
 
@@ -105,6 +107,7 @@ classmethod to_traces ($df, $params, $plot) {
         notched    => ( $params->at('notch') ? JSON::true : JSON::false ),
         notchwidth => $params->at('notchwidth'),
         hoverinfo  => ( $flip ? 'x' : 'y' ),
+        hoveron    => $class->hover_on,
 
         # plotly defaults to 'suspectedoutliers' to show outliers and
         # suspected in different styles.
