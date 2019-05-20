@@ -17,8 +17,7 @@ use Types::Standard qw(Str);
 use parent qw(Exporter::Tiny);
 
 our @EXPORT_OK = qw(
-  pt_to_px
-  cex_to_px
+  pt_to_px cex_to_px
   br
   to_rgb
   group_to_NA
@@ -44,6 +43,8 @@ fun to_rgb ($color, $alpha=pdl(1)) {
 
     my $rgb = sub {
         my ($c, $a) = @_;
+
+        return 'transparent' if $c eq 'BAD';
         unless ( $c =~ /^\#/ ) {
              $c = _color_name_to_rgb($c);
         }
@@ -78,9 +79,7 @@ fun to_rgb ($color, $alpha=pdl(1)) {
             @rgba = pairwise { $rgb->($a, $b) } @color, @alpha;
         }
 
-        my $p = PDL::SV->new(\@rgba);
-        $p = $p->setbadif( $color->isbad ) if $color->badflag;
-        return $p;
+        return PDL::SV->new(\@rgba);
     }
 }
 
