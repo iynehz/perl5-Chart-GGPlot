@@ -6,6 +6,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 # VERSION
 
+use Data::Frame;
 use Data::Munge qw(elem);
 use Graphics::Color::RGB;
 use List::AllUtils qw(all min max pairmap pairwise reduce);
@@ -22,6 +23,7 @@ our @EXPORT_OK = qw(
   to_rgb
   group_to_NA
   pdl_to_plotly
+  ribbon
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
@@ -225,6 +227,37 @@ fun pdl_to_plotly ($p, $allow_collapse=false) {
     }
 
     return $p->unpdl;
+}
+
+# Transform geom_smooth prediction confidence intervals into format plotly
+#  likes
+fun ribbon ($data) {
+    my $n        = $data->nrow;
+    my $tmp      = $data->sort( ['x'] );
+    my $tmp2     = $data->sort( ['x'], false );
+    my $not_used = $data->names->setdiff( [qw(x ymin ymax y)] );
+
+    # top-half of ribbon
+    my @others = map { $_ => $tmp->at($_) } @$not_used;
+    my $data1  = Data::Frame->new(
+        columns => [
+            x => $tmp->at('x'),
+            y => $tmp->at('ymax'),
+            @others,
+        ]
+    );
+
+    # bottom-half of ribbon
+    my @others2 = map { $_ => $tmp2->at($_) } @$not_used;
+    my $data2   = Data::Frame->new(
+        columns => [
+            x => $tmp2->at('x'),
+            y => $tmp2->at('ymin'),
+            @others2,
+        ]
+    );
+
+    return $data1->rbind($data2);
 }
 
 1;
