@@ -57,7 +57,7 @@ fun to_rgb ($color, $alpha=pdl(1)) {
             return sprintf(
                 "rgba(%s,%s,%s,%s)",
                 ( map { hex($_) } @rgb ),
-                int( $a * 255 + 0.5 )
+                0+sprintf("%.2f", $a)   # 0+ for removing trailing zeros
             );
         }
         return $c;

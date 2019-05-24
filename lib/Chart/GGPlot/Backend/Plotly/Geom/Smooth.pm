@@ -21,7 +21,7 @@ around to_traces( $orig, $class : $df, $params, $plot ) {
     return [] if $df->nrow == 0;
 
     my $path = $df->copy;
-    $path->set('alpha', BAD());     # alpha for the path is always 1
+    $path->set('alpha', pdl(1));    # alpha for the path is always 1
     my $traces_fitted = $class->$orig( $path, $params, $plot );
     unless ( $df->exists('ymin') and $df->exists('ymax') ) {
         return [@$traces_fitted];
