@@ -1,4 +1,4 @@
-requires "Alt::Data::Frame::ButMore" => "0.0047";
+requires "Alt::Data::Frame::ButMore" => "0.0049";
 requires "Autoload::AUTOCAN" => "0";
 requires "Carp" => "0";
 requires "Chart::Plotly" => "0.025";
@@ -74,11 +74,12 @@ requires "perl" => "5.016";
 requires "strict" => "0";
 requires "utf8" => "0";
 requires "warnings" => "0";
+recommends "Math::LOESS" => "0";
 
 on 'test' => sub {
   requires "Data::Frame::Examples" => "0";
   requires "Test2::Tools::DataFrame" => "0";
-  requires "Test2::Tools::PDL" => "0.0003";
+  requires "Test2::Tools::PDL" => "0.0004";
   requires "Test2::V0" => "0";
 };
 
