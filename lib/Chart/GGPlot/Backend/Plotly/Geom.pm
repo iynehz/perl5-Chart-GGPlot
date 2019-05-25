@@ -107,7 +107,8 @@ classmethod _hovertext_data_for_aes ($df, $aes) {
     );
 }
 
-classmethod to_basic($data, $prestats_data, $layout, $params, $plot) {
+# for preprocessing data at an early point
+classmethod prepare_data($data, $prestats_data, $layout, $params, $plot) {
     return $data;
 }
 

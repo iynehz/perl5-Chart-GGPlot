@@ -173,7 +173,7 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
 
             my $panel_prestats_data = $splitted_prestats_data->{$panel_id};
             $panel_to_traces->(
-                $class_geom_impl->to_basic(
+                $class_geom_impl->prepare_data(
                     $panel_data, $panel_prestats_data, $layout,
                     $params,     $plot
                 ),

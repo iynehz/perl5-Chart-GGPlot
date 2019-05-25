@@ -18,7 +18,7 @@ use Chart::GGPlot::Geom::Point;
 
 classmethod split_on () { [qw(color fill size)] }
 
-classmethod to_basic ($data, $prestats_data, $layout, $params, $plot) {
+classmethod prepare_data ($data, $prestats_data, @rest) {
     my @join_on_columns = qw(PANEL group);
 
     my $prestats_y = $prestats_data->at('y');
