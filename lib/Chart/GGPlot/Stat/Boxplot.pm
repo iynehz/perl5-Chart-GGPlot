@@ -182,3 +182,8 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 __END__
+
+=head1 SEE ALSO
+
+L<Chart::GGPlot::Stat>
+
