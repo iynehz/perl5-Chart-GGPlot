@@ -15,7 +15,7 @@ use Chart::Plotly::Image::Orca;
 
 use Data::Munge qw(elem);
 use JSON;
-use List::AllUtils qw(pairmap pairwise);
+use List::AllUtils qw(pairmap pairwise uniq);
 use Module::Load;
 use Types::Standard qw(HashRef Int);
 
@@ -27,9 +27,9 @@ use Chart::GGPlot::Backend::Plotly::Util qw(br to_rgb);
 #TODO: To test and see which value is proper.
 our $WEBGL_THRESHOLD = 2000;
 
-# TODO
-classmethod _split_on($data) {
-    return [];
+classmethod _split_on($class_geom_impl, $data) {
+    my $aes = $class_geom_impl->split_on;
+    return [ grep { $data->exists($_) } map { "${_}_raw" } @$aes ];
 }
 
 method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
@@ -64,7 +64,10 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
         Dumper( \@split_legend ) )
       if $log->is_debug;
 
-    my $split_by = [ @split_legend, @{$self->_split_on($data)} ];
+    my $split_by =
+      [ uniq( @split_legend, @{ $self->_split_on( $class_geom_impl, $data ) } )
+      ];
+
     my $split_vars = $split_by->intersect($data->names);
 
     my $hover_text_aes;     # which aes shall be displayed in hover text?
@@ -93,6 +96,13 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
             } @{$hover_text_aes->keys}
         )
     );
+    # throw out positional coordinates if we're hovering on fill
+    my $hover_on = $class_geom_impl->hover_on();
+    if ($hover_on eq 'fills') {
+        @hover_aes_ordered =
+          grep { not elem( $_, [qw(x xmin xmax y ymin ymax)] ) }
+          @hover_aes_ordered;
+    }
     my @hover_labels = map { $_ => $hover_text_aes->at($_) } @hover_aes_ordered;
 
     my $panel_to_traces = fun( $d, $panel_params ) {
@@ -125,28 +135,31 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
             sub {
                 my ($d) = @_;
 
-                my $trace = $class_geom_impl->to_trace($d, $params, $plot);
-
+                my $traces = $class_geom_impl->to_traces($d, $params, $plot);
                 # If we need a legend, set legend info.
                 my $show_legend =
                   @split_legend->intersect( $data->names )->length;
-                if ($show_legend) {
-                    my $legend_key = join(
-                        ', ',
-                        map {
-                            if ( $d->exists($_) ) {
-                                my $col_data = $d->at($_);
-                                $col_data->slice(pdl(0))->as_pdlsv->at(0);
-                            }
-                            else {
-                                ();
-                            }
-                        } @split_legend
-                    );
-                    $trace->{showlegend} = JSON::true;
-                    $trace->{name}       = $legend_key;
+                for my $trace (@$traces) {
+                    if ($show_legend) {
+                        my $legend_key = join(
+                            ', ',
+                            map {
+                                if ( $d->exists($_) ) {
+                                    my $col_data = $d->at($_);
+                                    $col_data->slice(pdl(0))->as_pdlsv->at(0);
+                                }
+                                else {
+                                    ();
+                                }
+                            } @split_legend
+                        );
+                        $trace->{showlegend} = JSON::true;
+                        $trace->{name}       = $legend_key;
+                    } else {
+                        $trace->{showlegend} = JSON::false;
+                    }
                 }
-                return $trace;
+                return @$traces;
             } 
         );
     };
@@ -160,7 +173,7 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
 
             my $panel_prestats_data = $splitted_prestats_data->{$panel_id};
             $panel_to_traces->(
-                $class_geom_impl->to_basic(
+                $class_geom_impl->prepare_data(
                     $panel_data, $panel_prestats_data, $layout,
                     $params,     $plot
                 ),

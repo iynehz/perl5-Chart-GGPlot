@@ -6,6 +6,7 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 # VERSION
 
+use Data::Frame;
 use Data::Munge qw(elem);
 use Graphics::Color::RGB;
 use List::AllUtils qw(all min max pairmap pairwise reduce);
@@ -17,12 +18,12 @@ use Types::Standard qw(Str);
 use parent qw(Exporter::Tiny);
 
 our @EXPORT_OK = qw(
-  pt_to_px
-  cex_to_px
+  pt_to_px cex_to_px
   br
   to_rgb
   group_to_NA
   pdl_to_plotly
+  ribbon
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
@@ -44,6 +45,8 @@ fun to_rgb ($color, $alpha=pdl(1)) {
 
     my $rgb = sub {
         my ($c, $a) = @_;
+
+        return 'transparent' if $c eq 'BAD';
         unless ( $c =~ /^\#/ ) {
              $c = _color_name_to_rgb($c);
         }
@@ -54,7 +57,7 @@ fun to_rgb ($color, $alpha=pdl(1)) {
             return sprintf(
                 "rgba(%s,%s,%s,%s)",
                 ( map { hex($_) } @rgb ),
-                int( $a * 255 + 0.5 )
+                0+sprintf("%.2f", $a)   # 0+ for removing trailing zeros
             );
         }
         return $c;
@@ -78,9 +81,7 @@ fun to_rgb ($color, $alpha=pdl(1)) {
             @rgba = pairwise { $rgb->($a, $b) } @color, @alpha;
         }
 
-        my $p = PDL::SV->new(\@rgba);
-        $p = $p->setbadif( $color->isbad ) if $color->badflag;
-        return $p;
+        return PDL::SV->new(\@rgba);
     }
 }
 
@@ -226,6 +227,37 @@ fun pdl_to_plotly ($p, $allow_collapse=false) {
     }
 
     return $p->unpdl;
+}
+
+# Transform geom_smooth prediction confidence intervals into format plotly
+#  likes
+fun ribbon ($data) {
+    my $n        = $data->nrow;
+    my $tmp      = $data->sort( ['x'] );
+    my $tmp2     = $data->sort( ['x'], false );
+    my $not_used = $data->names->setdiff( [qw(x ymin ymax y)] );
+
+    # top-half of ribbon
+    my @others = map { $_ => $tmp->at($_) } @$not_used;
+    my $data1  = Data::Frame->new(
+        columns => [
+            x => $tmp->at('x'),
+            y => $tmp->at('ymax'),
+            @others,
+        ]
+    );
+
+    # bottom-half of ribbon
+    my @others2 = map { $_ => $tmp2->at($_) } @$not_used;
+    my $data2   = Data::Frame->new(
+        columns => [
+            x => $tmp2->at('x'),
+            y => $tmp2->at('ymin'),
+            @others2,
+        ]
+    );
+
+    return $data1->rbind($data2);
 }
 
 1;

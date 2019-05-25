@@ -14,7 +14,10 @@ use parent qw(Exporter::Tiny);
 
 my @export_ggplot;
 
-our @sub_namespaces = qw(Bin Boxplot Count Identity);
+our @sub_namespaces = qw(
+  Bin Boxplot Count Identity
+  Smooth
+);
 
 for my $name (@sub_namespaces) {
     my $package = "Chart::GGPlot::Stat::$name";

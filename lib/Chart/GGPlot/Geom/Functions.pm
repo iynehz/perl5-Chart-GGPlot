@@ -16,6 +16,8 @@ our @sub_namespaces = qw(
   Blank
   Bar Boxplot
   Path Point Line
+  Polygon
+  Smooth
 );
 
 for my $name (@sub_namespaces) {

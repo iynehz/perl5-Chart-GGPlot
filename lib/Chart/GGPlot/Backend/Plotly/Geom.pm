@@ -11,7 +11,29 @@ use Types::Standard qw(ArrayRef);
 
 use Chart::GGPlot::Backend::Plotly::Util qw(br);
 
-=method use_webgl
+=classmethod split_on
+
+    split_on()
+
+Returns an arrayref of aestheics on which continuous variables in the data
+should be splitted.
+This is necessary for some geoms, for example, polygons.
+
+=cut
+
+classmethod split_on () { [] }
+
+=classmethod hover_on
+
+    hover_on()
+
+Return value would be used for plotly trace's C<hoveron> attribute.
+
+=cut
+
+classmethod hover_on () { 'points' }
+
+=classmethod use_webgl
 
     use_webgl($df)
 
@@ -25,24 +47,24 @@ The variable can be adjusted by like,
 
 =cut 
 
-method use_webgl ($df) {
+classmethod use_webgl ($df) {
     my $threshold = $Chart::GGPlot::Backend::Plotly::WEBGL_THRESHOLD;
     return 0 if ( $threshold < 0 );
     return ( $df->nrow > $threshold );
 }
 
-=method to_trace
+=classmethod to_traces
 
-    to_trace($df, $params, $plot)
+    to_traces($df, $params, $plot)
 
 This shall be implemented by consumers of this role.
 It should return an arrayref of Chart::Plotly::Trace::X objects.  
 
 =cut
 
-requires 'to_trace';
+requires 'to_traces';
 
-=method make_hovertext
+=classmethod make_hovertext
 
     make_hovertext($df, ArrayRef $hover_labels)
 
@@ -85,7 +107,8 @@ classmethod _hovertext_data_for_aes ($df, $aes) {
     );
 }
 
-classmethod to_basic($data, $prestats_data, $layout, $params, $plot) {
+# for preprocessing data at an early point
+classmethod prepare_data($data, $prestats_data, $layout, $params, $plot) {
     return $data;
 }
 
