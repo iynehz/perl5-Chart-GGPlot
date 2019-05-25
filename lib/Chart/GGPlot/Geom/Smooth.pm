@@ -37,11 +37,12 @@ my $geom_smooth_pod = layer_func_pod(<<'EOT');
                  :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
                  %rest)
 
-    The "bar" geom makes the height bar proportional to the number of cases
-    in each group (or if the C<weight> aesthetic is supplied, the sum of the
-    C<weights>). 
-    It uses C<stat_count()> by default: it counts the number of cases at
-    each x position. 
+    Aids the eye in seeing patterns in the presence of overplotting, by
+    calculating a smoothed conditional mean.
+
+    C<geom_smooth()> and C<stat_smooth()> are effectively aliases: they
+    both use the same arguments. Use C<stat_smooth()> if you want to
+    display the results with a non-standard geom.
 
     Arguments:
 
