@@ -84,8 +84,11 @@ method compute_panel ( $data, $scales, $params ) {
             my $new_df  = $stats->{$_};
             my $old_df  = $groups->{$_};
             my $missing = $old_df->names->setdiff($new_df->names);
-            $new_df->cbind(
-                $old_df->slice( [ 0 .. $new_df->nrow - 1 ], $missing ) );
+            for my $colname (@$missing) {
+                $new_df->set( $colname,
+                    $old_df->at($colname)->slice( pdl( [0] ) ) );
+            }
+            $new_df;
         } sort { $a <=> $b } @{ $stats->keys }
     ];
 
