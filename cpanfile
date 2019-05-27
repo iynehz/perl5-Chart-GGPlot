@@ -46,6 +46,7 @@ requires "PDL::Core" => "0";
 requires "PDL::DateTime" => "0";
 requires "PDL::Lite" => "0";
 requires "PDL::Math" => "0";
+requires "PDL::MatrixOps" => "0";
 requires "PDL::Primitive" => "0";
 requires "PDL::Ufunc" => "0";
 requires "POSIX" => "0";

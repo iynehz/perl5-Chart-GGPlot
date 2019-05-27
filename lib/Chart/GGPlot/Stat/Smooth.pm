@@ -11,6 +11,7 @@ use MooseX::Singleton;
 use Data::Frame;
 use Module::Load;
 use PDL::Core ();
+use PDL::MatrixOps ();
 
 use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(seq_n);
@@ -55,13 +56,19 @@ my $stat_smooth_pod = layer_func_pod(<<'EOT');
 
     =over 8
     
-    =item * 'auto' : loess is used for less than 1000 observations
+    =item * 'auto'
 
-    =item * 'loess' : Locally Weighted Regression
+    'loess' is used for less than 1000 observations, 'glm' otherwise 
 
-    Supported C<$method_args>,
+    =item * 'loess'
 
-    =over 8
+    Locally Weighted Regression
+
+    Requires L<Math::LOESS>.
+
+    Supported C<$method_args>, (see L<Math::LOESS::Model> for details, )
+
+    =over 12
 
     =item * $degree
 
@@ -75,7 +82,20 @@ my $stat_smooth_pod = layer_func_pod(<<'EOT');
 
     =back
 
-    See L<Math::LOESS::Model> for details.
+    =item * 'glm' : Generalized Linear Model
+
+    Requires L<PDL::Stats::GLM> and L<PDL::GSL::CDF>.
+
+    At this moment we can do only simple linear modeling. To support logistic
+    and polynomial in future.
+
+    Supported C<$method_args>,
+
+    =over 12
+
+    =item * $family
+
+    =back
 
     =back
 
@@ -152,8 +172,18 @@ classmethod ggplot_functions() {
     ];  
 }
 
+classmethod _predictdf($method) {
+    my $func = "_predictdf_${method}";
+    no strict 'refs';
+    unless (exists &{$func}) {
+        die "Unsupported smooth method: $method";
+    }
+    return $func;
+}
+
 method setup_params($data, $params) {
-    if ($params->at('method') eq 'auto') {
+    my $method = $params->at('method');
+    if ($method eq 'auto') {
 
         # Use loess for small datasets
         # Based on size of the "largest" group to avoid bad memory
@@ -164,21 +194,22 @@ method setup_params($data, $params) {
           List::AllUtils::max( map { $_->nrow } ( values %$splitted ) );
 
         if ($max_group < 1000) {
-            $params->set('method', 'loess');
+            $method = 'loess';
+            $params->set('method', $method);
         }
 
-        $log->debugf("geom_smooth() using method = %s", $params->{method});
+        $log->debugf("geom_smooth() using method = %s", $method);
     }
 
-    if ($params->at('method') ne 'loess') {
-        die "Not implemented";
-    }
+    # check if method is supported or not
+    $self->_predictdf($method);
     return $params;
 }
  
 around compute_layer( $data, $params, $layout ) {
 
-    # remove all "*_raw" columns
+    # remove all "*_raw" columns, to avoid backends like plotly from
+    #  generating wrong hovertext.
     my $data1 = $data->copy;
     for my $colname ( $data1->names->flatten ) {
         if ( $colname =~ /_raw$/ ) {
@@ -221,10 +252,7 @@ method compute_group($data, $scales, $params) {
         }
     }
 
-    my $predictdf = "_predictdf_${method}";
-    unless (defined &{$predictdf}) {
-        die "Unsupported smooth method: $method";
-    }
+    my $predictdf = $self->_predictdf($method);
 
     my %base_args = (
         x       => $data->at('x'),
@@ -273,6 +301,41 @@ fun _predictdf_loess (:$x, :$y, :$weights, :$xseq, :$se, :$level, :$span,
     if ($se) {
         push @columns, ( ymin => $ci->{lower}, ymax => $ci->{upper} );
     }
+    return Data::Frame->new( columns => \@columns );
+}
+
+fun _predictdf_glm (:$x, :$y, :$xseq, :$se, :$level,
+        :$family='gaussian', %rest) {
+    load PDL::Stats::GLM;
+    load PDL::GSL::CDF;
+
+    my $n = $x->length;
+    my %m = PDL::Stats::GLM::ols( $y, $x, { plot => 0 } );
+
+    # fit_t = Xb = pdl($x, [1...])->t x $m{b}->t = $m{b} x pdl($x, [1...])
+    my $fit = ( $m{b} x pdl( $xseq, [ (1) x $xseq->length ] ) )->flat;
+    my @columns = ( x => $xseq, y => $fit );
+
+    if ($se) {
+        my $res            = $y - $m{y_pred};
+        my $mse            = ( $res**2 )->sum / ( $y->length - 2 );
+        my $residual_scale = sqrt($mse);
+
+        my $se_fit =
+          $residual_scale *
+          sqrt( 1 / $n +
+              $n *
+              ( $xseq - $x->average )**2 /
+              ( $n * ( $x**2 )->sum - ( $x->sum )**2 ) );
+
+        my $cdf_func = "PDL::GSL::CDF::gsl_cdf_${family}_Pinv";
+        no strict 'refs';
+        my $t        = $cdf_func->( 1 - ( 1 - $level ) / 2, 1 );
+
+        push @columns,
+          ( ymin => $fit - $t * $se_fit, ymax => $fit + $t * $se_fit );
+    }
+
     return Data::Frame->new( columns => \@columns );
 }
 
