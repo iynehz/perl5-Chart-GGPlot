@@ -86,8 +86,7 @@ classmethod build($ggplot) {
     $debug_data->($data, 'after map_position()');
 
     # store prestats data.
-    # no need to copy, to save some time
-    my $prestats_data = $data;
+    my $prestats_data = $data->copy;
 
     # Apply and map statistics
     $data = &$by_layer( fun( $l, $d ) { $l->compute_statistic( $d, $layout ) }

@@ -131,36 +131,31 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
             push @splitted_sorted, $d;
         }
 
+        my $showlegend = @split_legend->intersect( $data->names )->length > 0;
         return @splitted_sorted->map(
             sub {
                 my ($d) = @_;
 
                 my $traces = $class_geom_impl->to_traces($d, $params, $plot);
-                # If we need a legend, set legend info.
-                my $show_legend =
-                  @split_legend->intersect( $data->names )->length;
                 for my $trace (@$traces) {
-                    if ($show_legend) {
-                        my $legend_key = join(
-                            ', ',
-                            map {
-                                if ( $d->exists($_) ) {
-                                    my $col_data = $d->at($_);
-                                    $col_data->slice(pdl(0))->as_pdlsv->at(0);
-                                }
-                                else {
-                                    ();
-                                }
-                            } @split_legend
-                        );
-                        $trace->{showlegend} = JSON::true;
-                        $trace->{name}       = $legend_key;
-                    } else {
-                        $trace->{showlegend} = JSON::false;
-                    }
+                    my $legend_key = join(
+                        ', ',
+                        map {
+                            if ( $d->exists($_) ) {
+                                my $col_data = $d->at($_);
+                                $col_data->slice(pdl(0))->as_pdlsv->at(0);
+                            }
+                            else {
+                                ();
+                            }
+                        } @split_legend
+                    );
+                    $trace->name($legend_key);
+                    $trace->legendgroup($legend_key);
+                    $trace->showlegend($showlegend);
                 }
                 return @$traces;
-            } 
+            }
         );
     };
 
@@ -172,7 +167,7 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
             my ( $panel_id, $panel_data ) = ( $a, $b );
 
             my $panel_prestats_data = $splitted_prestats_data->{$panel_id};
-            $panel_to_traces->(
+            my $traces = $panel_to_traces->(
                 $class_geom_impl->prepare_data(
                     $panel_data, $panel_prestats_data, $layout,
                     $params,     $plot
@@ -360,6 +355,7 @@ method _to_plotly ($plot_built) {
         }
     } # for (qw(x y))
 
+    my %seen_legendgroup;
     for my $i ( 0 .. $#$layers ) {
         my $layer = $layers->[$i];
         my $data  = $plot_built->layer_data($i);
@@ -367,12 +363,19 @@ method _to_plotly ($plot_built) {
 
         $log->debug( "data at layer $i:\n" . $data->string ) if $log->is_debug;
 
-        my $panels_traces =
+        my $traces =
           $self->layer_to_traces( $layer, $data, $prestats_data,
             $layout, $plot );
-        for my $panel (@$panels_traces) {
+
+        for my $panel (@$traces) {
             for my $trace (@$panel) {
                 $plotly->add_trace($trace);
+
+                # for traces of same legend group, show legend for only the
+                #  first one of them.
+                if ($seen_legendgroup{ $trace->legendgroup }++) {
+                    $trace->showlegend(0);
+                }
             }
 
             if ( List::AllUtils::any { $_->showlegend } @$panel ) {
@@ -407,6 +410,11 @@ method _to_plotly ($plot_built) {
             }
         }
     }
+
+    # Above operations already ensures for each legend group there be only
+    #  one legend item. So there is no need to keep legendgroup gap, then
+    #  it looks better to me compared with having the default gap.
+    $plotly_layout{legend} = { tracegroupgap => 0 };
 
     $plotly_layout{hovermode} = 'closest';
     $plotly_layout{barmode} = $barmode // 'relative';

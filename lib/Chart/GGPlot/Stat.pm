@@ -92,8 +92,7 @@ method compute_panel ( $data, $scales, $params ) {
         } sort { $a <=> $b } @{ $stats->keys }
     ];
 
-    my $rslt = reduce { $a->rbind($b) } @$stats;
-    return $rslt;
+    return reduce { $a->rbind($b) } @$stats;
 }
 
 method compute_group ( $data, $scales ) { ... }
