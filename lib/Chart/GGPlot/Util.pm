@@ -44,7 +44,6 @@ my @export_all = (
       call_if_coderef
       alias_color_functions
       dist_euclidean dist_polar
-      split_indices
       find_line_formula spiral_arc_length
       has_groups
       collect_functions_from_package
@@ -286,17 +285,6 @@ fun spiral_arc_length ($a, $theta1, $theta2) {
     return $a * 0.5 *
       ( ( $theta1 * ( $theta1**2 + 1 )->sqrt + $theta1->asinh ) -
           ( $theta2 * ( $theta2**2 + 1 )->sqrt + $theta2->asinh ) );
-}
-
-# Split indices of an indices array ref into groups
-# Return an arrayref of piddles.
-fun split_indices (Piddle1D $indices, $n=$indices->max) {
-    my @rslt = map { [] } ( 1 .. $n );
-    for my $i ( 0 .. $indices->length - 1 ) {
-        my $id = min($indices->at($i), $n);
-        push @{ $rslt[$id] }, $i;
-    }
-    return [ map { pdl($_) } @rslt ];
 }
 
 =func resolution

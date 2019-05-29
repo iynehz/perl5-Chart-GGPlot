@@ -8,7 +8,6 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 
 use Data::Frame;
 use Data::Munge qw(elem);
-use Graphics::Color::RGB;
 use List::AllUtils qw(all min max pairmap pairwise reduce);
 use Memoize;
 use PDL::Primitive qw(which);
@@ -86,13 +85,14 @@ fun to_rgb ($color, $alpha=pdl(1)) {
 }
 
 sub _color_name_to_rgb {
-    my ($color) = @_;
+    my ($color_name) = @_;
 
     try {
-        return Graphics::Color::RGB->from_color_library($color)->as_css_hex;
+        my $color = Color::Library->color($color_name);
+        return sprintf("#%02x%02x%02x", $color->rgb);
     }
     catch {
-        return $color;
+        return $color_name;
     }
 }
 memoize('_color_name_to_rgb');

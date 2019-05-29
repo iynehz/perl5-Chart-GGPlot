@@ -87,16 +87,17 @@ classmethod make_hovertext ($df, ArrayRef $hover_labels) {
                 $var = $var->expr;
             }
             my $data = $class->_hovertext_data_for_aes( $df, $aes );
-            return ( defined $data ? ( $var => $data->as_pdlsv ) : () );
+            return ( defined $data ? ( $var => $data->as_pdlsv->unpdl ) : () );
         }
     }
     @$hover_labels;
 
-    return [ 0 .. $df->nrow - 1 ]->map(
-        sub {
-            join( br(), pairmap { "$a: " . $b->at($_) } @hover_assoc );
-        }
-    );
+    my $br = br();
+    return [
+        map {
+            join( $br, pairmap { "$a: " . $b->[$_] } @hover_assoc )
+        } ( 0 .. $df->nrow - 1 )
+    ];
 }
 
 classmethod _hovertext_data_for_aes ($df, $aes) {

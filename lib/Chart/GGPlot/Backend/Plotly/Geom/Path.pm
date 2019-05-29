@@ -40,7 +40,7 @@ classmethod scatter_line ($df, $params, $plot) {
 
     my $color = to_rgb( $df->at('color'), $df->at('alpha') )->at(0);
     my $size  = cex_to_px( $df->at('size')->slice( pdl(0) ) );
-    $size = ifelse( $size < 2, 2, $size );
+    $size->where($size < 2) .= 2;
 
     # plotly supports solid, dashdot, dash, dot
     my $linetype = $df->at('linetype')->at(0);

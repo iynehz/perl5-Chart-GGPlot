@@ -36,7 +36,7 @@ method break_positions ($range=$self->get_limits()) {
 
 method axis_order () {
     my @ord = qw(primary secondary);
-    if ( List::Util::any { $self->position eq $_ } qw(right bottom) ) {
+    if ( $self->position eq 'right' or $self->position eq 'bottom' ) {
         @ord = reverse @ord;
     }
     return \@ord;

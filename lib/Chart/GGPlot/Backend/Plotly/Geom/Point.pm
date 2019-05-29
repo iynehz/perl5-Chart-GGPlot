@@ -24,7 +24,7 @@ classmethod scatter_marker ($df, $params, @rest) {
       ? ifelse( $df->at('fill')->isbad, $color, to_rgb( $df->at('fill') ) )
       : $color;
     my $size = cex_to_px( $df->at('size') );
-    $size = ifelse( $size > 2, $size, 2 );
+    $size->where($size < 2) .= 2;
     my $opacity = $df->at('alpha')->setbadtoval(1);
     my $stroke  = cex_to_px( $df->at('stroke') );
 

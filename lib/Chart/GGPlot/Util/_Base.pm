@@ -91,13 +91,10 @@ fun match (Piddle $a, Piddle $b) {
             my $sorted_idx = $b->qsorti;
             my $sorted     = $b->slice($sorted_idx);
             my $match      = $a->vsearch_match($sorted);
-            my $rslt       = [ 0 .. $a->length - 1 ]->map(
-                sub {
-                    my $idx = $match->at($_);
-                    $idx < 0 ? -1 : $sorted_idx->at($idx);
-                }
-            );
-            return pdl($rslt)->setvaltobad(-1);
+            my $idx        = $match->slice( pdl( [ 0 .. $a->length - 1 ] ) );
+            my $isbad      = $idx < 0;
+            $idx->where($isbad) .= 0;
+            return $sorted_idx->slice($idx)->setbadif($isbad);
         }
     }
 }
