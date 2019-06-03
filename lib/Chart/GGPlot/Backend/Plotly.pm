@@ -23,6 +23,7 @@ use Chart::GGPlot::Aes;
 use Chart::GGPlot::Util qw(:all);
 use Chart::GGPlot::Backend::Plotly::Geom;
 use Chart::GGPlot::Backend::Plotly::Util qw(br to_rgb);
+use Chart::GGPlot::Util qw(rescale);
 
 #TODO: To test and see which value is proper.
 our $WEBGL_THRESHOLD = 2000;
@@ -186,6 +187,61 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
 Returns a L<Chart::Plotly> object.
 
 =cut
+
+# create a hidden trace only for displaying colorbar
+method _colorbar_to_trace ($guide) {
+    load Chart::Plotly::Trace::Scatter;
+    load Chart::Plotly::Trace::Scatter::Marker;
+    load Chart::Plotly::Trace::Scatter::Marker::Colorbar;
+    load Chart::Plotly::Trace::Scatter::Marker::Colorbar::Title;
+
+    # do everything on a 0-1 scale
+
+    my $rng = pdl($guide->bar->at('value')->minmax);
+    my @colorscale_color = to_rgb( $guide->bar->at('color') )->list;
+    my @colorscale_value =
+      rescale( $guide->bar->at('value'), pdl( [ 0, 1 ] ), $rng )->list;
+    my @colorscale = (
+        pairwise { [ $a, $b ] }
+        @colorscale_value, @colorscale_color
+    );
+    my $ticktext = $guide->key->at('label')->unpdl;
+    my $tickvals =
+      rescale( $guide->key->at('value'), pdl( [ 0, 1 ] ), $rng )->unpdl;
+
+    my $marker = Chart::Plotly::Trace::Scatter::Marker->new(
+        color      => [ 0, 1 ],
+        colorscale => \@colorscale,
+        colorbar   => Chart::Plotly::Trace::Scatter::Marker::Colorbar->new(
+            title =>
+              Chart::Plotly::Trace::Scatter::Marker::Colorbar::Title->new(
+                text => $guide->title,
+                side => 'top'
+              ),
+            # R's default is 1.2 "lines" for "legend.key.size".
+            # We don't support the grid unit system now (maybe in future
+            # we can develop it on Graphics::Grid::Unit), now we just
+            # leave it be for plotly to use its default.
+            #thickness => 30,
+            tickmode => 'array',
+            ticktext => $ticktext,
+            tickvals => $tickvals,
+            ticklen  => 2,
+            len      => 0.5,
+        ),
+    );
+
+    return Chart::Plotly::Trace::Scatter->new(
+        x          => [0],
+        y          => [0],
+        type       => 'scatter',
+        mode       => 'markers',
+        opacity    => 0,
+        hoverinfo  => 'none',
+        showlegend => 0,
+        marker     => $marker,
+    );
+}
 
 method _to_plotly ($plot_built) {
     my $plot   = $plot_built->plot;
@@ -355,6 +411,9 @@ method _to_plotly ($plot_built) {
         }
     } # for (qw(x y))
 
+    # guides
+    my $gdefs = $plot->guides->build( $plot->scales, labels => $plot->labels );
+
     my %seen_legendgroup;
     for my $i ( 0 .. $#$layers ) {
         my $layer = $layers->[$i];
@@ -385,8 +444,7 @@ method _to_plotly ($plot_built) {
                 #
                 # TODO: See if plotly will officially support legend title
                 #  https://github.com/plotly/plotly.js/issues/276
-                my $legend_titles =
-                  join( "\n", map { $_->title } @{ $plot->guides->guides } );
+                my $legend_titles = join( "\n", map { $_->title } @$gdefs);
 
                 my $annotations = $plotly_layout{annotations} //= [];
                 push @$annotations,
@@ -439,6 +497,18 @@ method _to_plotly ($plot_built) {
                 y1   => 1,
             }
         ];
+    }
+
+    if ( $theme->at('legend_position') eq 'none' ) {
+        $plotly_layout{showlegend} = JSON::false;
+    }
+
+    # colorbar
+    my ($colorbar) =
+      grep { $_->$_DOES('Chart::GGPlot::Guide::Colorbar') } @$gdefs;
+    if ($colorbar) {
+        my $colorbar_trace = $self->_colorbar_to_trace($colorbar);
+        $plotly->add_trace($colorbar_trace);
     }
 
     $log->debug( "plotly layout : " . Dumper( \%plotly_layout ) )

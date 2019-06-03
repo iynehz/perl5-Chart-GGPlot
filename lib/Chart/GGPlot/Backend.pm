@@ -134,9 +134,6 @@ classmethod build($ggplot) {
     $data = $layout->finish_data($data);
     $debug_data->($data, 'after finish_data()');
 
-    # build guides
-    $plot->guides->build($scales, labels => $plot->labels);
-
     return Chart::GGPlot::Built->new(
         data          => $data,
         layout        => $layout,
