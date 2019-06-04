@@ -1,11 +1,11 @@
 Revision history for Chart::GGPlot
 
-0.0004_01   TBD
+0.0004_01   2019-06-05
   - New feature: experimental support of geom_smooth()
   - New feature: experimental support of geom_polygon()
   - Bug fix: Fixed alpha handling in the plotly backend.
-  - Bug fix: Now Chart::GGPlot::Stat would not die when generate data for data
-    with more points for stat then for raw data.
+  - Bug fix: Now Chart::GGPlot::Stat would not die when generate data for
+    data with more points for stat then for raw data.
 
 0.0003      2019-05-04
   - New feature: basic support of geom_boxplot()

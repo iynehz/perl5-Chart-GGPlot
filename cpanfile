@@ -1,4 +1,4 @@
-requires "Alt::Data::Frame::ButMore" => "0.0049";
+requires "Alt::Data::Frame::ButMore" => "0.0051";
 requires "Autoload::AUTOCAN" => "0";
 requires "Carp" => "0";
 requires "Chart::Plotly" => "0.025";
@@ -76,6 +76,8 @@ requires "strict" => "0";
 requires "utf8" => "0";
 requires "warnings" => "0";
 recommends "Math::LOESS" => "0";
+recommends "PDL::GSL::CDF" => "0.75";
+recommends "PDL::Stats::GLM" => "0.75";
 
 on 'test' => sub {
   requires "Data::Frame::Examples" => "0";
