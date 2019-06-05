@@ -52,7 +52,7 @@ my $geom_boxplot_pod = layer_func_pod(<<'EOT');
                      :$outlier_alpha=undef,
                      :$notch=false, :$notchwidth=0.25,
                      :$varwidth=false, :$na_rm=false,
-                     :$show_legend='auto', :$inherit_aes=true,
+                     :$show_legend=undef, :$inherit_aes=true,
                      %rest)
 
     The boxplot compactly displays the distribution of a continuous
@@ -104,7 +104,7 @@ my $geom_boxplot_code = fun (
         :$outlier_alpha=undef,
         :$notch=false, :$notchwidth=0.25,
         :$varwidth=false, :$na_rm=false,
-        :$show_legend='auto', :$inherit_aes=true,
+        :$show_legend=undef, :$inherit_aes=true,
         %rest )
 {
     if ( not Ref::Util::is_ref($position) ) {

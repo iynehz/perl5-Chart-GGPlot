@@ -33,7 +33,7 @@ my $geom_polygon_pod = layer_func_pod(<<'EOT');
 
         geom_polygon(:$mapping=undef, :$data=undef,
                      :$stat='identity', :$position='identity',
-                     :$na_rm=false, :$show_legend='auto',
+                     :$na_rm=false, :$show_legend=undef,
                      :$inherit_aes=true,
                      %rest)
 
@@ -54,7 +54,7 @@ my $geom_polygon_code = fun (
         :$mapping = undef, :$data = undef,
         :$stat = 'identity', :$position = 'identity',
         :$width = undef, :$na_rm = false,
-        :$show_legend = 'auto', :$inherit_aes = true,
+        :$show_legend = undef, :$inherit_aes = true,
         %rest )
 {
     return Chart::GGPlot::Layer->new(

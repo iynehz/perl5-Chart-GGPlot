@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 # VERSION
 
-use List::AllUtils;
+use List::AllUtils qw(uniq);
 use Module::Load;
 
 has _guides => (is => 'ro', default => sub { {} });
@@ -26,7 +26,7 @@ my $defined_or = sub {
 };
 
 # Train each scale in scales and generate the definition of guide.
-method build ($scales, :$labels, %rest) {
+method build ($scales, :$layers, :$labels, :$default_mapping=undef, %rest) {
     my @gdefs;
     for my $scale ($scales->scales->flatten) {
         for my $output ( $scale->aesthetics->flatten ) {
@@ -49,10 +49,26 @@ method build ($scales, :$labels, %rest) {
             }
 
             unless (defined $guide->title) {
-                $guide->set('title', $scale->make_title( $scale->name // $labels->at($output) ));
+                $guide->set( 'title',
+                    $scale->make_title( $scale->name // $labels->at($output) )
+                );
             }
 
             $guide = $guide->train($scale, $output);
+
+            if (
+                List::AllUtils::none {
+                    my $matched =
+                      $self->_matched_aes( $_, $guide, $default_mapping );
+                    my $show_legend = $_->show_legend;
+                    ( $matched->length > 0
+                          and ( not defined $show_legend or $show_legend ) )
+                }
+                @$layers
+              )
+            {
+                next;
+            }
 
             if (defined $guide) { 
                 push @gdefs, $guide;
@@ -78,6 +94,23 @@ classmethod _validate_guide ($guide) {
         load $class_guide;
         return $class_guide->new;
     }
+}
+
+classmethod _matched_aes ($layer, $guide, $defaults) {
+    my $all = [
+        uniq(
+            @{ $layer->mapping->names },
+            @{
+                ( $layer->inherit_aes ? $defaults : $layer->stat->default_aes )
+                  ->names
+            }
+        )
+    ];
+    my $geom_aes = [ @{ $layer->geom->required_aes },
+        @{ $layer->geom->default_aes->names } ];
+    my $matched = $all->intersect($geom_aes)->intersect( $guide->key->names );
+    return $matched->setdiff(
+        [ @{ $layer->geom_params->names }, @{ $layer->aes_params->names } ] );
 }
 
 1;

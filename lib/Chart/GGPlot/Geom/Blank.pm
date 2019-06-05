@@ -16,7 +16,7 @@ my $geom_blank_pod = '';
 my $geom_blank_code = fun (
         :$mapping = undef, :$data = undef,
         :$stat = "identity", :$position = "identity",
-        :$show_legend = 'auto', :$inherit_aes = true,
+        :$show_legend = undef, :$inherit_aes = true,
         %rest )
 {
     return Chart::GGPlot::Layer->new(

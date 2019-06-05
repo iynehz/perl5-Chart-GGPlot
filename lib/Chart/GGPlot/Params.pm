@@ -21,8 +21,12 @@ classmethod new (@rest) {
         _hash => %params->rename( sub { $class->transform_key( $_[0] ) } )
       },
       $class;
+
+    $self->BUILD(\%params);
     return $self;
 }
+
+sub BUILD { }
 
 sub _hash { $_[0]->{_hash} }
 

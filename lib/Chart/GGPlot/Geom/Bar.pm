@@ -24,7 +24,7 @@ my $geom_bar_pod = layer_func_pod(<<'EOT');
 
         geom_bar(:$mapping=undef, :$data=undef, :$stat='count',
                  :$position='stack', :$width=undef,
-                 :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+                 :$na_rm=false, :$show_legend=undef, :$inherit_aes=true,
                  %rest)
 
     The "bar" geom makes the height bar proportional to the number of cases
@@ -53,7 +53,7 @@ my $geom_bar_code = fun (
         :$mapping = undef, :$data = undef,
         :$stat = 'count', :$position = 'stack',
         :$width = undef, :$na_rm = false,
-        :$show_legend = 'auto', :$inherit_aes = true,
+        :$show_legend = undef, :$inherit_aes = true,
         %rest )
 {
     return Chart::GGPlot::Layer->new(
@@ -76,7 +76,7 @@ my $geom_histogram_pod = layer_func_pod(<<'EOT');
 
         geom_histogram(:$mapping=undef, :$data=undef, :$stat="bin",
                        :$position="stack", :$binwidth=undef, :$bins=undef,
-                       :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+                       :$na_rm=false, :$show_legend=undef, :$inherit_aes=true,
                        %rest)
 
     Visualise the distribution of a single continuous variable by dividing
@@ -112,7 +112,7 @@ my $geom_histogram_code = fun (
         :$stat = "bin", :$position = "stack",
         :$binwidth = undef, :$bins = undef,
         :$na_rm = false,
-        :$show_legend = 'auto', :$inherit_aes = true,
+        :$show_legend = undef, :$inherit_aes = true,
         %rest )
 {
     return Chart::GGPlot::Layer->new(

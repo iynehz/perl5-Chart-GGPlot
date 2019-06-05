@@ -412,7 +412,15 @@ method _to_plotly ($plot_built) {
     } # for (qw(x y))
 
     # guides
-    my $gdefs = $plot->guides->build( $plot->scales, labels => $plot->labels );
+    my $gdefs = $plot->guides->build(
+        $plot->scales,
+        labels          => $plot->labels,
+        layers          => $layers,
+        default_mapping => $plot->mapping
+    );
+
+    # if $gdefs is empty, then no legend is displayed.
+    my $global_showlegend = !!@$gdefs;
 
     my %seen_legendgroup;
     for my $i ( 0 .. $#$layers ) {
@@ -428,13 +436,16 @@ method _to_plotly ($plot_built) {
 
         for my $panel (@$traces) {
             for my $trace (@$panel) {
-                $plotly->add_trace($trace);
-
-                # for traces of same legend group, show legend for only the
-                #  first one of them.
-                if ($seen_legendgroup{ $trace->legendgroup }++) {
+                if (not $global_showlegend) {
                     $trace->showlegend(0);
                 }
+                elsif ($seen_legendgroup{ $trace->legendgroup }++) {
+                    # for traces of same legend group, show legend for only
+                    #  the first one of them.
+                    $trace->showlegend(0);
+                }
+
+                $plotly->add_trace($trace);
             }
 
             if ( List::AllUtils::any { $_->showlegend } @$panel ) {

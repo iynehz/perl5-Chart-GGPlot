@@ -45,8 +45,9 @@ my $TMPL_COMMON_ARGS = unindent(<<'EOT');
     =item * $show_legend
 
     Should this layer be included in the legends?
-    'auto', the default, includes if any aesthetics are mapped.
-    false never includes, and false always includes.
+    C<undef>, the default, includes if any aesthetics are mapped.
+    A true scalar for never includes, and a defined false scalar for always
+    includes.
 
     =item * $inherit_aes
 

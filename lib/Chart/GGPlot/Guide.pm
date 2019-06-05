@@ -32,10 +32,15 @@ for my $attr (qw(title key reverse)) {
     *{$attr} = sub { $_[0]->at($attr); }
 }
 
+# undef means "any"
 classmethod available_aes () { undef; }
 
 method train ($scale, $aesthetics=undef) {
     return $self;
+}
+
+classmethod _reverse_df ($df) {
+    return $df->select_rows( [ reverse( 0 .. $df->nrow - 1 ) ] );
 }
 
 1;

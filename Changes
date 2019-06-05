@@ -1,5 +1,8 @@
 Revision history for Chart::GGPlot
 
+0.0004_02   2019-06-06   
+  - Layer's show_legend attribute now really has effect.
+
 0.0004_01   2019-06-05
   - New feature: experimental support of geom_smooth()
   - New feature: experimental support of geom_polygon()

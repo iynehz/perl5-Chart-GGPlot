@@ -35,7 +35,7 @@ classmethod required_aes () { [qw(x y)] }
 my $geom_path_pod = layer_func_pod(<<'EOT');
 
         geom_path(:$mapping=undef, :$data=undef, :$stat='identity',
-                  :$position='identity', :$na_rm=false, :$show_legend='auto',
+                  :$position='identity', :$na_rm=false, :$show_legend=undef,
                   :$inherit_aes=true, 
                   %rest)
 
@@ -54,7 +54,7 @@ my $geom_path_code = fun (
         :$mapping = undef, :$data = undef,
         :$stat = 'identity', :$position = 'identity',
         :$na_rm = false,
-        :$show_legend = 'auto', :$inherit_aes = true,
+        :$show_legend = undef, :$inherit_aes = true,
         %rest )
 {
     return Chart::GGPlot::Layer->new(

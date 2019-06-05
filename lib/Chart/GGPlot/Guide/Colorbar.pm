@@ -26,15 +26,11 @@ for my $attr (qw(bar nbin available_aes)) {
     *{$attr} = sub { $_[0]->at($attr) };
 }
 
-
-around new => sub {
-    my $orig  = shift;
-    my $class = shift;
-    my $self  = $class->$orig(@_);
+sub BUILD {
+    my ($self, $args) = @_;
 
     $self->set( 'nbin', 20 );
     $self->set( 'available_aes', [qw(colour color fill)] );
-    return $self;
 };
 
 method train ($scale, $aesthetic=undef) {
@@ -75,13 +71,8 @@ method train ($scale, $aesthetic=undef) {
     );
 
     if ( $self->reverse ) {
-        state $reverse = sub {
-            my ($d) = @_;
-            return $d->select_rows( [ reverse( 0 .. $d->nrow - 1 ) ] );
-        };
-
-        $ticks = &$reverse($ticks);
-        $bar   = &$reverse($bar);
+        $ticks = $self->_reverse_df($ticks);
+        $bar   = $self->_reverse_df($bar);
     }
     $self->set( 'key', $ticks );
     $self->set( 'bar', $bar );

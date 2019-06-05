@@ -35,7 +35,7 @@ my $geom_point_pod = layer_func_pod(<<'EOT');
 
         geom_point(:$mapping=undef, :$data=undef, :$stat='identity',
                    :$position='identity',
-                   :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+                   :$na_rm=false, :$show_legend=undef, :$inherit_aes=true,
                    %rest)
 
     The "point" geom is used to create scatterplots.
@@ -58,7 +58,7 @@ my $geom_point_code = fun (
         :$mapping = undef, :$data = undef,
         :$stat = 'identity', :$position = 'identity',
         :$na_rm = false,
-        :$show_legend = 'auto', :$inherit_aes = true,
+        :$show_legend = undef, :$inherit_aes = true,
         %rest )
 {
     return Chart::GGPlot::Layer->new(

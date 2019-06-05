@@ -92,15 +92,15 @@ has inherit_aes => ( is => 'ro', default  => sub { false } );
 Should this layer be included in the legends?
 
 =for :list
-* C<'auto'>, includes if any aesthetics are mapped.
-* C<'never'>, never includes.
-* C<'always'>, always includes. 
-* A Chart::GGPlot::Aes object, to finely select the aesthetics to display.
+* C<undef>, includes if any aesthetics are mapped.
+* A defined true scalar (non-Chart::GGPlot::Aes), never includes.
+* A defined false scalar (non-Chart::GGPlot::Aes), always includes. 
+* A L<Chart::GGPlot::Aes> object whose values are booleans, to finely
+select the aesthetics to display.
 
 =cut
 
-my $ShowLegend = ( ( Enum [qw(auto never always)] ) | AesMapping );
-has show_legend => ( is => 'ro', isa => $ShowLegend, default => 'auto' );
+has show_legend => ( is => 'ro' );
 
 around BUILDARGS( $orig, $class : @rest ) {
     my %params = @rest;
