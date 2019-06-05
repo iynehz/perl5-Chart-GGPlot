@@ -16,6 +16,7 @@ use PDL::MatrixOps ();
 use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(seq_n);
 use Chart::GGPlot::Util::Pod qw(layer_func_pod);
+use Chart::GGPlot::Util::Stats;
 
 with qw(
   Chart::GGPlot::Stat
@@ -34,13 +35,13 @@ classmethod _parameters () {
 
 my $stat_smooth_pod = layer_func_pod(<<'EOT');
 
-    stat_smooth(:$maping=undef, :$data=undef,
-                :$geom='smooth', :$position='identity',
-                :$method='auto', :$se=true,
-                :$n=80, :$span=0.75, :$fullrange=false, :$level=0.95,
-                :$method_args={},
-                :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
-                %rest)
+        stat_smooth(:$maping=undef, :$data=undef,
+                    :$geom='smooth', :$position='identity',
+                    :$method='auto', :$se=true,
+                    :$n=80, :$span=0.75, :$fullrange=false, :$level=0.95,
+                    :$method_args={},
+                    :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+                    %rest)
 
     Arguments:
     
@@ -66,7 +67,7 @@ my $stat_smooth_pod = layer_func_pod(<<'EOT');
 
     Requires L<Math::LOESS>.
 
-    Supported C<$method_args>, (see L<Math::LOESS::Model> for details, )
+    Supported C<$method_args>, (see L<Math::LOESS::Model> for details)
 
     =over 12
 
@@ -86,8 +87,8 @@ my $stat_smooth_pod = layer_func_pod(<<'EOT');
 
     Requires L<PDL::Stats::GLM> and L<PDL::GSL::CDF>.
 
-    At this moment we can do only simple linear modeling. To support logistic
-    and polynomial in future.
+    At this moment we can do only simple linear modeling. Still to support
+    logistic and polynomial in future.
 
     Supported C<$method_args>,
 
@@ -173,7 +174,7 @@ classmethod ggplot_functions() {
 }
 
 classmethod _predictdf($method) {
-    my $func = "_predictdf_${method}";
+    my $func = "Chart::GGPlot::Util::Stats::${method}";
     no strict 'refs';
     unless (exists &{$func}) {
         die "Unsupported smooth method: $method";
@@ -274,71 +275,6 @@ method compute_group($data, $scales, $params) {
     return $predictdf->( %base_args, %$method_args );
 }
 
-fun _predictdf_loess (:$x, :$y, :$weights, :$xseq, :$se, :$level, :$span,
-                      :$degree=undef, :$parametric=undef,
-                      :$drop_square=undef, :$normalize=undef,
-                      :$family=undef) {
-    load Math::LOESS;
-
-    my $loess = Math::LOESS->new(
-        x            => $x,
-        y            => $y,
-        weights      => $weights,
-        span         => $span,
-        maybe family => $family,
-    );
-    $loess->model->degree($degree)      if defined $degree;
-    $loess->model->degree($parametric)  if defined $parametric;
-    $loess->model->degree($drop_square) if defined $drop_square;
-    $loess->model->degree($normalize)   if defined $normalize;
-
-    $loess->fit();
-    my $predict = $loess->predict( $xseq, $se );
-
-    my $ci =
-      $se ? $predict->confidence( 1 - $level ) : { fit => $predict->values };
-    my @columns = ( x => $xseq, y => $ci->{fit} );
-    if ($se) {
-        push @columns, ( ymin => $ci->{lower}, ymax => $ci->{upper} );
-    }
-    return Data::Frame->new( columns => \@columns );
-}
-
-fun _predictdf_glm (:$x, :$y, :$xseq, :$se, :$level,
-        :$family='gaussian', %rest) {
-    load PDL::Stats::GLM;
-    load PDL::GSL::CDF;
-
-    my $n = $x->length;
-    my %m = PDL::Stats::GLM::ols( $y, $x, { plot => 0 } );
-
-    # fit_t = Xb = pdl($x, [1...])->t x $m{b}->t = $m{b} x pdl($x, [1...])
-    my $fit = ( $m{b} x pdl( $xseq, [ (1) x $xseq->length ] ) )->flat;
-    my @columns = ( x => $xseq, y => $fit );
-
-    if ($se) {
-        my $res            = $y - $m{y_pred};
-        my $mse            = ( $res**2 )->sum / ( $y->length - 2 );
-        my $residual_scale = sqrt($mse);
-
-        my $se_fit =
-          $residual_scale *
-          sqrt( 1 / $n +
-              $n *
-              ( $xseq - $x->average )**2 /
-              ( $n * ( $x**2 )->sum - ( $x->sum )**2 ) );
-
-        my $cdf_func = "PDL::GSL::CDF::gsl_cdf_${family}_Pinv";
-        no strict 'refs';
-        my $t        = $cdf_func->( 1 - ( 1 - $level ) / 2, 1 );
-
-        push @columns,
-          ( ymin => $fit - $t * $se_fit, ymax => $fit + $t * $se_fit );
-    }
-
-    return Data::Frame->new( columns => \@columns );
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -347,6 +283,6 @@ __END__
 
 =head1 SEE ALSO
 
-L<Chart::GGPlot::Stat>
+L<Chart::GGPlot::Stat>, L<Chart::GGPlot::Util::Stats>
 
 L<Math::LOESS>
