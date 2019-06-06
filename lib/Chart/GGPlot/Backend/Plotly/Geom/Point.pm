@@ -1,6 +1,6 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Point;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Point
+# ABSTRACT: Chart::GGPlot's Plotly implementation for Geom::Point
 
 use Chart::GGPlot::Class;
 

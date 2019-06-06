@@ -1,6 +1,6 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Boxplot;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Boxplot
+# ABSTRACT: Chart::GGPlot's Plotly implementation for Geom::Boxplot
 
 use Chart::GGPlot::Class qw(:pdl);
 

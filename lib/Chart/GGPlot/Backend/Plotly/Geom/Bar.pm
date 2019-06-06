@@ -1,6 +1,6 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Bar;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Bar
+# ABSTRACT: Chart::GGPlot's Plotly implementation for Geom::Bar
 
 use Chart::GGPlot::Class;
 

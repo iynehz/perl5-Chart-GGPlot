@@ -1,6 +1,6 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Blank;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Blank
+# ABSTRACT: Chart::GGPlot's Plotly implementation for Geom::Blank
 
 use Chart::GGPlot::Class;
 

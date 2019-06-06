@@ -32,10 +32,11 @@ classmethod optional_aes() { [qw(ymin ymax)] }
 
 my $geom_smooth_pod = layer_func_pod(<<'EOT');
 
-        geom_smooth(:$mapping=undef, :$data=undef, :$stat='count',
-                 :$position='stack', :$width=undef,
-                 :$na_rm=false, :$show_legend=undef, :$inherit_aes=true,
-                 %rest)
+        geom_smooth(:$mapping=undef, :$data=undef,
+                    :$stat='smooth', :$position='identity',
+                    :$method='auto', :$se=true,
+                    :$na_rm=false, :$show_legend=undef, :$inherit_aes=true,
+                    %rest)
 
     Aids the eye in seeing patterns in the presence of overplotting, by
     calculating a smoothed conditional mean.

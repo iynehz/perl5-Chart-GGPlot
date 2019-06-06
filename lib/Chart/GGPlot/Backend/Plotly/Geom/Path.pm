@@ -1,6 +1,6 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Path;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Path
+# ABSTRACT: Chart::GGPlot's Plotly implementation for Geom::Path
 
 use Chart::GGPlot::Class qw(:pdl);
 

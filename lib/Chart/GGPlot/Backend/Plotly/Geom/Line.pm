@@ -1,6 +1,6 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Line;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Line
+# ABSTRACT: Chart::GGPlot's Plotly implementation for Geom::Line
 
 use Chart::GGPlot::Class;
 

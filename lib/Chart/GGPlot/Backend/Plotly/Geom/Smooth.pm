@@ -1,6 +1,6 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Smooth;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Smooth
+# ABSTRACT: Chart::GGPlot's Plotly implementation for Geom::Smooth
 
 use Chart::GGPlot::Class qw(:pdl);
 
