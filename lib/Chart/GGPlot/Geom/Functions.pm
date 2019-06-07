@@ -17,7 +17,7 @@ our @sub_namespaces = qw(
   Bar Boxplot
   Path Point Line
   Polygon
-  Rect Tile
+  Rect Tile Raster
   Smooth
 );
 

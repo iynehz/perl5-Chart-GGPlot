@@ -118,4 +118,5 @@ __END__
 =head1 SEE ALSO
 
 L<Chart::GGPlot::Geom>,
-L<Chart::GGPlot::Geom::Rect>
+L<Chart::GGPlot::Geom::Rect>,
+L<Chart::GGPlot::Geom::Raster>

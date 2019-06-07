@@ -9,7 +9,6 @@ use Chart::GGPlot::Class;
 extends qw(Chart::GGPlot::Backend::Plotly::Geom::Polygon);
 
 use List::AllUtils qw(reduce);
-use Module::Load;
 use PDL::Basic qw(sequence);
 
 classmethod prepare_data ($data, @rest) {

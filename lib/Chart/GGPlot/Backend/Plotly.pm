@@ -152,8 +152,12 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
                         } @split_legend
                     );
                     $trace->name($legend_key);
-                    $trace->legendgroup($legend_key);
-                    $trace->showlegend($showlegend);
+
+                    # some types like heatmap may not have below methods
+                    if ( $trace->can('showlegend') ) {
+                        $trace->legendgroup($legend_key);
+                        $trace->showlegend($showlegend);
+                    }
                 }
                 return @$traces;
             }
@@ -436,26 +440,31 @@ method _to_plotly ($plot_built) {
 
         for my $panel (@$traces) {
             for my $trace (@$panel) {
-                if (not $global_showlegend) {
-                    $trace->showlegend(0);
-                }
-                elsif ($seen_legendgroup{ $trace->legendgroup }++) {
-                    # for traces of same legend group, show legend for only
-                    #  the first one of them.
-                    $trace->showlegend(0);
+                if ( $trace->can('showlegend') ) {
+                    if ( not $global_showlegend ) {
+                        $trace->showlegend(0);
+                    }
+                    elsif ( $seen_legendgroup{ $trace->legendgroup }++ ) {
+
+                        # for traces of same legend group, show legend for
+                        # only the first one of them.
+                        $trace->showlegend(0);
+                    }
                 }
 
                 $plotly->add_trace($trace);
             }
 
-            if ( List::AllUtils::any { $_->showlegend } @$panel ) {
+            if ( List::AllUtils::any { $_->$_call_if_can('showlegend') }
+                @$panel )
+            {
                 $plotly_layout{showlegend} = JSON::true;
 
                 # legend title
                 #
                 # TODO: See if plotly will officially support legend title
                 #  https://github.com/plotly/plotly.js/issues/276
-                my $legend_titles = join( "\n", map { $_->title } @$gdefs);
+                my $legend_titles = join( "\n", map { $_->title } @$gdefs );
 
                 my $annotations = $plotly_layout{annotations} //= [];
                 push @$annotations,
