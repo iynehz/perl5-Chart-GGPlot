@@ -8,7 +8,6 @@ use namespace::autoclean;
 # VERSION
 
 use Data::Frame::Types qw(DataFrame);
-use Data::Munge qw(elem);
 use List::AllUtils qw(pairwise reduce);
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle1D);

@@ -7,7 +7,6 @@ use namespace::autoclean;
 
 # VERSION
 
-use Data::Munge qw(elem);
 use List::AllUtils qw(pairmap pairkeys);
 use Types::Standard qw(Any ArrayRef Object);
 use Type::Params;
@@ -197,7 +196,7 @@ method add_defaults ($data, $aesthetics) {
         my ( $scale_f, $func_name ) = find_scale( $aes, $datacols{$aes} );
         unless ( defined $scale_f ) {
             # some aesthetics do not have scale functions
-            if ( elem( $aes, [qw(weight)] ) ) {
+            if ( List::AllUtils::any { $aes eq $_ } (qw(weight width)) ) {
                 next;
             }
             else {
