@@ -13,6 +13,7 @@ use Types::Standard qw(Any ArrayRef Object);
 use Type::Params;
 use PDL::Primitive qw(which);
 
+use Chart::GGPlot::Aes::Functions qw(aes_to_scale);
 use Chart::GGPlot::Scale::Functions qw(find_scale);
 use Chart::GGPlot::Types qw(:all);
 use Chart::GGPlot::Util qw(:all);
@@ -65,7 +66,7 @@ method add ($scale) {
     my $prev_aes = $self->find( $scale->aesthetics );
     if ( $prev_aes->any ) {
         my $aes_name =
-          $self->scales->slice( $prev_aes->flatten )->aesthetics->[0];
+          $self->scales->slice( [ $prev_aes->at(0) ] )->aesthetics->[0];
         my $message =
           sprintf( "Scale for '%s' is already present. "
               . "Adding another scale for '%s', which will replace the existing scale.",
@@ -180,6 +181,7 @@ method transform_df ($df) {
 method add_defaults ($data, $aesthetics) {
     return if ( $aesthetics->isempty );
 
+    $aesthetics = $aesthetics->rename(\&aes_to_scale);
     my $new_aesthetics = $aesthetics->names->setdiff( $self->input );
 
     # No new aesthetics, so no new scales to add
