@@ -9,10 +9,9 @@ use Chart::GGPlot::Class;
 extends qw(Chart::GGPlot::Backend::Plotly::Geom::Polygon);
 
 use List::AllUtils qw(reduce);
-use PDL::Basic qw(sequence);
 
 classmethod prepare_data ($data, @rest) {
-    $data->set( 'group', sequence( $data->nrow ) );
+    $data->set( 'group', PDL->sequence( $data->nrow ) );
     my ( $xmin, $xmax, $ymin, $ymax ) =
       map { $data->at($_) } qw(xmin xmax ymin ymax);
     my $data1 = $data->copy;
