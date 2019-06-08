@@ -71,6 +71,15 @@ fun is_null ($p) {
 
 fun sign ($p) { $p <=> 0; }
 
+=func match
+
+    match(Piddle $a, $Piddle $b)
+
+Returns a vector of the positions of (first) matches of its first argument
+in its second.
+
+=cut
+
 fun match (Piddle $a, Piddle $b) {
     my $is_string =
       List::AllUtils::any { $_->$_DOES('PDL::SV') or $_->type eq 'byte' }
@@ -90,11 +99,11 @@ fun match (Piddle $a, Piddle $b) {
         else {
             my $sorted_idx = $b->qsorti;
             my $sorted     = $b->slice($sorted_idx);
-            my $match      = $a->vsearch_match($sorted);
-            my $idx        = $match->slice( pdl( [ 0 .. $a->length - 1 ] ) );
-            my $isbad      = $idx < 0;
-            $idx->where($isbad) .= 0;
-            return $sorted_idx->slice($idx)->setbadif($isbad);
+            $sorted = $sorted->where( $sorted->isgood ) if $sorted->badflag;
+            my $match = $a->vsearch_match($sorted);
+            my $idx   = $match->slice( pdl( [ 0 .. $a->length - 1 ] ) );
+            $idx = $idx->setbadif($idx < 0) if $idx->badflag;
+            return $sorted_idx->slice($idx);
         }
     }
 }
