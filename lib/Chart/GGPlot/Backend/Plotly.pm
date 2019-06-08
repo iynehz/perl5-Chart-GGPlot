@@ -464,13 +464,16 @@ method _to_plotly ($plot_built) {
                 #
                 # TODO: See if plotly will officially support legend title
                 #  https://github.com/plotly/plotly.js/issues/276
-                my $legend_titles = join( "\n", map { $_->title } @$gdefs );
+                my $br = br();
+                my $legend_titles =
+                  join( $br, map { $_->title =~ s/\n/$br/gr; } @$gdefs );
 
                 my $annotations = $plotly_layout{annotations} //= [];
                 push @$annotations,
                   {
                     x         => 1.02,
                     y         => 1,
+                    align     => 'left',
                     xanchor   => 'left',
                     yanchor   => 'bottom',
                     text      => $legend_titles,

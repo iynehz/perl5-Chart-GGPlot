@@ -8,6 +8,8 @@ Revision history for Chart::GGPlot
     has BAD values.
   - Make sure Chart::GGPlot::Util::seq_n() return piddle's last element
     always be same as its $to argument.
+  - Plotly backend legend title now aligns left and supports newlines in
+    legend title text.
 
 0.0004_01   2019-06-05
   - New feature: experimental support of geom_smooth()
