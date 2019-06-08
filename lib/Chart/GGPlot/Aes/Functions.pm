@@ -68,30 +68,17 @@ fun _aes ($mapping, $level=$aes_level_default) {
 }
 
 # Look up the scale that should be used for a given aesthetic
-sub aes_to_scale {
-    state $check =
-      Type::Params::compile( ArrayRef->plus_coercions(ArrayRefFromAny) );
-    my ($aes_names) = $check->(@_);
-
-    my $rename = fun($n) {
-        if ( grep { $n eq $_ } qw(x xmin xmax xend xintercept) ) {
-            return 'x';
-        }
-        if ( grep { $n eq $_ } qw(y ymin ymax yend yintercept) ) {
-            return 'y';
-        }
-        return $n;
-    };
-    my @new_names =
-      map { &$rename($_) }
-      map { Chart::GGPlot::Aes->transform_key($_) } @$aes_names;
-    return \@new_names;
+fun aes_to_scale ($aesthetic) {
+    $aesthetic = Chart::GGPlot::Aes->transform_key($aesthetic);
+    return 'x' if ( $aesthetic =~ /^x(?:|min|max|end|intercept)$/ );
+    return 'y' if ( $aesthetic =~ /^y(?:|min|max|end|intercept)$/ );
+    return $aesthetic;
 }
 
 # Figure out if an aesthetic is a position aesthetic or not
 fun is_position_aes ($aes_names) {
-    my $new_names = aes_to_scale($aes_names);
-    return ( List::AllUtils::all { $_ eq 'x' or $_ eq 'y' } @$new_names );
+    my @new_names = map { aes_to_scale($_) } @$aes_names;
+    return ( List::AllUtils::all { $_ eq 'x' or $_ eq 'y' } @new_names );
 }
 
 =method aes_all

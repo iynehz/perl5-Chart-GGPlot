@@ -55,6 +55,7 @@ method build ($scales, :$layers, :$labels, :$default_mapping=undef, %rest) {
             }
 
             $guide = $guide->train($scale, $output);
+            next unless defined $guide;
 
             if (
                 List::AllUtils::none {

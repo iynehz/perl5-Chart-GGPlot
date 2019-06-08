@@ -291,7 +291,7 @@ fun _color_ramp ($colors) {
             b => $_->[2] / 255
         );
         $c->as_css_hex;
-      } multi_array_gradient( 10, @hot_spots );
+      } multi_array_gradient( 255, @hot_spots );
 
     return fun( Piddle $p) {
         my @mapped = do {
