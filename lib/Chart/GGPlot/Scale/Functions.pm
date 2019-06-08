@@ -822,7 +822,7 @@ Depending on C<$type>,
 
 =cut
 
-fun scale_color_continuous ( : $type = "gradient", %rest ) {
+fun scale_color_continuous (:$type = "gradient", %rest) {
     state $switch = {
         gradient => \&scale_color_gradient,
         viridis  => \&scale_color_viridis_c,
@@ -833,7 +833,7 @@ fun scale_color_continuous ( : $type = "gradient", %rest ) {
     die("Unknown scale type");
 }
 
-fun scale_fill_continuous ( : $type = "gradient", %rest ) {
+fun scale_fill_continuous (:$type = "gradient", %rest) {
     state $switch = {
         gradient => \&scale_fill_gradient,
         viridis  => \&scale_fill_viridis_c,
