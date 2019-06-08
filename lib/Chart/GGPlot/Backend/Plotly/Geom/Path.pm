@@ -86,18 +86,9 @@ classmethod to_traces ($df, $params, $plot) {
           line => $line,
         maybe
           marker => $marker,
-
-        # TODO: hovertext for webgl does not seem to work. Maybe it's
-        #  because of large data count. To revisit this in future.
-        (
-            $use_webgl
-            ? ()
-            : (
-                hovertext => pdl_to_plotly( $df->at('hovertext') ),
-                hoverinfo => 'text',
-                hoveron   => $class->hover_on,
-            )
-        ),
+        hovertext => pdl_to_plotly( $df->at('hovertext') ),
+        hoverinfo => 'text',
+        hoveron   => $class->hover_on,
     );
     return [ $class->_adjust_trace_for_flip($trace, $plot) ];
 }
