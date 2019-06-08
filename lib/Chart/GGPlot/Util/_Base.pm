@@ -46,7 +46,9 @@ fun seq_n ( $from, $to, $n ) {
     return pdl( [$from] ) if ( $n == 1 );
 
     my $by = ( $to - $from ) / ( $n - 1 );
-    return seq_by( $from, $to, $by );
+    my $s = seq_by( $from, $to, $by );
+    $s->set(-1, $to);   # avoid float epsilon issues
+    return $s;
 }
 
 fun is_na ($p) { $p->isbad; }

@@ -1,10 +1,12 @@
 Revision history for Chart::GGPlot
 
-0.0004_02   2019-06-06   
+0.0004_02   2019-06-06
   - Layer's show_legend attribute now really has effect.
   - New feature: geom_rect(), geom_tile()
   - Fix Chart::GGPlot::Util::match() for cases where its second argument
     has BAD values.
+  - Make sure Chart::GGPlot::Util::seq_n() return piddle's last element
+    always be same as its $to argument.
 
 0.0004_01   2019-06-05
   - New feature: experimental support of geom_smooth()
