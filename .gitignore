@@ -41,3 +41,7 @@ inc/
 perltidy.ERR
 perltidy.LOG
 
+# dzil build tarball and dir
+Chart-GGPlot-*.tar.gz
+Chart-GGPlot-*/
+
