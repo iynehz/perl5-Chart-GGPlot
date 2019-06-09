@@ -400,7 +400,9 @@ method _to_plotly ($plot_built) {
                 ) ? ( showgrid => JSON::false, )
                 : (
                     gridcolor => to_rgb( $el_panel_grid->at('color') ),
-                    gridwidth => to_rgb( $el_panel_grid->at('size') ),
+
+                    # FIXME: fix this and use cex_to_px()
+                    gridwidth => $el_panel_grid->at('size'),
                 )
             ),
         };
