@@ -281,8 +281,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=head1 DESCRIPTION
+
+Some of the stats methods may require additional modules be installed. For
+example the C<"loess"> method requires L<Math::LOESS>. At present those
+dependencies are specified as "recommends" instead of "requires" of the 
+C<Chart-GGPlot> distribution on CPAN. So depending on your cpan client
+they may or may not be installed when you tell your cpan client to install
+Chart::GGPlot. If you see errors about missing modules, you can install
+the modules.
+
 =head1 SEE ALSO
 
 L<Chart::GGPlot::Stat>, L<Chart::GGPlot::Util::Stats>
 
-L<Math::LOESS>

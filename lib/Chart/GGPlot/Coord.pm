@@ -104,3 +104,11 @@ classmethod expand_default ($scale,
 1;
 
 __END__
+
+=head1 DESCRIPTION
+
+This module is a Moose role for "coord".
+
+For users of Chart::GGPlot you would mostly want to look at
+L<Chart::GGPlot::Coord::Functions> instead.
+

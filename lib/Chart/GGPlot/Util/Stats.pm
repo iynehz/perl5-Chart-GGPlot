@@ -15,9 +15,21 @@ our @EXPORT_OK = qw(loess glm);
 
 =func loess
 
+    loess(:$x, :$y, :$weights, :$xseq,
+          :$span=0.75,
+          :$se=false, :$level=0.95,
+          :$degree=2, :$parametric=undef, :$drop_square=undef,
+          :$normalize=true, :$family='gaussian')
+
+This function requires L<Math::LOESS>.
+
+See L<Math::LOESS::Model> for details of the arguments.
+
 =cut
 
-fun loess (:$x, :$y, :$weights, :$xseq, :$se, :$level, :$span,
+fun loess (:$x, :$y, :$weights, :$xseq,
+           :$span=0.75,
+           :$se=false, :$level=0.95,
            :$degree=undef, :$parametric=undef,
            :$drop_square=undef, :$normalize=undef,
            :$family=undef) {
@@ -49,9 +61,16 @@ fun loess (:$x, :$y, :$weights, :$xseq, :$se, :$level, :$span,
 
 =func glm
 
+    glm(:$x, :$y, :$xseq,
+        :$se=false, :$level=0.95,
+        $family='gaussian')
+
+This function requires L<PDL::Stats::GLM> and L<PDL::GSL::CDF>.
+
 =cut
 
-fun glm (:$x, :$y, :$xseq, :$se, :$level,
+fun glm (:$x, :$y, :$xseq,
+         :$se=false, :$level=0.95,
          :$family='gaussian', %rest) {
     load PDL::Stats::GLM;
     load PDL::GSL::CDF;
@@ -93,6 +112,11 @@ __END__
 =head1 DESCRIPTION
 
 Functions in this module are used by L<Chart::GGPlot::Stat::Smooth>.
+
+Each function returns a L<Data::Frame> object which has a column named
+C<"fit"> for smooth fit values for given argument C<$xseq>. And if argument
+C<$se> is a true value, the result data frame would have additonal two
+columns C<"ymin"> and C<"ymax"> for confidence interval.
 
 =head1 SEE ALSO
 

@@ -219,3 +219,11 @@ method make_sec_title ($title) { $title; }
 1;
 
 __END__
+
+=head1 DESCRIPTION
+
+This module is a Moose role for "scale".
+
+For users of Chart::GGPlot you would mostly want to look at
+L<Chart::GGPlot::Scale::Functions> instead.
+

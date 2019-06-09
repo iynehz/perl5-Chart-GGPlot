@@ -106,3 +106,11 @@ method aesthetics () {
 1;
 
 __END__
+
+=head1 DESCRIPTION
+
+This module is a Moose role for "stats".
+
+For users of Chart::GGPlot you would mostly want to look at
+L<Chart::GGPlot::Stat::Functions> instead.
+
