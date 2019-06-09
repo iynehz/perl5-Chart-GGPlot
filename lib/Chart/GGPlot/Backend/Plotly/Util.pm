@@ -16,8 +16,7 @@ use Types::Standard qw(Str);
 use parent qw(Exporter::Tiny);
 
 use Chart::GGPlot::Util::Scales qw(
-  color_hex_from_rgb color_rgb_from_hex
-  color_hex_from_color_library
+  csshex_to_rgb255 colorname_to_csshex
 );
 
 our @EXPORT_OK = qw(
@@ -51,14 +50,14 @@ fun to_rgb ($color, $alpha=pdl(1)) {
 
         return 'transparent' if $c eq 'BAD';
         unless ( $c =~ /^\#/ ) {
-             $c = color_hex_from_color_library($c);
+             $c = colorname_to_csshex($c);
         }
         return $c if $a == 1;
 
         if ($c =~ /^#/) {
             return sprintf(
                 "rgba(%s,%s,%s,%s)",
-                color_rgb_from_hex($c),
+                csshex_to_rgb255($c),
                 0+sprintf("%.2f", $a)   # 0+ for removing trailing zeros
             );
         }

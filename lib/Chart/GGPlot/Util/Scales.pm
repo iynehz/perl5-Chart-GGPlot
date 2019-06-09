@@ -48,9 +48,9 @@ our @EXPORT_OK = qw(
   extended_breaks regular_minor_breaks log_breaks
   pretty pretty_breaks
   number comma percent dollar
-  color_hex_from_rgb color_hex_from_rgb2
-  color_rgb_from_hex
-  color_hex_from_color_library
+  rgb255_to_csshex rgb_to_csshex
+  csshex_to_rgb255
+  colorname_to_csshex
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
@@ -184,7 +184,7 @@ fun _pal_name ( $palette, $type ) {
 #  difference in result color channel is at max just 1/256.
 fun hcl ($h, $c, $l) {
     my $c = Convert::Color::LCh->new( $l, $c, $h );
-    return color_hex_from_rgb2($c->rgb);
+    return rgb_to_csshex($c->rgb);
 }
 
 fun hue_pal (:$h=pdl([0, 360])+15, :$c=100, :$l=65, :$h_start=0, :$direction=1) {
@@ -222,7 +222,7 @@ fun brewer_pal ( $type, $palette = 0, $direction = 1 ) {
         # convert to Graphics::Color object
         @colors = map {
             my ( $r, $g, $b ) = $_ =~ /^rgb\((\d+),(\d+),(\d+)\)/;
-            color_hex_from_rgb($r, $g, $b);
+            rgb255_to_csshex($r, $g, $b);
         } @colors[ 0 .. $n - 1 ];
 
         if ( $direction == -1 ) {
@@ -240,14 +240,14 @@ fun _color_ramp ($colors) {
 
     my @hot_spots = map {
         if ( $_ =~ /^\#/ ) {
-            [ color_rgb_from_hex($_) ];
+            [ csshex_to_rgb255($_) ];
         }
         else {
-            [ Color::Library->color($_)->rgb ];
+            [ colorname_to_rgb255($_) ];
         }
     } ( $colors->flatten );
     my @gradient =
-      map { color_hex_from_rgb(@$_); } multi_array_gradient( 255, @hot_spots );
+      map { rgb255_to_csshex(@$_); } multi_array_gradient( 255, @hot_spots );
 
     return fun( Piddle $p) {
         my @mapped = do {
@@ -305,7 +305,7 @@ fun viridis_pal ($begin=0, $end=1, $direction=1, $option='viridis') {
         my $colors =
           Chart::GGPlot::Util::Scales::_Viridis::viridis( $n, $begin, $end,
             $direction, $option );
-        my @palette = map { color_hex_from_rgb2(@$_); } @$colors;
+        my @palette = map { rgb_to_csshex(@$_); } @$colors;
         return PDL::SV->new( \@palette );
     };
 }
@@ -954,49 +954,54 @@ fun _accuracy ($p) {
     return 10 ** (pdl($span)->log10->floor);  
 }
 
-=func color_hex_from_rgb
+=func rgb255_to_csshex
     
-    color_hex_from_rgb($r, $g, $b)
+    rgb255_to_csshex($r, $g, $b)
 
 You must make sure the arguments are beteen [0, 255] yourself.
 
-=func color_hex_from_rgb2
+=func rgb_to_csshex
 
-    color_hex_from_rgb2($r, $g, $b)
+    rgb_to_csshex($r, $g, $b)
 
-Similar as C<color_hex_from_rgb()> but the arguments should be between
+Similar as C<rgb255_to_csshex()> but the arguments should be between
 [0, 1]. This function would process arguments not within [0, 1]. 
 
-=func color_rgb_from_hex
+=func csshex_to_rgb255
 
-    color_rgb_from_hex($color_hex)
+    csshex_to_rgb255($color_hex)
 
-=func color_hex_from_color_library
+=func colorname_to_csshex
 
-    color_hex_from_color_library($color_id)
+    colorname_to_csshex($color_name)
 
 =cut
 
-sub color_hex_from_rgb { sprintf("#%02x%02x%02x", @_); }
+sub rgb255_to_csshex { sprintf("#%02x%02x%02x", @_); }
 
-sub color_hex_from_rgb2 {
+sub rgb_to_csshex {
     my ( $r, $g, $b ) = 
       map { $_ * 255 } map { $_ > 1 ? 1 : $_ < 0 ? 0 : $_ } @_; 
-    color_hex_from_rgb( $r, $g, $b );
+    rgb255_to_csshex( $r, $g, $b );
 }
 
-sub color_rgb_from_hex {
-    my ($color_hex) = @_;
-    return map { hex ($_) } ( $color_hex =~ /^#(..)(..)(..)/);
+sub csshex_to_rgb255 {
+    my ($csshex) = @_;
+    return map { hex($_) } ( $csshex =~ /^#(..)(..)(..)/);
 }
 
-sub color_hex_from_color_library {
-    my ($color_id) = @_;
-    my $color = Color::Library->color($color_id);
-    die "unknown color id '$color_id'" unless defined $color;
-    return color_hex_from_rgb($color->rgb);
+sub colorname_to_rgb255 {
+    my ($color_name) = @_;
+    my $color = Color::Library->color($color_name);
+    die "unknown color id '$color_name'" unless defined $color;
+    return $color->rgb;
 }
-memoize('color_hex_from_color_library');
+
+sub colorname_to_csshex {
+    my ($color_name) = @_;
+    return rgb255_to_csshex( colorname_to_rgb255($color_name) );
+}
+memoize('colorname_to_csshex');
 
 1;
 
