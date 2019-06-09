@@ -1,22 +1,23 @@
 Revision history for Chart::GGPlot
 
-0.0004_02   2019-06-08
+0.0005      2019-06-09
+  - New feature: experimental support of geom_smooth(). At present loess
+    (locally weighted estimated scatterplot smoothing) and simple linear
+    regression are supported. 
+  - New feature: experimental support of geom_polygon().
   - New feature: experimental support for geom_rect(), geom_tile(), and
     geom_raster().
-  - Layer's show_legend attribute now really has effect.
-  - Fix Chart::GGPlot::Util::match() for cases where its second argument
-    has BAD values.
-  - Make sure Chart::GGPlot::Util::seq_n() return piddle's last element
-    always be same as its $to argument.
-  - Plotly backend legend title now aligns left and supports newlines in
-    legend title text.
-
-0.0004_01   2019-06-05
-  - New feature: experimental support of geom_smooth()
-  - New feature: experimental support of geom_polygon()
+  - New feature: Layer's show_legend attribute now really has effect.
   - Bug fix: Fixed alpha handling in the plotly backend.
   - Bug fix: Now Chart::GGPlot::Stat would not die when generate data for
     data with more points for stat then for raw data.
+  - Bug fix: Fixed Chart::GGPlot::Util::match() for cases where its second
+    argument has BAD values.
+  - Make sure Chart::GGPlot::Util::seq_n() return piddle's last element
+    always be same as its $to argument.
+  - Plotly backend: legend title now aligns left and supports newlines in
+    legend title text.
+  - Plotly backend: now hovertext is shown for scattergl plots.
 
 0.0003      2019-05-04
   - New feature: basic support of geom_boxplot()
