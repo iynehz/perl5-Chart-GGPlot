@@ -19,18 +19,10 @@ has drop            => ( is => 'ro', default => sub { true } );
 has na_translate    => ( is => 'ro' );
 has _n_breaks_cache => ( is => 'rw' );
 
-my $Palette = ( ConsumerOf ['PDL::SV'] )->plus_coercions(
-    ArrayRef [ ConsumerOf ['Graphics::Color::RGB'] ],
-    sub {
-        PDL::SV->new( $_->map( sub { $_->as_css_hex } ) );
-    }
-);
-
 has _palette_cache => (
     is      => 'rw',
-    isa     => $Palette,
+    isa     => ConsumerOf ['PDL::SV'],
     default => sub { PDL::SV->new( [] ); },
-    coerce  => 1
 );
 
 has range => (

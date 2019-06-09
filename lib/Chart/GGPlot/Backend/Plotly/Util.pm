@@ -9,12 +9,16 @@ use Chart::GGPlot::Setup qw(:base :pdl);
 use Data::Frame;
 use Data::Munge qw(elem);
 use List::AllUtils qw(all min max pairmap pairwise reduce);
-use Memoize;
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle);
 use Types::Standard qw(Str);
 
 use parent qw(Exporter::Tiny);
+
+use Chart::GGPlot::Util::Scales qw(
+  color_hex_from_rgb color_rgb_from_hex
+  color_hex_from_color_library
+);
 
 our @EXPORT_OK = qw(
   pt_to_px cex_to_px
@@ -47,15 +51,14 @@ fun to_rgb ($color, $alpha=pdl(1)) {
 
         return 'transparent' if $c eq 'BAD';
         unless ( $c =~ /^\#/ ) {
-             $c = _color_name_to_rgb($c);
+             $c = color_hex_from_color_library($c);
         }
         return $c if $a == 1;
 
-        if ( my @rgb = ( $c =~ /^#(..)(..)(..)/ ) ) {
-            $a = max( min( $a, 1 ), 0 );
+        if ($c =~ /^#/) {
             return sprintf(
                 "rgba(%s,%s,%s,%s)",
-                ( map { hex($_) } @rgb ),
+                color_rgb_from_hex($c),
                 0+sprintf("%.2f", $a)   # 0+ for removing trailing zeros
             );
         }
@@ -63,13 +66,15 @@ fun to_rgb ($color, $alpha=pdl(1)) {
     };
 
     if ( !ref($color) ) {
-        return $rgb->($color, 1);
+        return $rgb->($color, $alpha->at(0));
     }
     else {
         if ($alpha->length != $color->length and $alpha->length != 1) {
             die "alpha must be of length 1 or the same length as x";
         }
         $alpha = $alpha->setbadtoval(1);
+        $alpha->where($alpha > 1) .= 1;
+        $alpha->where($alpha < 0) .= 0;
         
         my @color = $color->flatten;
         my @rgba;
@@ -83,19 +88,6 @@ fun to_rgb ($color, $alpha=pdl(1)) {
         return PDL::SV->new(\@rgba);
     }
 }
-
-sub _color_name_to_rgb {
-    my ($color_name) = @_;
-
-    try {
-        my $color = Color::Library->color($color_name);
-        return sprintf("#%02x%02x%02x", $color->rgb);
-    }
-    catch {
-        return $color_name;
-    }
-}
-memoize('_color_name_to_rgb');
 
 =func group_to_NA
 
