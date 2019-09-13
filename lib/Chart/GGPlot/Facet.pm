@@ -9,7 +9,6 @@ use namespace::autoclean;
 
 use Data::Frame;
 use Data::Munge qw(elem);
-use Eval::Closure;
 use List::AllUtils qw(firstidx);
 use Types::Standard qw(ArrayRef Bool CodeRef);
 
@@ -167,32 +166,6 @@ classmethod render_strips ($x, $y, $labeller, $theme) {
         x => $class->_build_strip( $x, $labeller, $theme, true ),
         y => $class->_build_strip( $y, $labeller, $theme, false ),
     };
-}
-
-# Evaluate variables in a facet specification.
-# Returns a hashref with keys be names of the variables.
-classmethod _eval_facet_vars ($vars, $data, $env = {}) {
-    my $names = $vars->names;
-    my $out   = {
-        $names->map(
-            sub { $_ => $class->_eval_facet_var( $vars->at($_), $data, $env ) }
-        )->flatten
-    };
-    return $out;
-}
-
-# Evaluate a single variable in a facet specification.
-classmethod _eval_facet_var ($var, $data, $env = {}) {
-    if ( $data->exists($var) ) {
-        return $data->at($var);
-    }
-    else {
-        my $evaled = eval_closure(
-            source      => $var,
-            environment => $env,
-        );
-        return call_if_coderef($evaled);
-    }
 }
 
 classmethod check_coord_freedom ($coord) {

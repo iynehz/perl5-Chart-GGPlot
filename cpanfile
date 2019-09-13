@@ -15,7 +15,6 @@ requires "Data::Frame::Autobox" => "0";
 requires "Data::Frame::Types" => "0";
 requires "Data::Frame::Util" => "0";
 requires "Data::Munge" => "0";
-requires "Eval::Closure" => "0";
 requires "Eval::Quosure" => "0";
 requires "Exporter::Tiny" => "0";
 requires "Function::Parameters" => "2.001003";
