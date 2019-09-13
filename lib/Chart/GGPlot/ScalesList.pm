@@ -75,7 +75,8 @@ method add ($scale) {
         # Remove old scale for this aesthetic (if it exists)
         $self->scales = $self->scales->slice( !$prev_aes );
     }
-    $self->scales->push($scale);
+    push @{$self->scales}, $scale;
+    return;
 }
 
 =method length

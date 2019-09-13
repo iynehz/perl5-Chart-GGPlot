@@ -220,7 +220,7 @@ method summary () {
     if ( $self->data ) {
         $s .=
             &$label("data:")
-          . $self->data->names->join(", ")
+          . join(", ", @{$self->data->names})
           . sprintf( " [%sx%s] ", $self->data->nrow, $self->data->ncol ) . "\n";
     }
     if ( $self->mapping->length > 0 ) {
@@ -228,7 +228,7 @@ method summary () {
     }
     if ( $self->scales->length() > 0 ) {
         $s .=
-          &$label("scales:") . $self->scales->input()->join(", ") . "\n";
+          &$label("scales:") . join( ", ", @{ $self->scales->input } ) . "\n";
     }
     $s .= &$label("faceting: ") . $self->facet . "\n";
     $s .= "-----------------------------------";
