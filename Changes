@@ -1,6 +1,6 @@
 Revision history for Chart::GGPlot
 
-0.0007      TBD
+0.0007      2019-09-15
   - Bump Alt::Data::Frame::ButMore requirement, to drop use of
     Moose::Autobox.
   - New feature: geom_col().
