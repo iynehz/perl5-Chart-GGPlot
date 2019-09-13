@@ -22,6 +22,7 @@ requires "Function::Parameters" => "2.001003";
 requires "Hash::Util::FieldHash" => "0";
 requires "Import::Into" => "0";
 requires "JSON" => "0";
+requires "JSON::XS" => "3.01";
 requires "List::AllUtils" => "0";
 requires "Log::Any" => "0";
 requires "Log::Any::Adapter" => "0";
