@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 with qw(Chart::GGPlot::Backend);
 
-use Chart::Plotly 0.025 qw(show_plot);
+use Chart::Plotly 0.039 qw(show_plot);
 use Chart::Plotly::Plot;
 use Chart::Plotly::Image::Orca;
 
@@ -543,6 +543,7 @@ method _to_plotly ($plot_built) {
 
     #$log->trace( "plotly html:\n" . $plotly->html ) if $log->is_trace;
 
+    $plotly->{config}{responsive} = JSON::true;
     return $plotly;
 }
 
@@ -559,6 +560,17 @@ C<BROWSER> to force a browser command on your system, for example,
 
     export BROWSER=chromium-browser
 
+Below options are supported for C<$opts>:
+
+=for :list
+* width: plot width in pixel
+* height: plot height in pixel
+
+If neither C<width> or C<height> is not specified, the plotly shown in browser
+will use L<fluid layout|https://plot.ly/javascript/responsive-fluid-layout/>,
+that is, figure size will be automatically resized when browser window size
+changes.
+
 =method save
 
     save($ggplot, $filename, HashRef $opts={})
@@ -569,8 +581,8 @@ L<Chart::Plotly::Image::Orca>.
 Below options are supported for C<$opts>:
 
 =for :list
-* width
-* height
+* width: plot width in pixel
+* height: plot height in pixel
 
 =method iplot
 
@@ -587,6 +599,14 @@ method ggplotly ($ggplot) {
 
 method show ($ggplot, HashRef $opts={}) {
     my $plotly = $self->ggplotly($ggplot);
+    if ( $opts->{width} or $opts->{height} ) {
+        $plotly->{layout}{width}  = $opts->{width}  if ( $opts->{width} );
+        $plotly->{layout}{height} = $opts->{height} if ( $opts->{height} );
+        $plotly->{config}{responsive} = JSON::false;
+    }
+    else {
+        $plotly->{config}{responsive} = JSON::true;
+    }
     show_plot( $plotly );
 }
 

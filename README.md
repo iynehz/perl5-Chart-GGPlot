@@ -7,7 +7,7 @@ Chart::GGPlot - ggplot2 port in Perl
 
 # VERSION
 
-version 0.0007
+version 0.0009
 
 # STATUS
 
@@ -15,7 +15,7 @@ At this moment this library is experimental and still under active
 development (at my after-work time). It's still quite incomplete compared
 to R's ggplot2 library, but the core features are working.
 
-Besides, it heavily depends on my [Alt::Data::Frame::ButMore](https://metacpan.org/pod/Alt::Data::Frame::ButMore) library,
+Besides, it heavily depends on my [Alt::Data::Frame::ButMore](https://metacpan.org/pod/Alt%3A%3AData%3A%3AFrame%3A%3AButMore) library,
 which is also experimental.
 
 # SYNOPSIS
@@ -43,7 +43,7 @@ $plot->save('mtcars.png');
 This Chart-GGPlot library is an implementation of
 [ggplot2](https://en.wikipedia.org/wiki/Ggplot2) in Perl. It's designed to
 be possible to support multiple plotting backends. And it ships a default
-backend which uses [Chart::Plotly](https://metacpan.org/pod/Chart::Plotly).
+backend which uses [Chart::Plotly](https://metacpan.org/pod/Chart%3A%3APlotly).
 
 This Chart::GGPlot module is the function interface of the Perl Chart-GGPlot
 library.
@@ -68,7 +68,7 @@ See the `examples` dir in the library's distribution for more examples.
 ## Document Conventions
 
 Function signatures in docs of this library follow the
-[Function::Parameters](https://metacpan.org/pod/Function::Parameters) conventions, for example,
+[Function::Parameters](https://metacpan.org/pod/Function%3A%3AParameters) conventions, for example,
 
 ```perl
 myfunc(Type1 $positional_parameter, Type2 :$named_parameter)
@@ -83,7 +83,7 @@ ggplot(:$data, :$mapping, %rest)
 ```
 
 This is same as `Chart::GGPlot::Plot->new(...)`.
-See [Chart::GGPlot::Plot](https://metacpan.org/pod/Chart::GGPlot::Plot) for details.
+See [Chart::GGPlot::Plot](https://metacpan.org/pod/Chart%3A%3AGGPlot%3A%3APlot) for details.
 
 ## qplot
 
@@ -136,9 +136,9 @@ A positive integer would enable debug messages.
 
 [ggplot2](https://en.wikipedia.org/wiki/Ggplot2)
 
-[Chart::GGPlot::Plot](https://metacpan.org/pod/Chart::GGPlot::Plot)
+[Chart::GGPlot::Plot](https://metacpan.org/pod/Chart%3A%3AGGPlot%3A%3APlot)
 
-[Alt::Data::Frame::ButMore](https://metacpan.org/pod/Alt::Data::Frame::ButMore)
+[Alt::Data::Frame::ButMore](https://metacpan.org/pod/Alt%3A%3AData%3A%3AFrame%3A%3AButMore)
 
 # AUTHOR
 
