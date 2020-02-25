@@ -7,7 +7,7 @@ Chart::GGPlot - ggplot2 port in Perl
 
 # VERSION
 
-version 0.0009
+version 0.0010\_01
 
 # STATUS
 

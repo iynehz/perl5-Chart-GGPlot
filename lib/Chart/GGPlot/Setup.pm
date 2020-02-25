@@ -28,7 +28,7 @@ use Module::Load;
 use Moose 2.1400;
 use Moose::Role               ();
 use MooseX::Aliases           ();
-use MooseX::MungeHas          ();
+use MooseX::MungeHas 0.011;
 use MooseX::StrictConstructor ();
 use boolean                   ();
 
