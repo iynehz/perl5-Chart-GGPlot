@@ -20,12 +20,13 @@ classmethod split_on () { [qw(color fill size)] }
 
 classmethod prepare_data ($data, $prestats_data, @rest) {
     my @join_on_columns = qw(PANEL group);
+    my @prestats_data_columns = map { $prestats_data->at($_) } @join_on_columns;
 
     my $prestats_y = $prestats_data->at('y');
     my %prestats_y_grouped;    # PANEL;group => $y_data
     for my $ridx ( 0 .. $prestats_data->nrow - 1 ) {
         my @key_values =
-          map { $prestats_data->at($_)->at($ridx) } @join_on_columns;
+          map { $_->at($ridx) } @prestats_data_columns;
         my $k = join( $;, @key_values );
         $prestats_y_grouped{$k} //= [];
         push @{ $prestats_y_grouped{$k} }, $prestats_y->at($ridx);
