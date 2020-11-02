@@ -2,6 +2,7 @@ Revision history for Chart::GGPlot
 
 0.0010_01   TBD
   - Bump MooseX::MungeHas version requirement.
+  - Speedup boxplot rendering.
 
 0.0009      2020-02-24
   - For plotly backend's show() in browser method, use fluid layout by

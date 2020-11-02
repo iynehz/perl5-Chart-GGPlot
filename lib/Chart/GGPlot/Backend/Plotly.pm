@@ -9,9 +9,9 @@ use namespace::autoclean;
 
 with qw(Chart::GGPlot::Backend);
 
-use Chart::Plotly 0.039 qw(show_plot);
+use Chart::Plotly qw(show_plot);
 use Chart::Plotly::Plot;
-use Chart::Plotly::Image::Orca;
+use Chart::Plotly::Image;
 
 use Data::Munge qw(elem);
 use JSON;
@@ -576,7 +576,7 @@ changes.
     save($ggplot, $filename, HashRef $opts={})
 
 Export the plot to a static image file. This internally uses
-L<Chart::Plotly::Image::Orca>.
+L<Chart::Plotly::Image>.
 
 Below options are supported for C<$opts>:
 
@@ -612,15 +612,16 @@ method show ($ggplot, HashRef $opts={}) {
 
 method save ($ggplot, $filename, HashRef $opts={}) {
     my $plotly = $self->ggplotly($ggplot);
-    my $good = Chart::Plotly::Image::Orca::orca(
+    my %opts = %$opts;
+    
+    my $good = Chart::Plotly::Image::save_image(
         #<<< no perltidy
                 plot => $plotly,
                 file => $filename,
-        maybe   width => $opts->{width},
-        maybe   height => $opts->{height},
+                %opts,
         #>>>
     );
-    die "Failed to save image via plotly-orca" unless $good;
+    die "Failed to save image" unless $good;
 }
 
 method iplot ($ggplot, HashRef $opts={}) {
@@ -647,5 +648,5 @@ L<https://plot.ly/|Plotly>
 
 L<Chart::GGPlot::Backend>
 
-L<Chart::Plotly>, L<Chart::Plotly::Image::Orca>
+L<Chart::Plotly>, L<Chart::Plotly::Image>
 
