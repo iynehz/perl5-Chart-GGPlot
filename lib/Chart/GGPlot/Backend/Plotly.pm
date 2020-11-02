@@ -576,7 +576,8 @@ changes.
     save($ggplot, $filename, HashRef $opts={})
 
 Export the plot to a static image file. This internally uses
-L<Chart::Plotly::Image>.
+L<Chart::Plotly::Image>. And to get L<Chart::Plotly::Image>
+to work, I recommend you install L<Chart::Kaleido::Plotly>.
 
 Below options are supported for C<$opts>:
 
@@ -648,5 +649,5 @@ L<https://plot.ly/|Plotly>
 
 L<Chart::GGPlot::Backend>
 
-L<Chart::Plotly>, L<Chart::Plotly::Image>
+L<Chart::Plotly>, L<Chart::Plotly::Image>, L<Chart::Kaleido::Plotly>
 
