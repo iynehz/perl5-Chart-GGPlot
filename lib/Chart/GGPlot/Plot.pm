@@ -392,5 +392,7 @@ C<add_layer()> is called.
 
 L<Chart::GGPlot>
 
+L<Chart::GGPlot::Backend>, L<Chart::GGPlot::Backend::Plotly>
+
 L<Devel::IPerl>
 
