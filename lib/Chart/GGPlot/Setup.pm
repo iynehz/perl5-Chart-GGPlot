@@ -27,7 +27,6 @@ use Syntax::Keyword::Try ();
 use Module::Load;
 use Moose 2.1400;
 use Moose::Role               ();
-use MooseX::Aliases           ();
 use MooseX::MungeHas 0.011;
 use MooseX::StrictConstructor ();
 use boolean                   ();
@@ -103,7 +102,6 @@ sub _import_tag {
             qw(classmethod :modifiers) );
 
         Moose->import::into($target);
-        MooseX::Aliases->import::into($target);
         MooseX::MungeHas->import::into($target);
         MooseX::StrictConstructor->import::into($target);
     }
@@ -114,7 +112,6 @@ sub _import_tag {
             qw(classmethod :modifiers) );
 
         Moose::Role->import::into($target);
-        MooseX::Aliases->import::into($target);
         MooseX::MungeHas->import::into($target);
     }
     elsif ( $tag eq ':pdl' ) {
