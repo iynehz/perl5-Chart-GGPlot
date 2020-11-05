@@ -153,3 +153,6 @@ This module is the role for Chart::GGPlot backend classes.
 =head1 SEE ALSO
 
 L<Chart::GGPlot>
+
+L<Chart::GGPlot::Backend::Plotly>
+
