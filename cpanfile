@@ -38,7 +38,6 @@ requires "Memoize" => "0";
 requires "Module::Load" => "0.32";
 requires "Moose" => "2.1400";
 requires "Moose::Role" => "0";
-requires "MooseX::Aliases" => "0";
 requires "MooseX::Clone" => "0";
 requires "MooseX::MungeHas" => "0.011";
 requires "MooseX::Singleton" => "0";

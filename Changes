@@ -1,5 +1,8 @@
 Revision history for Chart::GGPlot
 
+0.0012_01   TBD
+  - Remove MooseX::Aliases from deps.
+
 0.0011      2020-11-04
   - Use Chart::Plotly::Image to generate static images for Plotly Backend.
   - Speedup boxplot rendering.
