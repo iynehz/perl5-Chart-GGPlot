@@ -47,6 +47,7 @@ my @export_all = (
       find_line_formula spiral_arc_length
       has_groups
       collect_functions_from_package
+      arraylike
       ),
 );
 
@@ -361,6 +362,19 @@ sub collect_functions_from_package {
         push @func_names, $name;
     }   
     return @func_names;
+}
+
+=func arraylike
+
+    my $bool = arraylike($x);
+
+Returns true if argument is arrayref or 1D piddle.
+
+=cut
+
+sub arraylike {
+    my ($x) = @_;
+    return (Piddle1D->check($x) or ArrayRef->check($x));
 }
 
 1;

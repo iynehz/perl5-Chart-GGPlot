@@ -12,6 +12,7 @@ use Type::Library -base, -declare => qw(
   ColorBrewerTypeEnum PositionEnum
   Theme Margin Labeller
   Coord Facet Scale
+  HJust VJust
 );
 
 use Type::Utils -all;
@@ -43,6 +44,35 @@ declare Facet, as ConsumerOf["Chart::GGPlot::Facet"];
 declare Scale, as ConsumerOf["Chart::GGPlot::Scale"];
 
 declare_coercion "ArrayRefFromAny", to_type ArrayRef, from Any, via { [$_] };
+
+declare HJust, as(
+    Num->where( sub { $_ > -1e-10 and $_ < 1.0 + 1e-10 } ) | Piddle0D |
+      Enum [qw(left right center middle)] | ( ConsumerOf ["PDL::SV"] )->where(
+        sub {
+            ( ( $_ == "left" ) | ( $_ == "right" ) | ( $_ == "center" ) |
+                  ( $_ == "middle" ) )->all;
+        }
+      ) | Piddle1D->where(
+        sub {
+            not $_->$_DOES('PDL::SV')
+              and ( ( $_ > -1e-10 ) & ( $_ < 1.0 + 1e-10 ) )->all;
+        }
+      )
+);
+declare VJust, as(
+    Num->where( sub { $_ > -1e-10 and $_ < 1.0 + 1e-10 } ) | Piddle0D |
+      Enum [qw(top bottom center middle)] | ( ConsumerOf ["PDL::SV"] )->where(
+        sub {
+            ( ( $_ == "top" ) | ( $_ == "bottom" ) | ( $_ == "center" ) |
+                  ( $_ == "middle" ) )->all;
+        }
+      ) | Piddle1D->where(
+        sub {
+            not $_->$_DOES('PDL::SV')
+              and ( ( $_ > -1e-10 ) & ( $_ < 1.0 + 1e-10 ) )->all;
+        }
+      )
+);
 
 1;
 

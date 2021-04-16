@@ -14,6 +14,7 @@ use Types::Standard qw(ArrayRef);
 
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Types qw(:all);
+use Chart::GGPlot::Util qw(arraylike);
 
 use parent qw(Exporter::Tiny);
 
@@ -55,7 +56,7 @@ fun _aes ($mapping, $level=$aes_level_default) {
         # TODO: Shall we also support coderef sub { my ($df) = @_; } ?
         #  Thing is, is that really needed?
 
-        if ( $b->$_DOES('Eval::Quosure') ) {
+        if ( $b->$_DOES('Eval::Quosure') or arraylike($b)) {
             $val = $b;
         }
         else {
