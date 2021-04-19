@@ -177,7 +177,7 @@ method transform_df ($df) {
 }
 
 # aesthetics: a list of aesthetic-variable mappings. The name of each
-#  item is the aesthetic, and the value of each item is the valiable in data.
+#  item is the aesthetic, and the value of each item is the variable in data.
 method add_defaults ($data, $aesthetics) {
     return if ( $aesthetics->isempty );
 
@@ -197,7 +197,7 @@ method add_defaults ($data, $aesthetics) {
         my ( $scale_f, $func_name ) = find_scale( $aes, $datacols{$aes} );
         unless ( defined $scale_f ) {
             # some aesthetics do not have scale functions
-            if ( List::AllUtils::any { $aes eq $_ } (qw(weight width)) ) {
+            if ( List::AllUtils::any { $aes eq $_ } (qw(weight width label)) ) {
                 next;
             }
             else {

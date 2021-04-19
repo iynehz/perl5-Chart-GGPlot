@@ -1,5 +1,9 @@
 Revision history for Chart::GGPlot
 
+0.0012_02   TBD
+  - Add geom_text() for text annotations.
+  - Bump Alt::Data::Frame::ButMore requirement to 0.0056.
+
 0.0012_01   TBD
   - Remove MooseX::Aliases from deps.
 

@@ -19,6 +19,7 @@ our @sub_namespaces = qw(
   Polygon
   Rect Tile Raster
   Smooth
+  Text
 );
 
 for my $name (@sub_namespaces) {

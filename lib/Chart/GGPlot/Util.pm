@@ -20,6 +20,7 @@ use List::AllUtils qw(min);
 use Module::Load;
 use PDL::Primitive qw(which);
 use Package::Stash;
+use POSIX qw(floor);
 use Types::PDL qw(Piddle1D PiddleFromAny);
 use Types::Standard qw(ArrayRef);
 
@@ -47,6 +48,8 @@ my @export_all = (
       find_line_formula spiral_arc_length
       has_groups
       collect_functions_from_package
+      arraylike
+      mm_to_pt mm_to_px
       ),
 );
 
@@ -361,6 +364,41 @@ sub collect_functions_from_package {
         push @func_names, $name;
     }   
     return @func_names;
+}
+
+=func arraylike
+
+    my $bool = arraylike($x);
+
+Returns true if argument is arrayref or 1D piddle.
+
+=cut
+
+sub arraylike {
+    my ($x) = @_;
+    return (Piddle1D->check($x) or ArrayRef->check($x));
+}
+
+=func mm_to_pt
+
+Convert mm to pt. Result is round to int.
+
+=func mm_to_px
+
+Convert mm to px. Result is round to int.
+
+=cut
+
+sub mm_to_pt {
+    my $result = 72 / 25.4 * $_[0];
+    $result->$_call_if_can('rint') // floor($result + 0.5);
+}
+
+sub mm_to_px {
+    my ( $x, $dpi ) = @_;
+    $dpi //= 96;
+    my $result = $x / 25.4 * $dpi;
+    $result->$_call_if_can('rint') // floor($result + 0.5);
 }
 
 1;

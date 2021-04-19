@@ -14,9 +14,9 @@ use Types::PDL qw(Piddle1D PiddleFromAny);
 
 use Chart::GGPlot::Aes::Functions qw(aes_all);
 use Chart::GGPlot::Geom::Blank;
+use Chart::GGPlot::Scale::Functions;
 use Chart::GGPlot::Types;
 use Chart::GGPlot::Util qw(:all);
-use Chart::GGPlot::Scale::Functions qw(find_scale);
 
 use parent qw(Exporter::Tiny);
 

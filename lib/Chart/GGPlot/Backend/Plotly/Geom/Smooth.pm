@@ -11,7 +11,7 @@ extends qw(Chart::GGPlot::Backend::Plotly::Geom::Line);
 use Module::Load;
 
 use Chart::GGPlot::Backend::Plotly::Util qw(
-  cex_to_px to_rgb group_to_NA pdl_to_plotly
+  to_rgb group_to_NA pdl_to_plotly
 );
 use Chart::GGPlot::Backend::Plotly::Geom::Polygon;
 use Chart::GGPlot::Backend::Plotly::Util qw(ribbon);

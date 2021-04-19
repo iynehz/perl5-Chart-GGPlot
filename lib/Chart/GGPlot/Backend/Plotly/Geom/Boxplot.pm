@@ -12,7 +12,7 @@ use JSON;
 use List::AllUtils qw(max pairmap);
 use Module::Load;
 
-use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb pdl_to_plotly);
+use Chart::GGPlot::Backend::Plotly::Util qw(to_px to_rgb pdl_to_plotly);
 use Chart::GGPlot::Geom::Boxplot;
 use Chart::GGPlot::Geom::Point;
 
@@ -68,9 +68,9 @@ classmethod to_traces ($df, $params, $plot) {
 
     my $marker_size = do {
         my $s = $params->at('outlier_size');
-        $s ? max( cex_to_px($s), 2 ) : 2;
+        $s ? max( to_px($s), 2 ) : 2;
     };
-    my $marker_stroke = cex_to_px( $params->at('outlier_stroke')
+    my $marker_stroke = to_px( $params->at('outlier_stroke')
           // $geom_point_default_aes->at('stroke')->at(0) );
     my $marker = Chart::Plotly::Trace::Box::Marker->new(
         opacity      => $marker_opacity,
@@ -85,7 +85,7 @@ classmethod to_traces ($df, $params, $plot) {
 
     my $line = Chart::Plotly::Trace::Box::Line->new(
         color => to_rgb( $df->at('color') )->at(0),
-        width => max( cex_to_px( $df->at('size')->at(0) ), 2 ),
+        width => max( to_px( $df->at('size')->at(0) ), 2 ),
     );
     my $fillcolor = to_rgb( $df->at('fill'), $df->at('alpha') )->at(0);
 
