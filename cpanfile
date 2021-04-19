@@ -81,6 +81,7 @@ requires "warnings" => "0";
 recommends "Math::LOESS" => "0";
 recommends "PDL::GSL::CDF" => "0.75";
 recommends "PDL::Stats::GLM" => "0.75";
+recommends "Text::CSV_XS" => "0";
 
 on 'test' => sub {
   requires "Data::Frame::Examples" => "0";
