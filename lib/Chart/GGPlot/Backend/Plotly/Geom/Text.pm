@@ -13,8 +13,9 @@ use List::AllUtils qw(pairwise);
 use Module::Load;
 use PDL::Primitive qw(which);
 
+use Chart::GGPlot::Util qw(mm_to_pt);
 use Chart::GGPlot::Backend::Plotly::Util
-  qw(cex_to_px group_to_NA to_rgb pdl_to_plotly);
+  qw(group_to_NA to_rgb pdl_to_plotly);
 
 classmethod to_traces( $df, $params, $plot ) {
     $df = group_to_NA($df);
@@ -35,7 +36,7 @@ classmethod to_traces( $df, $params, $plot ) {
       map { $df->at($_) } qw(x y label hjust vjust);
     my $textfont = Chart::Plotly::Trace::Scatter::Textfont->new(
         color  => pdl_to_plotly( to_rgb( $df->at('color'), $df->at('alpha') ) ),
-        size   => pdl_to_plotly( cex_to_px( $df->at('size') ) ),
+        size   => pdl_to_plotly( mm_to_pt( $df->at('size') ) ),
         family => pdl_to_plotly( $df->at('family') ),
     );
     my @computed_hjust = $class->_compute_hjust($hjust)->list;

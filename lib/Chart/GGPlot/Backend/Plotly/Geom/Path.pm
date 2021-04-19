@@ -11,7 +11,7 @@ with qw(Chart::GGPlot::Backend::Plotly::Geom);
 use Module::Load;
 
 use Chart::GGPlot::Backend::Plotly::Util qw(
-  cex_to_px to_rgb group_to_NA pdl_to_plotly
+  to_px to_rgb group_to_NA pdl_to_plotly
 );
 use Chart::GGPlot::Util qw(ifelse);
 
@@ -39,7 +39,7 @@ classmethod scatter_line ($df, $params, $plot) {
     #  See https://github.com/plotly/plotly.js/issues/581
 
     my $color = to_rgb( $df->at('color'), $df->at('alpha') )->at(0);
-    my $size  = cex_to_px( $df->at('size')->slice( pdl(0) ) );
+    my $size  = to_px( $df->at('size')->slice( pdl(0) ) );
     $size->where($size < 2) .= 2;
 
     # plotly supports solid, dashdot, dash, dot
