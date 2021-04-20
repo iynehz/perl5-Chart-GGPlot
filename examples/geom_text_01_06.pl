@@ -17,7 +17,8 @@ my $mtcars = mtcars();
 my $p = ggplot(
     data    => $mtcars,
     mapping => aes( x => 'wt', y => 'mpg', label => $mtcars->row_names )
-)->geom_point()->geom_text( hjust => "right", vjust => "top" );
+)->geom_text( mapping => aes( color => 'factor($cyl)' ) )
+  ->scale_color_discrete( l => 40 );
 
 if ( defined $save_as ) {
     $p->save($save_as);
