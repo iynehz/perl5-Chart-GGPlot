@@ -7,7 +7,7 @@ Chart::GGPlot - ggplot2 port in Perl
 
 # VERSION
 
-version 0.0012\_02
+version 0.0014
 
 # STATUS
 
@@ -148,7 +148,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
