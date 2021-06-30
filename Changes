@@ -1,8 +1,8 @@
 Revision history for Chart::GGPlot
 
-0.0014      2021-06-28
+0.0014      2021-06-30
   - Add geom_text() for text annotations.
-  - Bump Alt::Data::Frame::ButMore requirement to 0.0056.
+  - Bump Alt::Data::Frame::ButMore requirement to 0.0058.
   - Remove MooseX::Aliases from deps.
 
 0.0011      2020-11-04
