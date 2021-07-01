@@ -31,7 +31,6 @@ requires "Log::Any" => "0";
 requires "Log::Any::Adapter" => "0";
 requires "Machine::Epsilon" => "0";
 requires "Math::Gradient" => "0";
-requires "Math::Interpolate" => "0";
 requires "Math::Round" => "0";
 requires "Math::SimpleHisto::XS" => "0";
 requires "Math::Trig" => "0";
