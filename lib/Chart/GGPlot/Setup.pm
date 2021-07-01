@@ -12,7 +12,7 @@ use feature ':5.16';
 
 use Import::Into;
 
-use Alt::Data::Frame::ButMore 0.0056;
+use Alt::Data::Frame::ButMore 0.0058;
 use Data::Frame::Autobox ();
 
 use Carp;
@@ -117,7 +117,6 @@ sub _import_tag {
     elsif ( $tag eq ':pdl' ) {
         require PDL::Lite;
         require PDL::Core;
-        #require PDL::IO::Dumper;
         require PDL::SV;
         require PDL::Factor;
         require PDL::DateTime;
@@ -125,7 +124,6 @@ sub _import_tag {
 
         PDL::Lite->import::into($target);
         PDL::Core->import::into( $target, qw(pdl null) );
-        #PDL::IO::Dumper->import::into($target);
 
         Role::Tiny->apply_roles_to_package( 'PDL', 'Data::Frame::PDL' );
 

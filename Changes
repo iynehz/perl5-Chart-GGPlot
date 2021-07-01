@@ -1,11 +1,9 @@
 Revision history for Chart::GGPlot
 
-0.0012_02   TBD
+0.0014      2021-07-01
   - Add geom_text() for text annotations.
-  - Bump Alt::Data::Frame::ButMore requirement to 0.0056.
-
-0.0012_01   TBD
-  - Remove MooseX::Aliases from deps.
+  - Bump Alt::Data::Frame::ButMore requirement to 0.0058.
+  - Remove MooseX::Aliases and Math::Interpolate from deps.
 
 0.0011      2020-11-04
   - Use Chart::Plotly::Image to generate static images for Plotly Backend.

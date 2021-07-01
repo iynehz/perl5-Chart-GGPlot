@@ -16,9 +16,8 @@ use Data::Munge qw(elem);
 use Machine::Epsilon qw(machine_epsilon);
 use Math::Gradient qw(multi_array_gradient);
 use Math::Round qw(round);
-use Math::Interpolate;
 use Memoize;
-use PDL::Primitive qw(which);
+use PDL::Primitive qw(which interpol);
 use Number::Format 1.75;
 use Scalar::Util qw(looks_like_number);
 use Time::Moment;
@@ -254,15 +253,14 @@ fun _color_ramp ($colors) {
             no warnings 'numeric';
             map { $gradient[$_] } ( $p * ( @gradient - 1 ) )->rint->flatten;
         };
-        
         my $rslt = PDL::SV->new( \@mapped );
         $rslt = $rslt->setbadif( $p->isbad ) if $p->badflag;
         return $rslt;
     };
 }
 
-# Arbitrary colour gradient palette (continous).
-fun gradient_n_pal ( $colors, $values = PDL->null ) {
+# Arbitrary color gradient palette (continous).
+fun gradient_n_pal ( $colors, $values = [] ) {
     my $ramp = _color_ramp($colors);
 
     my $length = $values->length;
@@ -271,12 +269,8 @@ fun gradient_n_pal ( $colors, $values = PDL->null ) {
     return fun($p) {
         return PDL->null if ( $p->isempty );
 
-        if ($xs) {
-            my $p_adjusted = pdl(
-                map {
-                    Math::Interpolate::robust_interpolate( $_, $values, \$xs )
-                } @{ $p->unpdl }
-            );
+        if (defined $xs) {
+            my $p_adjusted = interpol($p, pdl($values), $xs);
             return $ramp->($p_adjusted);
         }
         else {
