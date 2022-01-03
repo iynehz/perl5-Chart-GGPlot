@@ -23,7 +23,7 @@ use Log::Any::Adapter;
 use Safe::Isa 1.000010 ();
 use PerlX::Maybe ();
 
-use Syntax::Keyword::Try ();
+use Feature::Compat::Try ();
 use Module::Load;
 use Moose 2.1400;
 use Moose::Role               ();
@@ -90,7 +90,7 @@ sub _import_tag {
         Log::Any->import::into( $target, '$log' );
         Safe::Isa->import::into($target);
         PerlX::Maybe->import::into($target);
-        Syntax::Keyword::Try->import::into($target);
+        Feature::Compat::Try->import::into($target);
         boolean->import::into($target);
 
         Data::Frame::Autobox->import::into($target);

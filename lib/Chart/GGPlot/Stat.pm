@@ -58,8 +58,8 @@ method compute_layer ( $data, $params, $layout ) {
                 try {
                     return $self->compute_panel( $d, $scales, $params );
                 }
-                catch {
-                    die sprintf( "Computation failed in '%s': $@", ref($self) );
+                catch ($e) {
+                    die sprintf( "Computation failed in '%s': $e", ref($self) );
                 }
             }
         )->flatten
