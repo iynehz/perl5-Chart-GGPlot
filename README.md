@@ -7,16 +7,13 @@ Chart::GGPlot - ggplot2 port in Perl
 
 # VERSION
 
-version 0.0016
+version 0.002000
 
 # STATUS
 
 At this moment this library is experimental and still under active
 development (at my after-work time). It's still quite incomplete compared
 to R's ggplot2 library, but the core features are working.
-
-Besides, it heavily depends on my [Alt::Data::Frame::ButMore](https://metacpan.org/pod/Alt%3A%3AData%3A%3AFrame%3A%3AButMore) library,
-which is also experimental.
 
 # SYNOPSIS
 
@@ -140,7 +137,7 @@ A positive integer would enable debug messages.
 
 [Chart::GGPlot::Plot](https://metacpan.org/pod/Chart%3A%3AGGPlot%3A%3APlot)
 
-[Alt::Data::Frame::ButMore](https://metacpan.org/pod/Alt%3A%3AData%3A%3AFrame%3A%3AButMore)
+[Data::Frame](https://metacpan.org/pod/Data%3A%3AFrame)
 
 # AUTHOR
 

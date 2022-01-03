@@ -12,7 +12,7 @@ use feature ':5.16';
 
 use Import::Into;
 
-use Alt::Data::Frame::ButMore 0.0058;
+use Data::Frame 0.006002;
 use Data::Frame::Autobox ();
 
 use Carp;
