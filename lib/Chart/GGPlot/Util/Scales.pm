@@ -741,8 +741,8 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
             end => PDL::DateTime->new( $lim->at(1) ),
             by  => $spec
         );
-        my $r1 = List::AllUtils::max(( $at <= $lim->at(0) )->sum - 1, 0);
-        my $r2 = $at->length - ( $at >= $lim->at(1) )->sum;
+        my $r1 = List::AllUtils::max( $at->where( $at <= $lim->at(0) )->length - 1, 0 );
+        my $r2 = $at->length - $at->where( $at >= $lim->at(1) )->length;
         if ( $r2 == $at->length )
         {    # not covering at right -- add point at right
             my $nat = seq_dt(
@@ -750,7 +750,7 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
                 by  => $spec,
                 length => 2
             )->slice( pdl( [1] ) );
-            if ( !(( $nat > $at->at(-1) )->all) ) {    # failed
+            unless ( $nat->where( $nat > $at->at(-1) )->length == $nat->length ) {    # failed
                 $r2 = $at->length - 1;
             }
             $at = $at->glue( 0, $nat );
@@ -798,8 +798,8 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
     my $dn = $init_n - ($n - 1);
     if ($dn > 0) {
         # ticks "outside", on left and right, keep at least one on each side
-        my $nl = ($init_at <= $rx->at(0))->sum - 1;
-        my $nr = ($init_at >= $rx->at(1))->sum - 1;
+        my $nl = $init_at->where( $init_at <= $rx->at(0) )->length - 1;
+        my $nr = $init_at->where( $init_at >= $rx->at(1) )->length - 1;
         if ($nl > 0 or $nr > 0) {
             my $n_c = $nl + $nr;
             if ($dn < $n_c) { # remove $dn, not all
