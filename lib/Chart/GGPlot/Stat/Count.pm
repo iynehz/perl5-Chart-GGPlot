@@ -113,7 +113,7 @@ method compute_group ($data, $scales, $params) {
 
     my $uniq = $x->uniq->qsort;
     my $count = pdl(
-        $uniq->unpdl->map( sub { $weight->where($x == $_)->sum; } )
+        $uniq->unpdl->map( sub { int( $weight->where( $x == $_ )->sum ) } )
     );
     $count->setbadtoval(0);
 

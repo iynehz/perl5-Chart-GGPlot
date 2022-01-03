@@ -58,7 +58,7 @@ method map_to_limits ( $p, $limits = $self->get_limits ) {
         if ( defined $self->_n_breaks_cache ) {
             warn "Cached palette does not match requested";
         }
-        $pal = $self->palette->($n);
+        $pal = $self->palette->( int($n) );
         $self->_palette_cache($pal);
         $self->_n_breaks_cache($n);
     }

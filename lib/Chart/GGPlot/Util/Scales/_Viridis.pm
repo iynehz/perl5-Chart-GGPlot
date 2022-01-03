@@ -1315,6 +1315,7 @@ my %data = (
 sub viridis {
     my ( $n, $begin, $end, $direction, $option ) = @_;
 
+    $n = int($n);
     $begin     //= 0;
     $end       //= 1;
     $direction //= 1;

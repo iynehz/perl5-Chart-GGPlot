@@ -156,10 +156,10 @@ method compute_group ($data, $scales, $params) {
 
         # Sum up weights for non-NA positions of y and weight
         my $weight = $data->at('weight');
-        $n = $weight->where( $y->isgood & $weight->isgood )->sum;
+        $n = int( $weight->where( $y->isgood & $weight->isgood )->sum );
     }
     else {
-        $n = $y->isgood->sum;
+        $n = int( $y->isgood->sum );
     }
 
     my $middle = $df->at('middle');

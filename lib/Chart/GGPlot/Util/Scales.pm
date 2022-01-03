@@ -21,6 +21,7 @@ use PDL::Primitive qw(which interpol);
 use Number::Format 1.75;
 use Scalar::Util qw(looks_like_number);
 use Time::Moment;
+use Types::Standard qw(Int);
 
 use POSIX qw(ceil floor log10);
 
@@ -192,7 +193,7 @@ fun hue_pal (:$h=pdl([0, 360])+15, :$c=100, :$l=65, :$h_start=0, :$direction=1) 
           ->plus_coercions(PiddleFromAny) );
     ($h) = $check->($h);
 
-    return fun($n) {
+    return fun(Int $n) {
         if ( $n == 0 ) {
             die "Must request at least one color from a hue palette.";
         }
@@ -212,7 +213,7 @@ fun brewer_pal ( $type, $palette = 0, $direction = 1 ) {
     my $pal_name = _pal_name( $palette, $type );
 
     # $n is number of colors
-    return fun($n) {
+    return fun(Int $n) {
         my @colors = Color::Brewer::named_color_scheme(
             number_of_data_classes => List::AllUtils::max( $n, 3 ),
             name                   => $pal_name
@@ -295,7 +296,7 @@ fun rescale_pal ( $range = PDL->new( [ 0.1, 1 ] ) ) {
 }
 
 fun viridis_pal ($begin=0, $end=1, $direction=1, $option='viridis') {
-    return fun($n) {
+    return fun(Int $n) {
         my $colors =
           Chart::GGPlot::Util::Scales::_Viridis::viridis( $n, $begin, $end,
             $direction, $option );
