@@ -213,9 +213,6 @@ At this moment this library is experimental and still under active
 development (at my after-work time). It's still quite incomplete compared
 to R's ggplot2 library, but the core features are working.
 
-Besides, it heavily depends on my L<Alt::Data::Frame::ButMore> library,
-which is also experimental.
-
 =head1 SYNOPSIS
 
     use Chart::GGPlot qw(:all);
@@ -246,4 +243,4 @@ L<ggplot2|https://en.wikipedia.org/wiki/Ggplot2>
 
 L<Chart::GGPlot::Plot>
 
-L<Alt::Data::Frame::ButMore>
+L<Data::Frame>
