@@ -754,7 +754,7 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
             unless ( $nat->where( $nat > $at->at(-1) )->length == $nat->length ) {    # failed
                 $r2 = $at->length - 1;
             }
-            $at = $at->glue( 0, $nat );
+            $at = PDL::DateTime->new( $at->glue( 0, $nat ) );
         }
         return $at->slice( pdl( [ $r1 .. $r2 ] ) );
     };
