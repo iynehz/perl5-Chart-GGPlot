@@ -14,10 +14,10 @@ use Color::Library;
 use Convert::Color::LCh;
 use Data::Munge qw(elem);
 use Machine::Epsilon qw(machine_epsilon);
-use Math::Gradient qw(multi_array_gradient);
 use Math::Round qw(round);
 use Memoize;
 use PDL::Primitive qw(which interpol);
+use PDL::Graphics::ColorSpace 0.203 qw(rgb_to_lab lab_to_rgb);
 use Number::Format 1.75;
 use Scalar::Util qw(looks_like_number);
 use Time::Moment;
@@ -232,27 +232,36 @@ fun brewer_pal ( $type, $palette = 0, $direction = 1 ) {
     };
 }
 
-# Color interpolation. map interval [0,1] to a set of colors
+# Returns a function that maps the interval [0,1] to a set of colors.
+# Interpolation is performed in the CIELAB color space. 
 fun _color_ramp ($colors) {
     if ( $colors->isempty ) {
         die("Must provide at least one color to create a color ramp");
     }
 
-    my @hot_spots = map {
-        if ( $_ =~ /^\#/ ) {
-            [ csshex_to_rgb255($_) ];
-        }
-        else {
-            [ colorname_to_rgb255($_) ];
-        }
-    } ( $colors->flatten );
-    my @gradient =
-      map { rgb255_to_csshex(@$_); } multi_array_gradient( 255, @hot_spots );
+    my $hot_spots = rgb_to_lab(
+        pdl(
+            map {
+                /^\#/
+                  ? pdl( csshex_to_rgb255($_) )
+                  : pdl( colorname_to_rgb255($_) )
+            } ( $colors->flatten )
+        ) / 255.0, 
+        'sRGB'
+    );    # Lab space
 
-    return fun( Piddle $p) {
+    my $x = seq_n(0, 1, $colors->length);
+
+    return fun( Piddle $p ) {
         my @mapped = do {
-            no warnings 'numeric';
-            map { $gradient[$_] } ( $p * ( @gradient - 1 ) )->rint->flatten;
+            map {
+                my $xin = pdl($_);
+                my $l = $xin->interpol($x, $hot_spots->index(0));
+                my $a = $xin->interpol($x, $hot_spots->index(1));
+                my $b = $xin->interpol($x, $hot_spots->index(2));
+                my $rgb = lab_to_rgb(pdl($l, $a, $b), 'sRGB');
+                rgb_to_csshex($rgb->flatten);
+            } $p->flatten;
         };
         my $rslt = PDL::SV->new( \@mapped );
         $rslt = $rslt->setbadif( $p->isbad ) if $p->badflag;
@@ -965,7 +974,7 @@ Similar as C<rgb255_to_csshex()> but the arguments should be between
 
 =func csshex_to_rgb255
 
-    csshex_to_rgb255($color_hex)
+    ($r, $g, $b) = csshex_to_rgb255($color_hex)
 
 =func colorname_to_csshex
 
@@ -976,9 +985,9 @@ Similar as C<rgb255_to_csshex()> but the arguments should be between
 sub rgb255_to_csshex { sprintf("#%02x%02x%02x", @_); }
 
 sub rgb_to_csshex {
-    my ( $r, $g, $b ) = 
-      map { $_ * 255 } map { $_ > 1 ? 1 : $_ < 0 ? 0 : $_ } @_; 
-    rgb255_to_csshex( $r, $g, $b );
+    rgb255_to_csshex(
+        map { List::Util::max( 0, List::Util::min( 255, int( $_ * 256.0 ) ) ) }
+          @_ );
 }
 
 sub csshex_to_rgb255 {
