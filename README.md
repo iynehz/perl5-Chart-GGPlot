@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/stphnlyd/perl5-Chart-GGPlot/actions/workflows/ci.yml/badge.svg)](https://github.com/stphnlyd/perl5-Chart-GGPlot/actions)
+[![Actions Status](https://github.com/iynehz/perl5-Chart-GGPlot/actions/workflows/ci.yml/badge.svg)](https://github.com/iynehz/perl5-Chart-GGPlot/actions)
 
 # NAME
 
@@ -6,7 +6,7 @@ Chart::GGPlot - ggplot2 port in Perl
 
 # VERSION
 
-version 0.002002
+version 0.002003
 
 # STATUS
 
